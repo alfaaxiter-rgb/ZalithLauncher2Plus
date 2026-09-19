@@ -10,54 +10,48 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
+ * along with this program.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content
 
-import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.WarningCard
-import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
-import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryIcon
-import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryItem
 import com.movtery.zalithlauncher.ui.screens.content.settings.AboutInfoScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.ControlManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.ControlSettingsScreen
@@ -70,10 +64,11 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.TurnipDriversScree
 import com.movtery.zalithlauncher.ui.screens.navigateOnce
 import com.movtery.zalithlauncher.ui.screens.onBack
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
-import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
+import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryIcon
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
+
 
 @Composable
 fun SettingsScreen(
@@ -88,102 +83,353 @@ fun SettingsScreen(
         currentKey = backStackViewModel.mainScreen.currentKey
     ) { isVisible ->
 
-        Row(modifier = Modifier.fillMaxSize()) {
-            TabMenu(
-                modifier = Modifier.fillMaxHeight(),
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    if (com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme()) {
+                        NeonColors.DarkBackground
+                    } else {
+                        NeonColors.LightBackground
+                    }
+                )
+        ) {
+
+            NeonSettingsSidebar(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(205.dp),
                 isVisible = isVisible,
                 settingsScreenKey = backStackViewModel.settingsScreen.currentKey,
                 navigateTo = { settingKey ->
                     key.backStack.navigateOnce(settingKey)
                 }
             )
-            NavigationUI(
-                key = key,
-                mainScreenKey = backStackViewModel.mainScreen.currentKey,
-                settingsScreenKey = backStackViewModel.settingsScreen.currentKey,
-                onCurrentKeyChange = { newKey ->
-                    backStackViewModel.settingsScreen.currentKey = newKey
-                },
-                openLicenseScreen = openLicenseScreen,
-                toHomePageEditor = {
-                    backStackViewModel.mainScreen.navigateTo(NormalNavKey.HomePageEditor)
-                },
-                eventViewModel = eventViewModel,
-                submitError = submitError,
-                modifier = Modifier.fillMaxHeight()
-            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            ) {
+
+                NavigationUI(
+                    key = key,
+                    mainScreenKey = backStackViewModel.mainScreen.currentKey,
+                    settingsScreenKey = backStackViewModel.settingsScreen.currentKey,
+                    onCurrentKeyChange = { newKey ->
+                        backStackViewModel.settingsScreen.currentKey = newKey
+                    },
+                    openLicenseScreen = openLicenseScreen,
+                    toHomePageEditor = {
+                        backStackViewModel.mainScreen.navigateTo(
+                            NormalNavKey.HomePageEditor
+                        )
+                    },
+                    eventViewModel = eventViewModel,
+                    submitError = submitError,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
 
-private val settingItems = listOf(
-    CategoryItem(NormalNavKey.Settings.Renderer, { CategoryIcon(R.drawable.ic_video_settings, R.string.settings_tab_renderer) }, R.string.settings_tab_renderer),
-    CategoryItem(NormalNavKey.Settings.Game, { CategoryIcon(R.drawable.ic_rocket_launch_filled, R.string.settings_tab_game) }, R.string.settings_tab_game),
-    CategoryItem(NormalNavKey.Settings.Control, { CategoryIcon(R.drawable.ic_videogame_asset_outlined, R.string.settings_tab_control) }, R.string.settings_tab_control),
-    CategoryItem(NormalNavKey.Settings.Gamepad, { CategoryIcon(R.drawable.ic_sports_esports_outlined, R.string.settings_tab_gamepad) }, R.string.settings_tab_gamepad),
-    CategoryItem(NormalNavKey.Settings.Launcher, { CategoryIcon(R.drawable.ic_setting_launcher, R.string.settings_tab_launcher) }, R.string.settings_tab_launcher),
-    CategoryItem(NormalNavKey.Settings.JavaManager, { CategoryIcon(R.drawable.ic_java, R.string.settings_tab_java_manage) }, R.string.settings_tab_java_manage, division = true),
-    CategoryItem(NormalNavKey.Settings.ControlManager, { CategoryIcon(R.drawable.ic_videogame_asset_outlined, R.string.settings_tab_control_manage) }, R.string.settings_tab_control_manage),
-    CategoryItem(NormalNavKey.Settings.AboutInfo, { CategoryIcon(R.drawable.ic_info_outlined, R.string.settings_tab_info_about) }, R.string.settings_tab_info_about, division = true)
+/*
+ * ============================================================
+ * SETTINGS CATEGORIES
+ * ============================================================
+ */
+
+private data class NeonSettingItem(
+    val key: TitledNavKey,
+    val icon: Int,
+    val title: Int,
+    val accent: Color
 )
 
+private val settingItems = listOf(
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.Renderer,
+        icon = R.drawable.ic_video_settings,
+        title = R.string.settings_tab_renderer,
+        accent = NeonColors.Cyan
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.Game,
+        icon = R.drawable.ic_rocket_launch_filled,
+        title = R.string.settings_tab_game,
+        accent = NeonColors.Blue
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.Control,
+        icon = R.drawable.ic_videogame_asset_outlined,
+        title = R.string.settings_tab_control,
+        accent = NeonColors.Purple
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.Gamepad,
+        icon = R.drawable.ic_sports_esports_outlined,
+        title = R.string.settings_tab_gamepad,
+        accent = NeonColors.Orange
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.Launcher,
+        icon = R.drawable.ic_setting_launcher,
+        title = R.string.settings_tab_launcher,
+        accent = NeonColors.CyanBright
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.JavaManager,
+        icon = R.drawable.ic_java,
+        title = R.string.settings_tab_java_manage,
+        accent = NeonColors.Green
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.ControlManager,
+        icon = R.drawable.ic_videogame_asset_outlined,
+        title = R.string.settings_tab_control_manage,
+        accent = NeonColors.Purple
+    ),
+
+    NeonSettingItem(
+        key = NormalNavKey.Settings.AboutInfo,
+        icon = R.drawable.ic_info_outlined,
+        title = R.string.settings_tab_info_about,
+        accent = NeonColors.Blue
+    )
+)
+
+/*
+ * ============================================================
+ * NEON SIDEBAR
+ * ============================================================
+ */
+
 @Composable
-private fun TabMenu(
+private fun NeonSettingsSidebar(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     settingsScreenKey: TitledNavKey?,
     navigateTo: (TitledNavKey) -> Unit
 ) {
-    val xOffset by swapAnimateDpAsState(
-        targetValue = (-40).dp,
-        swapIn = isVisible,
-        isHorizontal = true
-    )
 
     val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
-            .fadeEdge(scrollState)
-            .width(IntrinsicSize.Min)
-            .padding(start = 8.dp)
-            .offset { IntOffset(x = xOffset.roundToPx(), y = 0) }
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(
+                start = 12.dp,
+                top = 12.dp,
+                bottom = 12.dp
+            )
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
-        settingItems.forEach { item ->
-            if (item.division) {
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp)
-                        .fillMaxWidth(0.4f)
-                        .alpha(0.4f),
-                    color = MaterialTheme.colorScheme.onSurface
+
+        NeonCard(
+            modifier = Modifier.fillMaxWidth(),
+            accent = NeonColors.Cyan
+        ) {
+
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = 15.dp,
+                    vertical = 14.dp
+                )
+            ) {
+
+                Text(
+                    text = "ALFAA",
+                    color = NeonColors.Cyan,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 10.sp,
+                    letterSpacing = 2.sp
+                )
+
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                Text(
+                    text = "SETTINGS",
+                    color = neonTextColor(),
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp
+                )
+
+                Spacer(
+                    modifier = Modifier.height(3.dp)
+                )
+
+                Text(
+                    text = "LAUNCHER CONFIGURATION",
+                    color = neonMutedColor(),
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 7.sp,
+                    letterSpacing = 0.8.sp
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+
+            settingItems.forEach { item ->
+
+                NeonSettingsItem(
+                    item = item,
+                    selected = settingsScreenKey == item.key,
+                    onClick = {
+                        navigateTo(item.key)
+                    }
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        NeonDivider(
+            accent = NeonColors.Cyan.copy(alpha = 0.45f)
+        )
+
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        NeonThemeToggle(
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(
+            modifier = Modifier.height(4.dp)
+        )
+
+        Text(
+            text = "TikTok: @alfathgpp",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp),
+            color = neonMutedColor(),
+            fontFamily = FontFamily.Monospace,
+            fontSize = 7.sp
+        )
+    }
+}
+
+/*
+ * ============================================================
+ * SIDEBAR ITEM
+ * ============================================================
+ */
+
+@Composable
+private fun NeonSettingsItem(
+    item: NeonSettingItem,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+
+    NeonCard(
+        modifier = Modifier.fillMaxWidth(),
+        accent = item.accent,
+        onClick = onClick
+    ) {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 11.dp,
+                    vertical = 11.dp
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Box(
+                modifier = Modifier.width(30.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                CategoryIcon(
+                    iconRes = item.icon,
+                    contentDescriptionRes = item.title
                 )
             }
 
-            NavigationRailItem(
-                selected = settingsScreenKey == item.key,
-                onClick = {
-                    navigateTo(item.key)
-                },
-                icon = {
-                    item.icon()
-                },
-                label = {
-                    Text(
-                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
-                        text = stringResource(item.textRes),
-                        maxLines = 1,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
+            Spacer(
+                modifier = Modifier.width(8.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text = stringResource(item.title),
+                    color = if (selected) {
+                        item.accent
+                    } else {
+                        neonTextColor()
+                    },
+                    fontWeight = if (selected) {
+                        FontWeight.ExtraBold
+                    } else {
+                        FontWeight.Bold
+                    },
+                    fontSize = 10.sp
+                )
+
+                Text(
+                    text = if (selected) {
+                        "ACTIVE"
+                    } else {
+                        "CONFIGURE"
+                    },
+                    color = if (selected) {
+                        item.accent.copy(alpha = 0.72f)
+                    } else {
+                        neonMutedColor()
+                    },
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 6.sp,
+                    letterSpacing = 0.6.sp
+                )
+            }
+
+            if (selected) {
+
+                Box(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(25.dp)
+                        .background(item.accent)
+                )
+            }
         }
     }
 }
+
+/*
+ * ============================================================
+ * NAVIGATION CONTENT
+ * ============================================================
+ */
 
 @Composable
 private fun NavigationUI(
@@ -197,83 +443,385 @@ private fun NavigationUI(
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     val backStack = key.backStack
     val currentKey = backStack.lastOrNull()
+
     LaunchedEffect(currentKey) {
         onCurrentKeyChange(currentKey)
     }
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+            .padding(
+                start = 10.dp,
+                end = 12.dp,
+                top = 12.dp,
+                bottom = 12.dp
+            )
+    ) {
+
+        /*
+         * ====================================================
+         * HEADER
+         * ====================================================
+         */
+
+        NeonSettingsHeader(
+            currentKey = currentKey,
+            onBack = {
+                onBack(backStack)
+            }
+        )
+
+        /*
+         * ====================================================
+         * IMPORT / EXPORT WARNING
+         * ====================================================
+         */
+
         if (AllSettings.showSettingsTip.state) {
+
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
+
             WarningCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                modifier = Modifier.fillMaxWidth(),
                 title = stringResource(R.string.generic_info),
-                text = { Text(stringResource(R.string.settings_tip_import_export)) },
-                onDismiss = { AllSettings.showSettingsTip.save(false) }
+                text = {
+                    Text(
+                        text = stringResource(
+                            R.string.settings_tip_import_export
+                        )
+                    )
+                },
+                onDismiss = {
+                    AllSettings.showSettingsTip.save(false)
+                }
             )
         }
 
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        /*
+         * ====================================================
+         * ACTUAL SETTINGS SCREEN
+         *
+         * Semua screen lama tetap dipanggil.
+         * Hanya shell luarnya yang kita ubah.
+         * ====================================================
+         */
+
         if (backStack.isNotEmpty()) {
-            NavDisplay(
-                backStack = backStack,
-                modifier = Modifier.weight(1f),
-                onBack = {
-                    onBack(backStack)
-                },
-                transitionSpec = rememberTransitionSpec(),
-                popTransitionSpec = rememberTransitionSpec(),
-                entryProvider = entryProvider {
-                    entry<NormalNavKey.Settings.Renderer> {
-                        RendererSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
+
+            NeonCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                accent = NeonColors.Cyan.copy(alpha = 0.45f)
+            ) {
+
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.fillMaxSize(),
+                    onBack = {
+                        onBack(backStack)
+                    },
+                    transitionSpec = rememberTransitionSpec(),
+                    popTransitionSpec = rememberTransitionSpec(),
+                    entryProvider = entryProvider {
+
+                        /*
+                         * ================================
+                         * RENDERER
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.Renderer> {
+
+                            RendererSettingsScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey,
+                                eventViewModel
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * TURNIP DRIVERS
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.TurnipDrivers> {
+
+                            TurnipDriversScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * GAME
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.Game> {
+
+                            GameSettingsScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey,
+                                eventViewModel
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * CONTROL
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.Control> {
+
+                            ControlSettingsScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey,
+                                eventViewModel,
+                                submitError
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * GAMEPAD
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.Gamepad> {
+
+                            GamepadSettingsScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey,
+                                eventViewModel
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * LAUNCHER
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.Launcher> {
+
+                            LauncherSettingsScreen(
+                                key = key,
+                                settingsScreenKey = settingsScreenKey,
+                                mainScreenKey = mainScreenKey,
+                                eventViewModel = eventViewModel,
+                                toHomePageEditor = toHomePageEditor,
+                                submitError = submitError
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * JAVA
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.JavaManager> {
+
+                            JavaManageScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey,
+                                eventViewModel,
+                                submitError
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * CONTROL MANAGER
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.ControlManager> {
+
+                            ControlManageScreen(
+                                key,
+                                settingsScreenKey,
+                                mainScreenKey,
+                                eventViewModel,
+                                submitError
+                            )
+                        }
+
+                        /*
+                         * ================================
+                         * ABOUT
+                         * ================================
+                         */
+
+                        entry<NormalNavKey.Settings.AboutInfo> {
+
+                            AboutInfoScreen(
+                                key = key,
+                                settingsScreenKey = settingsScreenKey,
+                                mainScreenKey = mainScreenKey,
+
+                                checkUpdate = {
+                                    eventViewModel.sendEvent(
+                                        EventViewModel.Event.CheckUpdate
+                                    )
+                                },
+
+                                openLicense = openLicenseScreen,
+
+                                openLink = { url ->
+
+                                    eventViewModel.sendEvent(
+                                        EventViewModel.Event.OpenLink(url)
+                                    )
+                                }
+                            )
+                        }
                     }
-                    entry<NormalNavKey.Settings.TurnipDrivers> {
-                        TurnipDriversScreen(key, settingsScreenKey, mainScreenKey)
-                    }
-                    entry<NormalNavKey.Settings.Game> {
-                        GameSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
-                    }
-                    entry<NormalNavKey.Settings.Control> {
-                        ControlSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
-                    }
-                    entry<NormalNavKey.Settings.Gamepad> {
-                        GamepadSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
-                    }
-                    entry<NormalNavKey.Settings.Launcher> {
-                        LauncherSettingsScreen(
-                            key = key,
-                            settingsScreenKey = settingsScreenKey,
-                            mainScreenKey = mainScreenKey,
-                            eventViewModel = eventViewModel,
-                            toHomePageEditor = toHomePageEditor,
-                            submitError = submitError,
+                )
+            }
+
+        } else {
+
+            /*
+             * Empty state.
+             *
+             * Tidak mengubah navigation logic.
+             */
+
+            NeonCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                accent = NeonColors.Cyan
+            ) {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(7.dp)
+                    ) {
+
+                        Text(
+                            text = "SETTINGS",
+                            color = NeonColors.Cyan,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 13.sp,
+                            letterSpacing = 2.sp
                         )
-                    }
-                    entry<NormalNavKey.Settings.JavaManager> {
-                        JavaManageScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
-                    }
-                    entry<NormalNavKey.Settings.ControlManager> {
-                        ControlManageScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
-                    }
-                    entry<NormalNavKey.Settings.AboutInfo> {
-                        AboutInfoScreen(
-                            key = key,
-                            settingsScreenKey = settingsScreenKey,
-                            mainScreenKey = mainScreenKey,
-                            checkUpdate = {
-                                eventViewModel.sendEvent(EventViewModel.Event.CheckUpdate)
-                            },
-                            openLicense = openLicenseScreen,
-                            openLink = { url ->
-                                eventViewModel.sendEvent(EventViewModel.Event.OpenLink(url))
-                            }
+
+                        Text(
+                            text = "SELECT A CATEGORY",
+                            color = neonMutedColor(),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 8.sp
                         )
                     }
                 }
-            )
-        } else {
-            Box(Modifier.weight(1f))
+            }
         }
+    }
+}
+
+/*
+ * ============================================================
+ * SETTINGS HEADER
+ * ============================================================
+ */
+
+@Composable
+private fun NeonSettingsHeader(
+    currentKey: TitledNavKey?,
+    onBack: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+
+            Text(
+                text = "CONTROL CENTER",
+                color = NeonColors.Cyan,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 8.sp,
+                letterSpacing = 1.6.sp
+            )
+
+            Spacer(
+                modifier = Modifier.height(3.dp)
+            )
+
+            Text(
+                text = when (currentKey) {
+
+                    NormalNavKey.Settings.Renderer ->
+                        stringResource(R.string.settings_tab_renderer)
+
+                    NormalNavKey.Settings.Game ->
+                        stringResource(R.string.settings_tab_game)
+
+                    NormalNavKey.Settings.Control ->
+                        stringResource(R.string.settings_tab_control)
+
+                    NormalNavKey.Settings.Gamepad ->
+                        stringResource(R.string.settings_tab_gamepad)
+
+                    NormalNavKey.Settings.Launcher ->
+                        stringResource(R.string.settings_tab_launcher)
+
+                    NormalNavKey.Settings.JavaManager ->
+                        stringResource(R.string.settings_tab_java_manage)
+
+                    NormalNavKey.Settings.ControlManager ->
+                        stringResource(R.string.settings_tab_control_manage)
+
+                    NormalNavKey.Settings.AboutInfo ->
+                        stringResource(R.string.settings_tab_info_about)
+
+                    else ->
+                        "SETTINGS"
+                },
+                color = neonTextColor(),
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 23.sp
+            )
+        }
+
+        Text(
+            text = "ZL // CUSTOM UI",
+            color = neonMutedColor(),
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            fontSize = 7.sp
+        )
     }
 }
