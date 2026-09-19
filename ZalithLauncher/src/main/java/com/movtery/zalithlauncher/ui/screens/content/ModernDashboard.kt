@@ -29,6 +29,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -1054,7 +1055,7 @@ private fun QuickActions(
                     subtitle = "Launcher options",
                     icon = R.drawable.ic_settings_filled,
                     accent = AccentOrange,
-                    onClick = onVersionSettingsClick
+                    onClick = onSettingsClick
                 )
             }
         }
@@ -1063,20 +1064,18 @@ private fun QuickActions(
 
 
 @Composable
-ActionCard(
-    title = "SETTINGS",
-    subtitle = "Launcher options",
-    icon = R.drawable.ic_settings_filled,
-    accent = AccentOrange,
-    onClick = onSettingsClick
+private fun ActionCard(
+    title: String,
+    subtitle: String,
+    icon: Int,
+    accent: Color,
+    onClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier
             .width(150.dp)
             .height(96.dp)
-            .clickable(
-                onClick = onClick
-            ),
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(19.dp),
         color = Color(0xFF141D24),
         border = BorderStroke(
@@ -1085,6 +1084,51 @@ ActionCard(
         ),
         shadowElevation = 4.dp
     ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = RoundedCornerShape(13.dp),
+                color = accent.copy(alpha = .10f),
+                border = BorderStroke(
+                    1.dp,
+                    accent.copy(alpha = .22f)
+                )
+            ) {
+                Box(
+                    modifier = Modifier.size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(10.dp))
+
+            Column {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 10.sp
+                )
+
+                Text(
+                    text = subtitle,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 7.sp
+                )
+            }
+        }
+    }
+}
 
         
 
