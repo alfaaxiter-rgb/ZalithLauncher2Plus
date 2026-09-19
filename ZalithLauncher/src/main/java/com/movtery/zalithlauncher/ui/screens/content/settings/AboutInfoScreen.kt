@@ -156,18 +156,39 @@ fun AboutInfoScreen(
                     title = stringResource(R.string.about_acknowledgements_title)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        ButtonIconItem(
-                            icon = painterResource(R.drawable.img_avatar_bangbang93),
-                            title = "bangbang93",
-                            text = stringResource(R.string.about_acknowledgements_bangbang93_text, BuildKeys.LAUNCHER_SHORT_NAME),
-                            button = {
-                                Button(
-                                    onClick = { openLink("https://ifdian.net/a/bangbang93") }
-                                ) {
-                                    Text(text = stringResource(R.string.about_sponsor))
-                                }
-                            }
-                        )
+
+    ButtonIconItem(
+        icon = painterResource(R.drawable.img_avatar_alfaa_bejirr),
+        title = "AlfaaBEJIRR",
+        text = "Terima kasih sudah me-remake bagian UI depan ZalithLauncher 2 Plus.",
+        button = {
+            Button(
+                onClick = {
+                    openLink("https://www.tiktok.com/@alfathgpp")
+                }
+            ) {
+                Text(text = "TikTok")
+            }
+        }
+    )
+
+    ButtonIconItem(
+        icon = painterResource(R.drawable.img_avatar_bangbang93),
+        title = "bangbang93",
+        text = stringResource(
+            R.string.about_acknowledgements_bangbang93_text,
+            BuildKeys.LAUNCHER_SHORT_NAME
+        ),
+        button = {
+            Button(
+                onClick = {
+                    openLink("https://ifdian.net/a/bangbang93")
+                }
+            ) {
+                Text(text = stringResource(R.string.about_sponsor))
+            }
+        }
+    )
                         LinkIconItem(
                             icon = painterResource(R.drawable.img_launcher_fcl),
                             title = "Fold Craft Launcher",
