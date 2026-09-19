@@ -24,6 +24,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -115,12 +118,13 @@ fun ModernDashboard(
                 )
 
                 QuickActions(
-                    panel = panelAlt,
-                    border = border,
-                    onVersionsClick = onVersionsClick,
-                    onAccountClick = onAccountClick,
-                    onVersionSettingsClick = onVersionSettingsClick
-                )
+    panel = panelAlt,
+    border = border,
+    onVersionsClick = onVersionsClick,
+    onAccountClick = onAccountClick,
+    onVersionSettingsClick = onVersionSettingsClick,
+    onSettingsClick = onSettingsClick
+)
             }
 
             /*
@@ -204,23 +208,132 @@ fun ModernDashboard(
 @Composable
 private fun Header(
     version: Version?,
-    hasAccount: Boolean
+    hasAccount: Boolean,
+    onSettingsClick: () -> Unit,
+    onFileManagerClick: () -> Unit,
+    onMultiplayerClick: () -> Unit,
+    onDownloadClick: () -> Unit,
+    onRecordingsClick: () -> Unit,
+    onFpsClick: () -> Unit,
+    onAboutClick: () -> Unit
 ) {
+    var menuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
+        /*
+         * NEON MENU BUTTON
+         */
+        Box {
+
+            Surface(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clickable {
+                        menuExpanded = !menuExpanded
+                    },
+                shape = RoundedCornerShape(15.dp),
+                color = Accent.copy(alpha = .10f),
+                border = BorderStroke(
+                    1.dp,
+                    Accent.copy(alpha = .40f)
+                ),
+                shadowElevation = 8.dp
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "☰",
+                        color = Accent,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = {
+                    menuExpanded = false
+                }
+            ) {
+
+                NeonMenuItem(
+                    "FPS / PERFORMANCE",
+                    onClick = {
+                        menuExpanded = false
+                        onFpsClick()
+                    }
+                )
+
+                NeonMenuItem(
+                    "RECORDINGS",
+                    onClick = {
+                        menuExpanded = false
+                        onRecordingsClick()
+                    }
+                )
+
+                NeonMenuItem(
+                    "FILE MANAGER",
+                    onClick = {
+                        menuExpanded = false
+                        onFileManagerClick()
+                    }
+                )
+
+                NeonMenuItem(
+                    "MULTIPLAYER",
+                    onClick = {
+                        menuExpanded = false
+                        onMultiplayerClick()
+                    }
+                )
+
+                NeonMenuItem(
+                    "DOWNLOADS",
+                    onClick = {
+                        menuExpanded = false
+                        onDownloadClick()
+                    }
+                )
+
+                NeonMenuItem(
+                    "SETTINGS",
+                    onClick = {
+                        menuExpanded = false
+                        onSettingsClick()
+                    }
+                )
+
+                NeonMenuItem(
+                    "ABOUT",
+                    onClick = {
+                        menuExpanded = false
+                        onAboutClick()
+                    }
+                )
+            }
+        }
+
+        Spacer(Modifier.width(12.dp))
 
         Column(
             modifier = Modifier.weight(1f)
         ) {
 
             Text(
-                text = "ZALITHLAUNCHER 2 PLUS",
+                text = "DASHBOARD",
                 color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 20.sp,
+                fontSize = 21.sp,
                 fontWeight = FontWeight.ExtraBold,
-                letterSpacing = .5.sp
+                letterSpacing = .7.sp
             )
 
             Row(
@@ -229,15 +342,15 @@ private fun Header(
 
                 Surface(
                     shape = RoundedCornerShape(50),
-                    color = Accent.copy(alpha = .12f),
+                    color = Accent.copy(alpha = .10f),
                     border = BorderStroke(
                         1.dp,
-                        Accent.copy(alpha = .30f)
+                        Accent.copy(alpha = .35f)
                     )
                 ) {
 
                     Text(
-                        text = "DASHBOARD",
+                        text = "ZL2+",
                         modifier = Modifier.padding(
                             horizontal = 9.dp,
                             vertical = 4.dp
@@ -245,15 +358,15 @@ private fun Header(
                         color = Accent,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 8.sp,
-                        letterSpacing = .7.sp
+                        fontSize = 8.sp
                     )
                 }
 
                 Spacer(Modifier.width(7.dp))
 
                 Text(
-                    text = version?.getVersionName() ?: "NO INSTANCE",
+                    text = version?.getVersionName()
+                        ?: "NO INSTANCE",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 9.sp
@@ -262,22 +375,28 @@ private fun Header(
         }
 
         /*
-         * STATUS SAJA.
-         * Bukan tombol akun kedua.
+         * STATUS
          */
         Surface(
-            shape = RoundedCornerShape(14.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(15.dp),
+            color = if (hasAccount)
+                Accent.copy(alpha = .10f)
+            else
+                MaterialTheme.colorScheme.surfaceVariant,
             border = BorderStroke(
                 1.dp,
-                MaterialTheme.colorScheme.outlineVariant
-            )
+                if (hasAccount)
+                    Accent.copy(alpha = .35f)
+                else
+                    MaterialTheme.colorScheme.outlineVariant
+            ),
+            shadowElevation = 7.dp
         ) {
 
             Row(
                 modifier = Modifier.padding(
-                    horizontal = 10.dp,
-                    vertical = 7.dp
+                    horizontal = 11.dp,
+                    vertical = 8.dp
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -290,18 +409,23 @@ private fun Header(
                             if (hasAccount)
                                 Accent
                             else
-                                MaterialTheme.colorScheme.onSurfaceVariant
+                                MaterialTheme.colorScheme
+                                    .onSurfaceVariant
                         )
                 )
 
                 Spacer(Modifier.width(7.dp))
 
                 Text(
-                    text = if (hasAccount) "READY" else "OFFLINE",
+                    text = if (hasAccount)
+                        "READY"
+                    else
+                        "OFFLINE",
                     color = if (hasAccount)
                         Accent
                     else
-                        MaterialTheme.colorScheme.onSurfaceVariant,
+                        MaterialTheme.colorScheme
+                            .onSurfaceVariant,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     fontSize = 8.sp
@@ -309,6 +433,26 @@ private fun Header(
             }
         }
     }
+}
+
+
+@Composable
+private fun NeonMenuItem(
+    text: String,
+    onClick: () -> Unit
+) {
+    DropdownMenuItem(
+        text = {
+            Text(
+                text = text,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        onClick = onClick
+    )
 }
 
 
@@ -831,7 +975,8 @@ private fun QuickActions(
     border: Color,
     onVersionsClick: () -> Unit,
     onAccountClick: () -> Unit,
-    onVersionSettingsClick: () -> Unit
+    onVersionSettingsClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -916,12 +1061,12 @@ private fun QuickActions(
 
 
 @Composable
-private fun ActionCard(
-    title: String,
-    subtitle: String,
-    icon: Int,
-    accent: Color,
-    onClick: () -> Unit
+ActionCard(
+    title = "SETTINGS",
+    subtitle = "Launcher options",
+    icon = R.drawable.ic_settings_filled,
+    accent = AccentOrange,
+    onClick = onSettingsClick
 ) {
     Surface(
         modifier = Modifier
