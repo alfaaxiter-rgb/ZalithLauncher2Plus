@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.scrollbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -414,7 +415,6 @@ private fun VersionError(
                 AlfaaBorder
             )
         ) {
-
             Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -428,10 +428,11 @@ private fun VersionError(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text(
-                    color = AlfaaMuted,
+                AndroidStringText(
                     text = buildAppendedText {
-                        append(R.string.download_game_failed_to_get_versions)
+                        append(
+                            R.string.download_game_failed_to_get_versions
+                        )
                         append(message)
                     }
                 )
@@ -440,7 +441,9 @@ private fun VersionError(
                     onClick = onRetry
                 ) {
                     Text(
-                        text = stringResource(R.string.generic_refresh),
+                        text = stringResource(
+                            R.string.generic_refresh
+                        ),
                         color = AlfaaCyan,
                         fontWeight = FontWeight.Bold
                     )
@@ -737,17 +740,14 @@ private fun VersionList(
     val scrollState = rememberLazyListState()
 
     LazyColumn(
-        modifier = modifier.scrollbar(
-            state = scrollState.scrollIndicatorState,
-            orientation = Orientation.Vertical
-        ),
-        contentPadding = PaddingValues(
-            horizontal = 16.dp,
-            vertical = 8.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        state = scrollState
-    ) {
+    modifier = modifier,
+    contentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 8.dp
+    ),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+    state = scrollState
+) {
 
         items(
             items = versions,
