@@ -113,7 +113,6 @@ import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.CommonVersionInfoLayout
 import com.movtery.zalithlauncher.ui.screens.content.elements.AboutDialog
-import com.movtery.zalithlauncher.ui.screens.content.elements.SideBar
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 import com.movtery.zalithlauncher.ui.screens.game.elements.PerformanceSettingsDialog
 import com.movtery.zalithlauncher.ui.screens.game.elements.PerformanceSettingsOperation
@@ -156,27 +155,90 @@ fun LauncherScreen(
         )
 
         Row(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            SideBar(
-                modifier = Modifier
-                    .padding(start = 12.dp, top = 12.dp, bottom = 12.dp),
-                isVisible = isVisible,
-                onFpsClick = {
-                    performanceSettingsState = PerformanceSettingsOperation.Fps
-                },
-                onVersionsClick = {
-                    backStackViewModel.mainScreen.removeAndNavigateTo(
-                        remove = NestedNavKey.VersionSettings::class,
-                        screenKey = NormalNavKey.VersionsManager
-                    )
-                },
-                onInfoClick = {
-                    showAboutDialog = true
-                }
-            )
+    modifier = Modifier.fillMaxSize()
+) {
+    CompositionLocalProvider(
+        LocalUriHandler provides object : UriHandler {
+            override fun openUri(uri: String) {
+                onOpenLink(uri)
+            }
+        }
+    ) {
+        ModernDashboard(
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    start = 12.dp,
+                    top = 12.dp,
+                    bottom = 12.dp
+                ),
 
-            CompositionLocalProvider(
+            onLaunchGame = onLaunchGame,
+
+            onAccountClick = {
+                backStackViewModel.mainScreen.navigateTo(
+                    screenKey = NormalNavKey.AccountManager(
+                        FirstLoginMenu.NONE
+                    )
+                )
+            },
+
+            onVersionsClick = {
+                backStackViewModel.mainScreen.removeAndNavigateTo(
+                    remove = NestedNavKey.VersionSettings::class,
+                    screenKey = NormalNavKey.VersionsManager
+                )
+            },
+
+            onVersionSettingsClick = {
+                VersionsManager.currentVersion.value?.let {
+                    navigateToVersions(it)
+                }
+            },
+
+            // NEW
+            onSettingsClick = {
+                backStackViewModel.mainScreen.removeAndNavigateTo(
+                    removes = backStackViewModel.clearBeforeNavKeys,
+                    screenKey = backStackViewModel.settingsScreen
+                )
+            },
+
+            onFileManagerClick = {
+                backStackViewModel.mainScreen.navigateTo(
+                    screenKey = NormalNavKey.BuiltInFileManager()
+                )
+            },
+
+            onMultiplayerClick = {
+                backStackViewModel.mainScreen.removeAndNavigateTo(
+                    removes = backStackViewModel.clearBeforeNavKeys,
+                    screenKey = NormalNavKey.Multiplayer
+                )
+            },
+
+            onDownloadClick = {
+                backStackViewModel.navigateToDownload()
+            },
+
+            onRecordingsClick = {
+                backStackViewModel.mainScreen.removeAndNavigateTo(
+                    removes = backStackViewModel.clearBeforeNavKeys,
+                    screenKey = NormalNavKey.Recordings
+                )
+            },
+
+            onFpsClick = {
+                performanceSettingsState =
+                    PerformanceSettingsOperation.Fps
+            },
+
+            onAboutClick = {
+                showAboutDialog = true
+            }
+        )
+    }
+}
                 LocalUriHandler provides object : UriHandler {
                     override fun openUri(uri: String) {
                         onOpenLink(uri)
