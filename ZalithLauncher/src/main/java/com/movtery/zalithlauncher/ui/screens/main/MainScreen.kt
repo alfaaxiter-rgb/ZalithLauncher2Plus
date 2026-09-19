@@ -149,7 +149,6 @@ fun MainScreen(
     }
 
     val isTaskMenuExpanded = AllSettings.launcherTaskMenuExpanded.state
-    val isTaskMenuExpanded = AllSettings.launcherTaskMenuExpanded.state
 val showDisclaimer = AllSettings.disclaimerAccepted.state
 val context = androidx.compose.ui.platform.LocalContext.current
 
