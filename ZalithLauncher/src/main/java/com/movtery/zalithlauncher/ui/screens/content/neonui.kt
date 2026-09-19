@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.icons.Icons
-import androidx.compose.material3.Icons.Filled.ArrowBack
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.Icons.Filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
