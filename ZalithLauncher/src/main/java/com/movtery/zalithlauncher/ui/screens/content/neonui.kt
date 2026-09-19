@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.Icons.Filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -763,7 +763,7 @@ fun NeonTopBar(
         if (onBack != null) {
 
             NeonIconButton(
-                icon = androidx.compose.material.icons.Icons.Default.ArrowBack,
+                icon = Icons.Filled.ArrowBack,
                 accent = accent,
                 contentDescription = "Back",
                 onClick = onBack
