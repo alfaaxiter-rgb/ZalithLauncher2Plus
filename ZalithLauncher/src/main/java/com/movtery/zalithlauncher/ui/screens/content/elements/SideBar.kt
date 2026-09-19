@@ -75,6 +75,322 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.setting.enums.DarkMode
+import com.movtery.zalithlauncher.ui.theme.isLauncherInDarkTheme
+import com.movtery.zalithlauncher.ui.screens.content.elements.backgroundGlass
+import com.movtery.zalithlauncher.ui.theme.cardColor
+import com.movtery.zalithlauncher.ui.theme.onCardColor
+import kotlinx.coroutines.delay
+
+private val CollapsedWidth = 56.dp
+private val ExpandedWidth = 110.dp
+
+@Composable
+fun SideBar(
+    modifier: Modifier = Modifier,
+    isVisible: Boolean,
+    onFpsClick: () -> Unit,
+    onVersionsClick: () -> Unit,
+    onInfoClick: () -> Unit
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    val contentOffset by animateDpAsState(
+        targetValue = if (expanded) 0.dp else (CollapsedWidth - ExpandedWidth),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "sidebarOffset"
+    )
+
+    Box(
+        modifier = modifier
+            .width(ExpandedWidth)
+            .fillMaxHeight()
+            .padding(vertical = 8.dp)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .offset(x = contentOffset)
+                .clipToBounds(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = cardColor(),
+                contentColor = onCardColor()
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(20.dp))
+                    .backgroundGlass(
+                        blur = AllSettings.backgroundBlur.state,
+                        color = cardColor()
+                    )
+                    .padding(vertical = 10.dp)
+            ) {
+                SideBarMenuContent(
+                    expanded = expanded,
+                    onFpsClick = onFpsClick,
+                    onVersionsClick = onVersionsClick,
+                    onInfoClick = onInfoClick,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+                SideBarToggle(
+                    expanded = expanded,
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                )
+                ThemeToggle(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SideBarMenuContent(
+    expanded: Boolean,
+    onFpsClick: () -> Unit,
+    onVersionsClick: () -> Unit,
+    onInfoClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        visible = expanded,
+        enter = fadeIn(animationSpec = tween(250)) +
+            slideInVertically(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            ) { it / 3 },
+        exit = fadeOut(animationSpec = tween(150)) +
+            slideOutVertically(
+                animationSpec = tween(150)
+            ) { it / 3 },
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(horizontal = 14.dp)
+                    .alpha(0.2f)
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            StaggeredItem(delay = 0) {
+                SideBarShortcut(
+                    icon = painterResource(R.drawable.ic_video_settings),
+                    label = stringResource(R.string.game_menu_option_fps_settings),
+                    onClick = onFpsClick
+                )
+            }
+
+            StaggeredItem(delay = 120) {
+                SideBarShortcut(
+                    icon = painterResource(R.drawable.ic_assignment_filled),
+                    label = stringResource(R.string.page_title_version_manage),
+                    onClick = onVersionsClick
+                )
+            }
+
+            StaggeredItem(delay = 180) {
+                SideBarShortcut(
+                    icon = painterResource(R.drawable.ic_info_outlined),
+                    label = stringResource(R.string.about_launcher_title),
+                    onClick = onInfoClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StaggeredItem(
+    delay: Int,
+    visible: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    var show by remember { mutableStateOf(!visible) }
+
+    LaunchedEffect(visible) {
+        if (visible) {
+            kotlinx.coroutines.delay(delay.toLong())
+            show = true
+        } else {
+            show = false
+        }
+    }
+
+    AnimatedVisibility(
+        visible = show,
+        enter = fadeIn(animationSpec = tween(200)) +
+            slideInVertically(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            ) { it },
+        exit = fadeOut(animationSpec = tween(100))
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun SideBarToggle(
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.85f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "toggleScale"
+    )
+
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .scale(scale)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = if (expanded) painterResource(R.drawable.ic_arrow_right_rounded)
+                else painterResource(R.drawable.ic_arrow_left_rounded),
+            contentDescription = if (expanded) "Collapse" else "Expand",
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+    }
+}
+
+@Composable
+private fun SideBarShortcut(
+    icon: Painter,
+    label: String,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.9f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "shortcutScale"
+    )
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp)
+            .scale(scale)
+            .shadow(
+                elevation = if (isPressed) 1.dp else 4.dp,
+                shape = RoundedCornerShape(12.dp),
+                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+            )
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        tonalElevation = if (isPressed) 1.dp else 2.dp,
+        shadowElevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                painter = icon,
+                contentDescription = label,
+                modifier = Modifier.size(22.dp),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                fontSize = 10.sp,
+                maxLines = 1
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun ThemeToggle(modifier: Modifier = Modifier) {
+    val dark = isLauncherInDarkTheme()
+    Surface(
+        modifier = modifier
+            .padding(bottom = 6.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .clickable {
+                AllSettings.launcherDarkMode.save(
+                    if (dark) DarkMode.Disable else DarkMode.Enable
+                )
+            },
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = if (dark) "☾" else "☀",
+                fontSize = 14.sp
+            )
+            Text(
+                text = if (dark) "Dark" else "Light",
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1
+            )
+        }
+    }
+}
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.screens.content.elements.backgroundGlass
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
