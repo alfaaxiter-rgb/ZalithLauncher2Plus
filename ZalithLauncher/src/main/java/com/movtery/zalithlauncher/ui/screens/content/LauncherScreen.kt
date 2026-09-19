@@ -128,6 +128,134 @@ import com.movtery.zalithlauncher.viewmodel.LocalHomePageViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 
 @Composable
+fun LauncherScreen(
+    backStackViewModel: ScreenBackStackViewModel,
+    navigateToVersions: (Version) -> Unit,
+    onLaunchGame: (Version?) -> Unit,
+    onOpenLink: (String) -> Unit,
+    onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
+    onNavigateToStats: () -> Unit = {},
+    onNavigateToPlayTimeStats: () -> Unit = {},
+    onNavigateToLog: (String) -> Unit = {},
+) {
+    BaseScreen(
+        screenKey = NormalNavKey.LauncherMain,
+        currentKey = backStackViewModel.mainScreen.currentKey
+    ) { isVisible ->
+
+        var showAboutDialog by remember {
+            mutableStateOf(false)
+        }
+
+        var performanceSettingsState by remember {
+            mutableStateOf(
+                PerformanceSettingsOperation.None
+            )
+        }
+
+        if (showAboutDialog) {
+            AboutDialog(
+                onDismissRequest = {
+                    showAboutDialog = false
+                }
+            )
+        }
+
+        PerformanceSettingsDialog(
+            operation = performanceSettingsState,
+            onDismissRequest = {
+                performanceSettingsState =
+                    PerformanceSettingsOperation.None
+            }
+        )
+
+        Row(
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            CompositionLocalProvider(
+                LocalUriHandler provides object : UriHandler {
+                    override fun openUri(uri: String) {
+                        onOpenLink(uri)
+                    }
+                }
+            ) {
+
+                ModernDashboard(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(
+                            start = 12.dp,
+                            top = 12.dp,
+                            bottom = 12.dp
+                        ),
+
+                    onLaunchGame = onLaunchGame,
+
+                    onAccountClick = {
+                        backStackViewModel.mainScreen.navigateTo(
+                            screenKey = NormalNavKey.AccountManager()
+                        )
+                    },
+
+                    onVersionsClick = {
+                        backStackViewModel.mainScreen.removeAndNavigateTo(
+                            remove = NestedNavKey.VersionSettings::class,
+                            screenKey = NormalNavKey.VersionsManager
+                        )
+                    },
+
+                    onVersionSettingsClick = {
+                        VersionsManager.currentVersion.value?.let {
+                            navigateToVersions(it)
+                        }
+                    },
+
+                    onSettingsClick = {
+                        backStackViewModel.mainScreen.removeAndNavigateTo(
+                            removes = backStackViewModel.clearBeforeNavKeys,
+                            screenKey = backStackViewModel.settingsScreen
+                        )
+                    },
+
+                    onFileManagerClick = {
+                        backStackViewModel.mainScreen.navigateTo(
+                            screenKey = NormalNavKey.BuiltInFileManager()
+                        )
+                    },
+
+                    onMultiplayerClick = {
+                        backStackViewModel.mainScreen.removeAndNavigateTo(
+                            removes = backStackViewModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.Multiplayer
+                        )
+                    },
+
+                    onDownloadClick = {
+                        backStackViewModel.navigateToDownload()
+                    },
+
+                    onRecordingsClick = {
+                        backStackViewModel.mainScreen.removeAndNavigateTo(
+                            removes = backStackViewModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.Recordings
+                        )
+                    },
+
+                    onFpsClick = {
+                        performanceSettingsState =
+                            PerformanceSettingsOperation.Fps
+                    },
+
+                    onAboutClick = {
+                        showAboutDialog = true
+                    }
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun LauncherScreen(
     backStackViewModel: ScreenBackStackViewModel,
@@ -226,34 +354,7 @@ fun LauncherScreen(
                     onMultiplayerClick = {
                         backStackViewModel.mainScreen.removeAndNavigateTo(
                             removes = backStackViewModel.clearBeforeNavKeys,
-                            screenKey = NormalNavKey.Multiplayer
-                        )
-                    },
 
-                    onDownloadClick = {
-                        backStackViewModel.navigateToDownload()
-                    },
-
-                    onRecordingsClick = {
-                        backStackViewModel.mainScreen.removeAndNavigateTo(
-                            removes = backStackViewModel.clearBeforeNavKeys,
-                            screenKey = NormalNavKey.Recordings
-                        )
-                    },
-
-                    onFpsClick = {
-                        performanceSettingsState =
-                            PerformanceSettingsOperation.Fps
-                    },
-
-                    onAboutClick = {
-                        showAboutDialog = true
-                    }
-                )
-            }
-        }
-    }
-}
                 LocalUriHandler provides object : UriHandler {
                     override fun openUri(uri: String) {
                         onOpenLink(uri)
