@@ -24,8 +24,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,26 +38,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.scrollbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -80,6 +75,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -95,19 +91,16 @@ import com.movtery.zalithlauncher.game.account.isLocalAccount
 import com.movtery.zalithlauncher.game.account.isMicrosoftLogging
 import com.movtery.zalithlauncher.game.account.yggdrasil.PlayerProfile
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.ui.AndroidStringText
+import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.base.BaseScreen
-import com.movtery.zalithlauncher.ui.components.BackgroundCard
-import com.movtery.zalithlauncher.ui.components.MarqueeText
-import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
-import com.movtery.zalithlauncher.ui.components.SimpleEditDialog
 import com.movtery.zalithlauncher.ui.components.ModelAnimation
 import com.movtery.zalithlauncher.ui.components.PlayerSkin
-import com.movtery.zalithlauncher.ui.components.ScalingActionButton
-import com.movtery.zalithlauncher.ui.components.ScalingLabel
+import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
+import com.movtery.zalithlauncher.ui.components.SimpleEditDialog
 import com.movtery.zalithlauncher.ui.components.SimpleListDialog
 import com.movtery.zalithlauncher.ui.components.SimpleListItem
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
-import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountOperation
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountSkinOperation
 import com.movtery.zalithlauncher.ui.screens.content.elements.ChangeSkinDialog
@@ -121,8 +114,8 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.OtherLoginOperatio
 import com.movtery.zalithlauncher.ui.screens.content.elements.OtherServerLoginDialog
 import com.movtery.zalithlauncher.ui.screens.content.elements.PlayerFace
 import com.movtery.zalithlauncher.ui.screens.content.elements.ServerOperation
+import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.utils.PlayTimeUtils
-import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.utils.checkStoragePermissions
 import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.settings.SettingsTransferUtils
@@ -130,8 +123,6 @@ import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.viewmodel.AccountManageEffect
 import com.movtery.zalithlauncher.viewmodel.AccountManageIntent
 import com.movtery.zalithlauncher.viewmodel.AccountManageViewModel
-import com.movtery.zalithlauncher.ui.AndroidStringText
-import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.LocalBackgroundViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
@@ -142,15 +133,7 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /**
- * 封装账号界面 UI 交互的回调函数
- * 
- * @property onIntent 发送 MVI Intent 到 ViewModel
- * @property openLink 打开外部链接
- * @property backToMainScreen 返回主界面
- * @property navigateToWeb 导航到应用内浏览器界面
- * @property checkIfInWebScreen 检查当前是否在浏览器界面中（用于微软登录逻辑判断）
- * @property formatError 格式化异常为本地化字符串
- * @property submitError 提交错误到全局错误展示系统
+ * Semua callback yang digunakan oleh Account Manager.
  */
 private data class AccountActions(
     val onIntent: (AccountManageIntent) -> Unit,
@@ -164,26 +147,19 @@ private data class AccountActions(
 )
 
 /**
- * 进入账号管理器时，可附加的打开登录菜单选项
+ * Menu login ketika Account Manager pertama kali dibuka.
  */
 enum class FirstLoginMenu {
-    /** 不打开菜单 */
     NONE,
-    /** 打开微软登录菜单 */
     MICROSOFT,
-    /** 打开总登录菜单 */
     NORMAL
 }
 
 /**
- * 账号管理主界面
+ * Account Manager.
  *
- * @param backStackViewModel 屏幕堆栈管理器
- * @param backToMainScreen 返回主屏幕的回调
- * @param openLink 外部链接跳转回调
- * @param showToast 展示一个 Toast
- * @param submitError 全局错误提交回调
- * @param viewModel 账号管理 ViewModel (Hilt 自动注入)
+ * Seluruh logic login/account tetap menggunakan ViewModel asli.
+ * File ini hanya merombak tampilan UI.
  */
 @Composable
 fun AccountManageScreen(
@@ -195,9 +171,14 @@ fun AccountManageScreen(
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
     viewModel: AccountManageViewModel = hiltViewModel()
 ) {
-    val loginUiState by viewModel.loginUiState.collectAsStateWithLifecycle()
-    val profileUiState by viewModel.profileUiState.collectAsStateWithLifecycle()
-    val operationUiState by viewModel.operationUiState.collectAsStateWithLifecycle()
+    val loginUiState by viewModel.loginUiState
+        .collectAsStateWithLifecycle()
+
+    val profileUiState by viewModel.profileUiState
+        .collectAsStateWithLifecycle()
+
+    val operationUiState by viewModel.operationUiState
+        .collectAsStateWithLifecycle()
 
     val actions = remember(
         viewModel,
@@ -208,39 +189,86 @@ fun AccountManageScreen(
     ) {
         AccountActions(
             onIntent = viewModel::onIntent,
+
             openLink = openLink,
+
             backToMainScreen = backToMainScreen,
-            navigateToWeb = { url -> backStackViewModel.mainScreen.backStack.navigateToWeb(url) },
-            navigateToCapeGallery = { uuid ->
-                backStackViewModel.mainScreen.backStack.navigateTo(
-                    NormalNavKey.CapeGallery(uuid)
-                )
+
+            navigateToWeb = { url ->
+                backStackViewModel
+                    .mainScreen
+                    .backStack
+                    .navigateToWeb(url)
             },
-            checkIfInWebScreen = { backStackViewModel.mainScreen.currentKey is NormalNavKey.WebScreen },
-            formatError = { th -> viewModel.formatAccountError(th) },
-            submitError = submitError,
+
+            navigateToCapeGallery = { uuid ->
+                backStackViewModel
+                    .mainScreen
+                    .backStack
+                    .navigateTo(
+                        NormalNavKey.CapeGallery(uuid)
+                    )
+            },
+
+            checkIfInWebScreen = {
+                backStackViewModel
+                    .mainScreen
+                    .currentKey is NormalNavKey.WebScreen
+            },
+
+            formatError = { throwable ->
+                viewModel.formatAccountError(throwable)
+            },
+
+            submitError = submitError
         )
     }
 
     LaunchedEffect(Unit) {
+
         when (key.loginMenu) {
-            FirstLoginMenu.NONE -> {}
+
+            FirstLoginMenu.NONE -> Unit
+
             FirstLoginMenu.MICROSOFT -> {
-                actions.onIntent(AccountManageIntent.UpdateMicrosoftLoginOp(MicrosoftLoginOperation.Tip))
+                actions.onIntent(
+                    AccountManageIntent
+                        .UpdateMicrosoftLoginOp(
+                            MicrosoftLoginOperation.Tip
+                        )
+                )
             }
+
             FirstLoginMenu.NORMAL -> {
-                actions.onIntent(AccountManageIntent.UpdateLoginMenuOp(LoginMenuOperation.Login))
+                actions.onIntent(
+                    AccountManageIntent
+                        .UpdateLoginMenuOp(
+                            LoginMenuOperation.Login
+                        )
+                )
             }
         }
 
         viewModel.effect.collect { effect ->
+
             when (effect) {
+
                 is AccountManageEffect.ShowError -> {
-                    submitError(ErrorViewModel.ThrowableMessage(effect.title, effect.message))
+
+                    submitError(
+                        ErrorViewModel.ThrowableMessage(
+                            effect.title,
+                            effect.message
+                        )
+                    )
                 }
 
                 is AccountManageEffect.ShowToast -> {
-                    showToast(effect.text, effect.duration)
+
+                    showToast(
+                        effect.text,
+                        effect.duration
+                    )
                 }
             }
         }
@@ -250,6 +278,7 @@ fun AccountManageScreen(
         screenKey = key,
         currentKey = backStackViewModel.mainScreen.currentKey
     ) { isVisible ->
+
         AccountManageContent(
             isVisible = isVisible,
             loginUiState = loginUiState,
@@ -261,9 +290,12 @@ fun AccountManageScreen(
 }
 
 /**
- * 账号管理界面的实际内容布局 - iki panel
+ * UI utama Account Manager.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 private fun AccountManageContent(
     isVisible: Boolean,
@@ -272,301 +304,900 @@ private fun AccountManageContent(
     operationUiState: AccountManageViewModel.OperationUiState,
     actions: AccountActions,
 ) {
-    val refreshWardrobe by AccountsManager.refreshWardrobe.collectAsStateWithLifecycle()
-    val currentAccount = profileUiState.currentAccount
-    val isOffline = profileUiState.isOffline
     val context = LocalContext.current
 
+    val refreshWardrobe by AccountsManager
+        .refreshWardrobe
+        .collectAsStateWithLifecycle()
 
-    val accountSkin = remember(currentAccount, refreshWardrobe) {
-        currentAccount?.getSkinFile()?.takeIf { it.exists() }
+    val currentAccount =
+        profileUiState.currentAccount
+
+    val isOffline =
+        profileUiState.isOffline
+
+    val accountSkin = remember(
+        currentAccount,
+        refreshWardrobe
+    ) {
+        currentAccount
+            ?.getSkinFile()
+            ?.takeIf { it.exists() }
     }
-    val accountCape = remember(currentAccount, refreshWardrobe) {
-        currentAccount?.getCapeFile()?.takeIf { it.exists() }
+
+    val accountCape = remember(
+        currentAccount,
+        refreshWardrobe
+    ) {
+        currentAccount
+            ?.getCapeFile()
+            ?.takeIf { it.exists() }
     }
-    val playerSkin = remember { PlayerSkin(context) }
-    var pageFinished by remember { mutableStateOf(false) }
+
+    val playerSkin = remember {
+        PlayerSkin(context)
+    }
+
+    var pageFinished by remember {
+        mutableStateOf(false)
+    }
 
     DisposableEffect(Unit) {
-        onDispose { playerSkin.destroy() }
+        onDispose {
+            playerSkin.destroy()
+        }
     }
+
+    /*
+     * =========================================================
+     * MAIN ACCOUNT LAYOUT
+     * =========================================================
+     */
 
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .background(
+                neonBackgroundColor()
+            )
+            .padding(14.dp),
+
+        horizontalArrangement =
+            Arrangement.spacedBy(14.dp)
     ) {
-        // ── Left panel: skin preview + add account ──
+
+        /*
+         * =====================================================
+         * LEFT PANEL
+         * =====================================================
+         */
+
         Column(
             modifier = Modifier
-                .weight(0.35f)
+                .weight(0.38f)
                 .fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+
+            verticalArrangement =
+                Arrangement.spacedBy(10.dp)
         ) {
-            BackgroundCard(
+
+            /*
+             * PLAYER CARD
+             */
+
+            NeonCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                shape = MaterialTheme.shapes.extraLarge
+
+                accent =
+                    NeonColors.CyanBright
             ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    // 3D skin preview
+
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+
+                    /*
+                     * HEADER
+                     */
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 14.dp
+                            ),
+
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+
+                        Column(
+                            modifier =
+                                Modifier.weight(1f)
+                        ) {
+
+                            Text(
+                                text =
+                                    "ACCOUNT CENTER",
+
+                                color =
+                                    NeonColors.CyanBright,
+
+                                fontSize = 9.sp,
+
+                                fontWeight =
+                                    FontWeight.ExtraBold,
+
+                                letterSpacing =
+                                    1.7.sp
+                            )
+
+                            Text(
+                                text =
+                                    currentAccount?.username
+                                        ?: stringResource(
+                                            R.string.account_no_account
+                                        ),
+
+                                color =
+                                    neonTextColor(),
+
+                                fontSize = 18.sp,
+
+                                fontWeight =
+                                    FontWeight.Bold,
+
+                                maxLines = 1,
+
+                                overflow =
+                                    TextOverflow.Ellipsis
+                            )
+
+                            Text(
+                                text =
+                                    currentAccount?.let {
+                                        getAccountTypeName(
+                                            context,
+                                            it
+                                        )
+                                    }
+                                        ?: "NO ACTIVE ACCOUNT",
+
+                                color =
+                                    neonMutedColor(),
+
+                                fontSize = 9.sp
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(9.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (
+                                        currentAccount != null
+                                    ) {
+                                        NeonColors.CyanBright
+                                    } else {
+                                        NeonColors.Orange
+                                    }
+                                )
+                        )
+                    }
+
+                    /*
+                     * 3D SKIN VIEWER
+                     */
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
+                            .weight(1f)
+                            .padding(
+                                horizontal = 10.dp
+                            )
+                            .clip(
+                                RoundedCornerShape(20.dp)
+                            )
+                            .background(
+                                NeonColors.Black
+                            ),
+
+                        contentAlignment =
+                            Alignment.Center
                     ) {
+
                         AndroidView(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier =
+                                Modifier.fillMaxSize(),
+
                             factory = { ctx ->
+
                                 playerSkin.loadWebView(
                                     context = ctx,
+
                                     onPageFinished = {
-                                        pageFinished = true
-                                        playerSkin.startAnim(ModelAnimation.NewIdle)
-                                        playerSkin.setAzimuthAndPitch(-35, 10)
+
+                                        pageFinished =
+                                            true
+
+                                        playerSkin.startAnim(
+                                            ModelAnimation.NewIdle
+                                        )
+
+                                        playerSkin
+                                            .setAzimuthAndPitch(
+                                                -35,
+                                                10
+                                            )
                                     }
                                 )
                             },
+
                             update = {
+
                                 if (pageFinished) {
+
                                     runCatching {
-                                        accountSkin?.inputStream().use { inputStream ->
-                                            playerSkin.loadSkin(inputStream, currentAccount?.skinModelType)
-                                        }
+
+                                        accountSkin
+                                            ?.inputStream()
+                                            .use { inputStream ->
+
+                                                playerSkin.loadSkin(
+                                                    inputStream,
+                                                    currentAccount
+                                                        ?.skinModelType
+                                                )
+                                            }
                                     }
+
                                     runCatching {
-                                        accountCape?.inputStream().use { inputStream ->
-                                            playerSkin.loadCape(inputStream)
-                                        }
+
+                                        accountCape
+                                            ?.inputStream()
+                                            .use { inputStream ->
+
+                                                playerSkin.loadCape(
+                                                    inputStream
+                                                )
+                                            }
                                     }
                                 }
                             }
                         )
+
                         if (!pageFinished) {
-                            LoadingIndicator()
+
+                            LoadingIndicator(
+                                color =
+                                    NeonColors.CyanBright
+                            )
                         }
                     }
 
-                    HorizontalDivider(modifier = Modifier.alpha(0.2f))
+                    /*
+                     * CURRENT ACCOUNT INFO
+                     */
 
-                    // Account info + chroma
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        if (currentAccount != null) {
+                    if (currentAccount != null) {
+
+                        val totalMs =
+                            AllSettings.playTime.getValue()
+
+                        val rank =
+                            PlayTimeUtils.getRankName(
+                                context,
+                                totalMs
+                            )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 16.dp,
+                                    vertical = 12.dp
+                                ),
+
+                            verticalArrangement =
+                                Arrangement.spacedBy(3.dp)
+                        ) {
+
                             Text(
-                                text = currentAccount.username,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                text =
+                                    currentAccount.username,
+
+                                color =
+                                    neonTextColor(),
+
+                                fontSize = 15.sp,
+
+                                fontWeight =
+                                    FontWeight.Bold,
+
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+
+                                overflow =
+                                    TextOverflow.Ellipsis
                             )
+
                             Text(
-                                text = getAccountTypeName(context, currentAccount),
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.alpha(0.7f)
+                                text =
+                                    getAccountTypeName(
+                                        context,
+                                        currentAccount
+                                    ),
+
+                                color =
+                                    neonMutedColor(),
+
+                                fontSize = 9.sp
                             )
-                            val totalMs = AllSettings.playTime.getValue()
-                            val rank = PlayTimeUtils.getRankName(context, totalMs)
+
                             Text(
-                                text = rank,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(R.string.account_no_account),
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.alpha(0.6f)
+                                text =
+                                    rank.uppercase(),
+
+                                color =
+                                    NeonColors.CyanBright,
+
+                                fontSize = 8.sp,
+
+                                fontWeight =
+                                    FontWeight.Bold,
+
+                                letterSpacing = 1.sp
                             )
                         }
                     }
-
                 }
             }
 
-            // Add account button at bottom of left panel
-            ScalingActionButton(
-                modifier = Modifier.fillMaxWidth(),
+            /*
+             * ADD ACCOUNT
+             */
+
+            NeonPrimaryButton(
+                text =
+                    stringResource(
+                        R.string.account_add_new_account
+                    ),
+
+                modifier =
+                    Modifier.fillMaxWidth(),
+
                 onClick = {
+
                     if (isOffline) {
-                        actions.onIntent(AccountManageIntent.UpdateMicrosoftLoginOp(MicrosoftLoginOperation.Tip))
+
+                        actions.onIntent(
+                            AccountManageIntent
+                                .UpdateMicrosoftLoginOp(
+                                    MicrosoftLoginOperation.Tip
+                                )
+                        )
+
                     } else {
-                        actions.onIntent(AccountManageIntent.UpdateLoginMenuOp(LoginMenuOperation.Login))
+
+                        actions.onIntent(
+                            AccountManageIntent
+                                .UpdateLoginMenuOp(
+                                    LoginMenuOperation.Login
+                                )
+                        )
                     }
                 }
-            ) {
-                MarqueeText(text = stringResource(R.string.account_add_new_account))
-            }
+            )
 
-            // Import/Export buttons
+            /*
+             * IMPORT / EXPORT
+             */
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier =
+                    Modifier.fillMaxWidth(),
+
+                horizontalArrangement =
+                    Arrangement.spacedBy(8.dp)
             ) {
-                val scope = rememberCoroutineScope()
-                val importLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.GetContent()
-                ) { uri ->
-                    uri?.let {
-                        scope.launch {
-                            val success = SettingsTransferUtils.importData(context, it)
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    context,
-                                    if (success) R.string.settings_import_success else R.string.settings_import_failed,
-                                    Toast.LENGTH_SHORT
-                                ).show()
+
+                val scope =
+                    rememberCoroutineScope()
+
+                val importLauncher =
+                    rememberLauncherForActivityResult(
+                        contract =
+                            ActivityResultContracts.GetContent()
+                    ) { uri ->
+
+                        uri?.let {
+
+                            scope.launch {
+
+                                val success =
+                                    SettingsTransferUtils
+                                        .importData(
+                                            context,
+                                            it
+                                        )
+
+                                withContext(
+                                    Dispatchers.Main
+                                ) {
+
+                                    Toast.makeText(
+                                        context,
+
+                                        if (success) {
+                                            R.string.settings_import_success
+                                        } else {
+                                            R.string.settings_import_failed
+                                        },
+
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }
-                }
 
-                FilledTonalButton(
-                    modifier = Modifier.weight(1f),
+                NeonButton(
+                    text = "EXPORT",
+
+                    modifier =
+                        Modifier.weight(1f),
+
                     onClick = {
-                        val activity = context as? android.app.Activity ?: return@FilledTonalButton
+
+                        val activity =
+                            context as? android.app.Activity
+                                ?: return@NeonButton
+
                         checkStoragePermissions(
                             activity = activity,
-                            title = R.string.storage_permission_request_title,
-                            message = context.getString(R.string.storage_permission_request_message),
+
+                            title =
+                                R.string.storage_permission_request_title,
+
+                            message =
+                                context.getString(
+                                    R.string.storage_permission_request_message
+                                ),
+
                             hasPermission = {
+
                                 scope.launch {
-                                    val file = SettingsTransferUtils.exportAccounts(context)
-                                    withContext(Dispatchers.Main) {
+
+                                    val file =
+                                        SettingsTransferUtils
+                                            .exportAccounts(
+                                                context
+                                            )
+
+                                    withContext(
+                                        Dispatchers.Main
+                                    ) {
+
                                         if (file != null) {
-                                            Toast.makeText(context, context.getString(R.string.settings_export_success, file.absolutePath), Toast.LENGTH_LONG).show()
+
+                                            Toast.makeText(
+                                                context,
+
+                                                context.getString(
+                                                    R.string.settings_export_success,
+                                                    file.absolutePath
+                                                ),
+
+                                                Toast.LENGTH_LONG
+                                            ).show()
+
                                         } else {
-                                            Toast.makeText(context, R.string.settings_export_failed, Toast.LENGTH_SHORT).show()
+
+                                            Toast.makeText(
+                                                context,
+
+                                                R.string.settings_export_failed,
+
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                                 }
                             }
                         )
-                    }
-                ) {
-                    Icon(painter = painterResource(R.drawable.ic_share_filled), contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.size(4.dp))
-                    Text(stringResource(R.string.settings_export_accounts), style = MaterialTheme.typography.labelMedium)
-                }
-                FilledTonalButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = { importLauncher.launch("application/json") }
-                ) {
-                    Icon(painter = painterResource(R.drawable.ic_upload), contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.size(4.dp))
-                    Text(stringResource(R.string.settings_import_accounts), style = MaterialTheme.typography.labelMedium)
-                }
-            }
-        }
-
-        // ── Right panel: account cards with drag-and-drop ──
-        BackgroundCard(
-            modifier = Modifier
-                .weight(0.65f)
-                .fillMaxHeight(),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            val accounts = profileUiState.accounts
-            if (accounts.isNotEmpty()) {
-                val scrollState = rememberLazyListState()
-                val reorderableState = rememberReorderableLazyListState(
-                    lazyListState = scrollState,
-                    onMove = { from, to ->
-                        actions.onIntent(AccountManageIntent.ReorderAccount(from.index, to.index))
                     }
                 )
 
-                LazyColumn(
+                NeonButton(
+                    text = "IMPORT",
+
+                    modifier =
+                        Modifier.weight(1f),
+
+                    onClick = {
+                        importLauncher.launch(
+                            "application/json"
+                        )
+                    }
+                )
+            }
+        }
+
+        /*
+         * =====================================================
+         * RIGHT PANEL
+         * =====================================================
+         */
+
+        NeonCard(
+            modifier = Modifier
+                .weight(0.62f)
+                .fillMaxHeight(),
+
+            accent =
+                NeonColors.Purple
+        ) {
+
+            val accounts =
+                profileUiState.accounts
+
+            Column(
+                modifier =
+                    Modifier.fillMaxSize()
+            ) {
+
+                /*
+                 * HEADER
+                 */
+
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .scrollbar(
-                            state = scrollState.scrollIndicatorState,
-                            orientation = androidx.compose.foundation.gestures.Orientation.Vertical,
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 14.dp
                         ),
-                    state = scrollState,
-                    contentPadding = PaddingValues(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+
+                    verticalAlignment =
+                        Alignment.CenterVertically
                 ) {
-                    items(accounts, key = { it.uniqueUUID }) { account ->
-                        ReorderableItem(
-                            state = reorderableState,
-                            key = account.uniqueUUID
-                        ) { isDragging ->
-                            val elevation by animateDpAsState(
-                                targetValue = if (isDragging) 6.dp else 0.dp,
-                                animationSpec = spring(),
-                                label = "cardElevation"
+
+                    Column(
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+
+                        Text(
+                            text =
+                                "YOUR ACCOUNTS",
+
+                            color =
+                                neonTextColor(),
+
+                            fontSize = 15.sp,
+
+                            fontWeight =
+                                FontWeight.ExtraBold
+                        )
+
+                        Text(
+                            text =
+                                "${accounts.size} ACCOUNT(S)",
+
+                            color =
+                                NeonColors.Purple,
+
+                            fontSize = 8.sp,
+
+                            letterSpacing =
+                                1.sp
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(9.dp)
+                            .clip(CircleShape)
+                            .background(
+                                NeonColors.Purple
                             )
-                            val dragHandleModifier = Modifier.draggableHandle()
-                            AccountCard(
-                                modifier = Modifier.fillMaxWidth(),
-                                account = account,
-                                currentAccount = currentAccount,
-                                elevation = elevation,
-                                dragHandleModifier = dragHandleModifier,
-                                onSelected = { AccountsManager.setCurrentAccount(account) },
-                                openChangeSkinDialog = {
-                                    if (!account.isAuthServerAccount() || account.isElyByAccount()) {
-                                        actions.onIntent(
-                                            AccountManageIntent.UpdateAccountSkinOp(
-                                                AccountSkinOperation.ChangeSkin(account)
+                    )
+                }
+
+                if (accounts.isNotEmpty()) {
+
+                    val scrollState =
+                        rememberLazyListState()
+
+                    val reorderableState =
+                        rememberReorderableLazyListState(
+                            lazyListState =
+                                scrollState,
+
+                            onMove = { from, to ->
+
+                                actions.onIntent(
+                                    AccountManageIntent
+                                        .ReorderAccount(
+                                            from.index,
+                                            to.index
+                                        )
+                                )
+                            }
+                        )
+
+                    LazyColumn(
+                        modifier =
+                            Modifier.fillMaxSize(),
+
+                        state =
+                            scrollState,
+
+                        contentPadding =
+                            PaddingValues(
+                                horizontal = 10.dp,
+                                vertical = 6.dp
+                            ),
+
+                        verticalArrangement =
+                            Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        items(
+                            accounts,
+                            key = {
+                                it.uniqueUUID
+                            }
+                        ) { account ->
+
+                            ReorderableItem(
+                                state =
+                                    reorderableState,
+
+                                key =
+                                    account.uniqueUUID
+                            ) { isDragging ->
+
+                                val elevation by
+                                    animateDpAsState(
+                                        targetValue =
+                                            if (isDragging) {
+                                                8.dp
+                                            } else {
+                                                0.dp
+                                            },
+
+                                        animationSpec =
+                                            spring(),
+
+                                        label =
+                                            "accountElevation"
+                                    )
+
+                                AccountCard(
+                                    modifier =
+                                        Modifier.fillMaxWidth(),
+
+                                    account =
+                                        account,
+
+                                    currentAccount =
+                                        currentAccount,
+
+                                    elevation =
+                                        elevation,
+
+                                    dragHandleModifier =
+                                        Modifier.draggableHandle(),
+
+                                    onSelected = {
+
+                                        AccountsManager
+                                            .setCurrentAccount(
+                                                account
                                             )
+                                    },
+
+                                    openChangeSkinDialog = {
+
+                                        if (
+                                            !account
+                                                .isAuthServerAccount()
+                                            || account
+                                                .isElyByAccount()
+                                        ) {
+
+                                            actions.onIntent(
+                                                AccountManageIntent
+                                                    .UpdateAccountSkinOp(
+                                                        AccountSkinOperation
+                                                            .ChangeSkin(
+                                                                account
+                                                            )
+                                                    )
+                                            )
+                                        }
+                                    },
+
+                                    onRefreshClick = {
+
+                                        actions.onIntent(
+                                            AccountManageIntent
+                                                .RefreshAccount(
+                                                    account
+                                                )
+                                        )
+                                    },
+
+                                    onCopyUUID = {
+
+                                        copyText(
+                                            COPY_LABEL_ACCOUNT_UUID,
+                                            account.profileId,
+                                            context,
+                                            false
+                                        )
+
+                                        Toast.makeText(
+                                            context,
+
+                                            context.getString(
+                                                R.string.account_local_uuid_copied,
+                                                account.username
+                                            ),
+
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    },
+
+                                    onDeleteClick = {
+
+                                        actions.onIntent(
+                                            AccountManageIntent
+                                                .UpdateAccountOp(
+                                                    AccountOperation
+                                                        .Delete(
+                                                            account
+                                                        )
+                                                )
                                         )
                                     }
-                                },
-                                onRefreshClick = {
-                                    actions.onIntent(AccountManageIntent.RefreshAccount(account))
-                                },
-                                onCopyUUID = {
-                                    copyText(COPY_LABEL_ACCOUNT_UUID, account.profileId, context, false)
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.account_local_uuid_copied, account.username),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                onDeleteClick = {
-                                    actions.onIntent(
-                                        AccountManageIntent.UpdateAccountOp(AccountOperation.Delete(account))
-                                    )
-                                }
-                            )
+                                )
+                            }
                         }
                     }
-                }
-            } else {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ScalingLabel(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(R.string.account_no_account)
-                    )
+
+                } else {
+
+                    /*
+                     * EMPTY STATE
+                     */
+
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(20.dp),
+
+                        contentAlignment =
+                            Alignment.Center
+                    ) {
+
+                        NeonCard(
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
+                            accent =
+                                NeonColors.Orange
+                        ) {
+
+                            Column(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+
+                                horizontalAlignment =
+                                    Alignment.CenterHorizontally,
+
+                                verticalArrangement =
+                                    Arrangement.spacedBy(8.dp)
+                            ) {
+
+                                Text(
+                                    text =
+                                        "NO ACCOUNT",
+
+                                    color =
+                                        NeonColors.Orange,
+
+                                    fontSize = 13.sp,
+
+                                    fontWeight =
+                                        FontWeight.ExtraBold,
+
+                                    letterSpacing =
+                                        1.5.sp
+                                )
+
+                                Text(
+                                    text =
+                                        stringResource(
+                                            R.string.account_no_account
+                                        ),
+
+                                    color =
+                                        neonMutedColor(),
+
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    AccountOperation(operationUiState.accountOp, actions)
-    LoginMenuOperation(loginUiState.menuOp, actions, profileUiState.authServers)
-    MicrosoftLoginOperation(loginUiState.microsoftOp, actions)
-    LocalLoginOperation(loginUiState.localOp, actions)
-    OtherLoginOperation(loginUiState.otherOp, actions)
-    ServerTypeOperation(operationUiState.serverOp, actions)
+    /*
+     * =========================================================
+     * ALL EXISTING ACCOUNT OPERATIONS
+     * =========================================================
+     */
+
+    AccountOperation(
+        operationUiState.accountOp,
+        actions
+    )
+
+    LoginMenuOperation(
+        loginUiState.menuOp,
+        actions,
+        profileUiState.authServers
+    )
+
+    MicrosoftLoginOperation(
+        loginUiState.microsoftOp,
+        actions
+    )
+
+    LocalLoginOperation(
+        loginUiState.localOp,
+        actions
+    )
+
+    OtherLoginOperation(
+        loginUiState.otherOp,
+        actions
+    )
+
+    ServerTypeOperation(
+        operationUiState.serverOp,
+        actions
+    )
+
     AccountSkinOperation(
-        accountSkinOperation = operationUiState.accountSkinOp,
-        skinDialogState = operationUiState.accountSkinDialogState,
-        accountCapes = profileUiState.accountCapeOpMap,
-        actions = actions,
+        accountSkinOperation =
+            operationUiState.accountSkinOp,
+
+        skinDialogState =
+            operationUiState.accountSkinDialogState,
+
+        accountCapes =
+            profileUiState.accountCapeOpMap,
+
+        actions =
+            actions
     )
 }
 
+/**
+ * Card satu akun.
+ */
 @Composable
 private fun AccountCard(
     modifier: Modifier = Modifier,
@@ -580,127 +1211,259 @@ private fun AccountCard(
     onCopyUUID: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val isSelected = currentAccount?.uniqueUUID == account.uniqueUUID
-    val context = LocalContext.current
+    val isSelected =
+        currentAccount?.uniqueUUID ==
+            account.uniqueUUID
 
-    BackgroundCard(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        onClick = onSelected,
-        elevation = CardDefaults.cardElevation(defaultElevation = elevation)
+    val context =
+        LocalContext.current
+
+    NeonCard(
+        modifier =
+            modifier.clickable(
+                onClick = onSelected
+            ),
+
+        accent =
+            if (isSelected) {
+                NeonColors.CyanBright
+            } else {
+                NeonColors.Purple
+            },
+
+        enabled = true
     ) {
-        Column(modifier = Modifier.padding(12.dp).fillMaxWidth()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 11.dp
+                ),
+
+            verticalAlignment =
+                Alignment.CenterVertically,
+
+            horizontalArrangement =
+                Arrangement.spacedBy(10.dp)
+        ) {
+
+            /*
+             * PLAYER FACE / DRAG HANDLE
+             */
+
+            Box(
+                modifier =
+                    dragHandleModifier,
+
+                contentAlignment =
+                    Alignment.Center
             ) {
-                // Drag handle + profile head
-                Box(
-                    modifier = dragHandleModifier,
-                    contentAlignment = Alignment.Center
-                ) {
-                    PlayerFace(
-                        modifier = Modifier.size(44.dp),
-                        account = account,
-                        avatarSize = 44.dp
-                    )
-                }
 
-                // Account info
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = account.username,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
-                        if (isSelected) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_check),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    Text(
-                        text = getAccountTypeName(context, account),
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.alpha(0.6f)
-                    )
-                }
+                PlayerFace(
+                    modifier =
+                        Modifier.size(46.dp),
 
-                // Action buttons
-                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                    if (!account.isAuthServerAccount() || account.isElyByAccount()) {
-                        IconButton(
-                            modifier = Modifier.size(36.dp),
-                            onClick = openChangeSkinDialog
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_checkroom),
-                                contentDescription = stringResource(R.string.account_change_skin),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                    if (!account.isLocalAccount()) {
-                        IconButton(
-                            modifier = Modifier.size(36.dp),
-                            onClick = onRefreshClick
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_refresh),
-                                contentDescription = stringResource(R.string.generic_refresh),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                    IconButton(
-                        modifier = Modifier.size(36.dp),
-                        onClick = onCopyUUID
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_copy_all_outlined),
-                            contentDescription = stringResource(R.string.account_local_uuid_copy),
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                    IconButton(
-                        modifier = Modifier.size(36.dp),
-                        onClick = onDeleteClick
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_delete_outlined),
-                            contentDescription = stringResource(R.string.generic_delete),
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-                        )
-                    }
-                }
+                    account =
+                        account,
+
+                    avatarSize =
+                        46.dp
+                )
             }
 
+            /*
+             * ACCOUNT INFORMATION
+             */
+
+            Column(
+                modifier =
+                    Modifier.weight(1f)
+            ) {
+
+                Row(
+                    verticalAlignment =
+                        Alignment.CenterVertically,
+
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+
+                    Text(
+                        text =
+                            account.username,
+
+                        color =
+                            neonTextColor(),
+
+                        fontSize = 13.sp,
+
+                        fontWeight =
+                            if (isSelected) {
+                                FontWeight.ExtraBold
+                            } else {
+                                FontWeight.Bold
+                            },
+
+                        maxLines = 1,
+
+                        overflow =
+                            TextOverflow.Ellipsis,
+
+                        modifier =
+                            Modifier.weight(
+                                1f,
+                                fill = false
+                            )
+                    )
+
+                    if (isSelected) {
+
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(7.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        NeonColors.CyanBright
+                                    )
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier =
+                        Modifier.height(2.dp)
+                )
+
+                Text(
+                    text =
+                        getAccountTypeName(
+                            context,
+                            account
+                        ),
+
+                    color =
+                        if (isSelected) {
+                            NeonColors.CyanBright
+                        } else {
+                            neonMutedColor()
+                        },
+
+                    fontSize = 9.sp,
+
+                    fontWeight =
+                        FontWeight.Medium
+                )
+            }
+
+            /*
+             * ACCOUNT ACTIONS
+             */
+
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(2.dp)
+            ) {
+
+                /*
+                 * CHANGE SKIN
+                 */
+
+                if (
+                    !account.isAuthServerAccount()
+                    || account.isElyByAccount()
+                ) {
+
+                    NeonIconButton(
+                        icon =
+                            R.drawable.ic_checkroom,
+
+                        contentDescription =
+                            stringResource(
+                                R.string.account_change_skin
+                            ),
+
+                        onClick =
+                            openChangeSkinDialog
+                    )
+                }
+
+                /*
+                 * REFRESH
+                 */
+
+                if (!account.isLocalAccount()) {
+
+                    NeonIconButton(
+                        icon =
+                            R.drawable.ic_refresh,
+
+                        contentDescription =
+                            stringResource(
+                                R.string.generic_refresh
+                            ),
+
+                        onClick =
+                            onRefreshClick
+                    )
+                }
+
+                /*
+                 * COPY UUID
+                 */
+
+                NeonIconButton(
+                    icon =
+                        R.drawable.ic_copy_all_outlined,
+
+                    contentDescription =
+                        stringResource(
+                            R.string.account_local_uuid_copy
+                        ),
+
+                    onClick =
+                        onCopyUUID
+                )
+
+                /*
+                 * DELETE
+                 */
+
+                NeonIconButton(
+                    icon =
+                        R.drawable.ic_delete_outlined,
+
+                    contentDescription =
+                        stringResource(
+                            R.string.generic_delete
+                        ),
+
+                    onClick =
+                        onDeleteClick
+                )
+            }
         }
     }
 }
 
+/**
+ * Nama tipe akun.
+ */
 @Composable
-private fun getAccountTypeName(context: Context, account: Account): String {
-    return com.movtery.zalithlauncher.game.account.getAccountTypeName(account)
+private fun getAccountTypeName(
+    context: Context,
+    account: Account
+): String {
+    return com.movtery.zalithlauncher
+        .game.account
+        .getAccountTypeName(account)
 }
 
+/**
+ * Login menu.
+ */
 @Composable
 private fun LoginMenuOperation(
     operation: LoginMenuOperation,
@@ -708,42 +1471,79 @@ private fun LoginMenuOperation(
     authServers: List<AuthServer>
 ) {
     when (operation) {
-        LoginMenuOperation.None -> {}
+
+        LoginMenuOperation.None -> Unit
+
         LoginMenuOperation.Login -> {
+
             LoginMenuDialog(
+
                 onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateLoginMenuOp(LoginMenuOperation.None)
+                        AccountManageIntent
+                            .UpdateLoginMenuOp(
+                                LoginMenuOperation.None
+                            )
                     )
                 },
-                authServers = authServers,
+
+                authServers =
+                    authServers,
+
                 onMicrosoftLogin = {
+
                     if (!isMicrosoftLogging()) {
+
                         actions.onIntent(
-                            AccountManageIntent.UpdateMicrosoftLoginOp(
-                                MicrosoftLoginOperation.Tip
-                            )
+                            AccountManageIntent
+                                .UpdateMicrosoftLoginOp(
+                                    MicrosoftLoginOperation.Tip
+                                )
                         )
                     }
                 },
+
                 onLocalLogin = {
-                    actions.onIntent(AccountManageIntent.UpdateLocalLoginOp(LocalLoginOperation.Edit))
-                },
-                onAuthServerLogin = { server ->
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateOtherLoginOp(
-                            OtherLoginOperation.OnLogin(server)
-                        )
+                        AccountManageIntent
+                            .UpdateLocalLoginOp(
+                                LocalLoginOperation.Edit
+                            )
                     )
                 },
-                onAddAuthServer = {
-                    actions.onIntent(AccountManageIntent.UpdateServerOp(ServerOperation.AddNew))
-                },
-                onDeleteAuthServer = { server ->
+
+                onAuthServerLogin = { server ->
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateServerOp(
-                            ServerOperation.Delete(server)
-                        )
+                        AccountManageIntent
+                            .UpdateOtherLoginOp(
+                                OtherLoginOperation
+                                    .OnLogin(server)
+                            )
+                    )
+                },
+
+                onAddAuthServer = {
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateServerOp(
+                                ServerOperation.AddNew
+                            )
+                    )
+                },
+
+                onDeleteAuthServer = { server ->
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateServerOp(
+                                ServerOperation.Delete(
+                                    server
+                                )
+                            )
                     )
                 }
             )
@@ -752,7 +1552,7 @@ private fun LoginMenuOperation(
 }
 
 /**
- * 微软登录相关逻辑处理
+ * Microsoft login.
  */
 @Composable
 private fun MicrosoftLoginOperation(
@@ -760,38 +1560,56 @@ private fun MicrosoftLoginOperation(
     actions: AccountActions
 ) {
     when (operation) {
-        is MicrosoftLoginOperation.None -> {}
+
+        is MicrosoftLoginOperation.None -> Unit
+
         is MicrosoftLoginOperation.Tip -> {
+
             MicrosoftLoginTipDialog(
+
                 onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateMicrosoftLoginOp(
-                            MicrosoftLoginOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateMicrosoftLoginOp(
+                                MicrosoftLoginOperation.None
+                            )
                     )
                 },
+
                 onConfirm = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateMicrosoftLoginOp(
-                            MicrosoftLoginOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateMicrosoftLoginOp(
+                                MicrosoftLoginOperation.None
+                            )
                     )
+
                     actions.onIntent(
-                        AccountManageIntent.PerformMicrosoftLogin(
-                            toWeb = actions.navigateToWeb,
-                            backToMain = actions.backToMainScreen,
-                            checkIfInWebScreen = actions.checkIfInWebScreen
-                        )
+                        AccountManageIntent
+                            .PerformMicrosoftLogin(
+                                toWeb =
+                                    actions.navigateToWeb,
+
+                                backToMain =
+                                    actions.backToMainScreen,
+
+                                checkIfInWebScreen =
+                                    actions.checkIfInWebScreen
+                            )
                     )
                 },
-                openLink = actions.openLink
+
+                openLink =
+                    actions.openLink
             )
         }
     }
 }
 
 /**
- * 离线账号登录相关逻辑处理
+ * Offline login.
  */
 @Composable
 private fun LocalLoginOperation(
@@ -799,70 +1617,168 @@ private fun LocalLoginOperation(
     actions: AccountActions
 ) {
     when (operation) {
-        is LocalLoginOperation.None -> {}
+
+        is LocalLoginOperation.None -> Unit
+
         is LocalLoginOperation.Edit -> {
+
+            var serverUrl by rememberSaveable {
+                mutableStateOf("")
+            }
+
             LocalLoginDialog(
+
                 onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateLocalLoginOp(
-                            LocalLoginOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateLocalLoginOp(
+                                LocalLoginOperation.None
+                            )
                     )
                 },
-                onConfirm = { isInvalid, name, uuid ->
-                    val nextOp = if (isInvalid) LocalLoginOperation.Alert(
-                        name,
-                        uuid
-                    ) else LocalLoginOperation.Create(name, uuid)
-                    actions.onIntent(AccountManageIntent.UpdateLocalLoginOp(nextOp))
+
+                onConfirm = {
+                    isInvalid,
+                    name,
+                    uuid ->
+
+                    val nextOp =
+                        if (isInvalid) {
+
+                            LocalLoginOperation.Alert(
+                                name,
+                                uuid
+                            )
+
+                        } else {
+
+                            LocalLoginOperation.Create(
+                                name,
+                                uuid
+                            )
+                        }
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateLocalLoginOp(
+                                nextOp
+                            )
+                    )
                 },
-                openLink = actions.openLink
+
+                openLink =
+                    actions.openLink
             )
         }
 
         is LocalLoginOperation.Create -> {
+
             LaunchedEffect(operation) {
+
                 actions.onIntent(
-                    AccountManageIntent.CreateLocalAccount(
-                        operation.userName,
-                        operation.userUUID
-                    )
+                    AccountManageIntent
+                        .CreateLocalAccount(
+                            operation.userName,
+                            operation.userUUID
+                        )
                 )
             }
         }
 
         is LocalLoginOperation.Alert -> {
+
             SimpleAlertDialog(
-                title = stringResource(R.string.account_supporting_username_invalid_title),
+
+                title =
+                    stringResource(
+                        R.string.account_supporting_username_invalid_title
+                    ),
+
                 text = {
-                    Text(text = stringResource(R.string.account_supporting_username_invalid_local_message_hint1))
-                    Spacer(modifier = Modifier.height(4.dp))
+
                     Text(
-                        text = stringResource(R.string.account_supporting_username_invalid_local_message_hint2),
-                        fontWeight = FontWeight.Bold
+                        text =
+                            stringResource(
+                                R.string.account_supporting_username_invalid_local_message_hint1
+                            )
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = stringResource(R.string.account_supporting_username_invalid_local_message_hint3))
-                    Text(text = stringResource(R.string.account_supporting_username_invalid_local_message_hint4))
-                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(4.dp)
+                    )
+
                     Text(
-                        text = stringResource(R.string.account_supporting_username_invalid_local_message_hint5),
-                        fontWeight = FontWeight.Bold
+                        text =
+                            stringResource(
+                                R.string.account_supporting_username_invalid_local_message_hint2
+                            ),
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(4.dp)
+                    )
+
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.account_supporting_username_invalid_local_message_hint3
+                            )
+                    )
+
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.account_supporting_username_invalid_local_message_hint4
+                            )
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(4.dp)
+                    )
+
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.account_supporting_username_invalid_local_message_hint5
+                            ),
+
+                        fontWeight =
+                            FontWeight.Bold
                     )
                 },
-                confirmText = stringResource(R.string.account_supporting_username_invalid_still_use),
+
+                confirmText =
+                    stringResource(
+                        R.string.account_supporting_username_invalid_still_use
+                    ),
+
                 onConfirm = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateLocalLoginOp(
-                            LocalLoginOperation.Create(operation.userName, operation.userUUID)
-                        )
+                        AccountManageIntent
+                            .UpdateLocalLoginOp(
+                                LocalLoginOperation.Create(
+                                    operation.userName,
+                                    operation.userUUID
+                                )
+                            )
                     )
                 },
+
                 onCancel = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateLocalLoginOp(
-                            LocalLoginOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateLocalLoginOp(
+                                LocalLoginOperation.None
+                            )
                     )
                 }
             )
@@ -871,7 +1787,7 @@ private fun LocalLoginOperation(
 }
 
 /**
- * 第三方验证服务器登录逻辑处理
+ * Third-party authentication server login.
  */
 @Composable
 private fun OtherLoginOperation(
@@ -879,64 +1795,131 @@ private fun OtherLoginOperation(
     actions: AccountActions
 ) {
     when (operation) {
-        is OtherLoginOperation.None -> {}
+
+        is OtherLoginOperation.None -> Unit
+
         is OtherLoginOperation.OnLogin -> {
+
             OtherServerLoginDialog(
-                server = operation.server,
+
+                server =
+                    operation.server,
+
                 onRegisterClick = { url ->
+
                     actions.openLink(url)
-                    actions.onIntent(AccountManageIntent.UpdateOtherLoginOp(OtherLoginOperation.None))
-                },
-                onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateOtherLoginOp(
-                            OtherLoginOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateOtherLoginOp(
+                                OtherLoginOperation.None
+                            )
                     )
                 },
-                onConfirm = { email, password ->
-                    actions.onIntent(AccountManageIntent.UpdateOtherLoginOp(OtherLoginOperation.None))
+
+                onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.LoginWithOtherServer(
-                            operation.server,
-                            email,
-                            password
-                        )
+                        AccountManageIntent
+                            .UpdateOtherLoginOp(
+                                OtherLoginOperation.None
+                            )
+                    )
+                },
+
+                onConfirm = {
+                    email,
+                    password ->
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateOtherLoginOp(
+                                OtherLoginOperation.None
+                            )
+                    )
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .LoginWithOtherServer(
+                                operation.server,
+                                email,
+                                password
+                            )
                     )
                 }
             )
         }
 
         is OtherLoginOperation.OnFailed -> {
+
             LaunchedEffect(operation) {
+
                 actions.submitError(
                     ErrorViewModel.ThrowableMessage(
-                        title = androidText(R.string.account_logging_in_failed),
-                        message = actions.formatError(operation.th)
+                        title =
+                            androidText(
+                                R.string.account_logging_in_failed
+                            ),
+
+                        message =
+                            actions.formatError(
+                                operation.th
+                            )
                     )
                 )
-                actions.onIntent(AccountManageIntent.UpdateOtherLoginOp(OtherLoginOperation.None))
+
+                actions.onIntent(
+                    AccountManageIntent
+                        .UpdateOtherLoginOp(
+                            OtherLoginOperation.None
+                        )
+                )
             }
         }
 
         is OtherLoginOperation.SelectRole -> {
+
             SimpleListDialog(
-                title = stringResource(R.string.account_other_login_select_role),
-                items = operation.profiles,
-                onItemSelected = { operation.selected(it) },
+
+                title =
+                    stringResource(
+                        R.string.account_other_login_select_role
+                    ),
+
+                items =
+                    operation.profiles,
+
+                onItemSelected = {
+                    operation.selected(it)
+                },
+
                 onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateOtherLoginOp(
-                            OtherLoginOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateOtherLoginOp(
+                                OtherLoginOperation.None
+                            )
                     )
                 },
-                itemLayout = { item, isCurrent, onClick ->
+
+                itemLayout = {
+                    item,
+                    isCurrent,
+                    onClick ->
+
                     SimpleListItem(
-                        selected = isCurrent,
-                        itemName = item.name,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onClick
+                        selected =
+                            isCurrent,
+
+                        itemName =
+                            item.name,
+
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        onClick =
+                            onClick
                     )
                 }
             )
@@ -945,7 +1928,7 @@ private fun OtherLoginOperation(
 }
 
 /**
- * 验证服务器管理操作逻辑处理
+ * Authentication server management.
  */
 @Composable
 private fun ServerTypeOperation(
@@ -953,142 +1936,330 @@ private fun ServerTypeOperation(
     actions: AccountActions
 ) {
     when (operation) {
+
         is ServerOperation.AddNew -> {
-            var serverUrl by rememberSaveable { mutableStateOf("") }
+
+            var serverUrl by rememberSaveable {
+                mutableStateOf("")
+            }
+
             SimpleEditDialog(
-                title = stringResource(R.string.account_add_new_server),
-                value = serverUrl,
-                onValueChange = { serverUrl = it.trim() },
-                label = { Text(text = stringResource(R.string.account_label_server_url)) },
+
+                title =
+                    stringResource(
+                        R.string.account_add_new_server
+                    ),
+
+                value =
+                    serverUrl,
+
+                onValueChange = {
+                    serverUrl = it.trim()
+                },
+
+                label = {
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.account_label_server_url
+                            )
+                    )
+                },
+
                 singleLine = true,
+
                 extraBody = {
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        horizontalArrangement =
+                            Arrangement.spacedBy(8.dp)
                     ) {
-                        //快速填入Ely.by的authlib-injector地址，方便用户一键添加Ely.by验证服务器
+
                         AssistChip(
-                            onClick = { serverUrl = ELY_BY_AUTH_SERVER_URL },
-                            label = { Text(text = stringResource(R.string.account_add_server_quick_ely_by)) },
-                            colors = AssistChipDefaults.assistChipColors()
+
+                            onClick = {
+                                serverUrl =
+                                    ELY_BY_AUTH_SERVER_URL
+                            },
+
+                            label = {
+
+                                Text(
+                                    text =
+                                        stringResource(
+                                            R.string.account_add_server_quick_ely_by
+                                        )
+                                )
+                            },
+
+                            colors =
+                                AssistChipDefaults
+                                    .assistChipColors()
                         )
                     }
                 },
+
                 onDismissRequest = {
+
                     actions.onIntent(
-                        AccountManageIntent.UpdateServerOp(
-                            ServerOperation.None
-                        )
+                        AccountManageIntent
+                            .UpdateServerOp(
+                                ServerOperation.None
+                            )
                     )
                 },
+
                 onConfirm = {
+
                     if (serverUrl.isNotEmpty()) {
-                        actions.onIntent(AccountManageIntent.AddServer(serverUrl))
+
+                        actions.onIntent(
+                            AccountManageIntent
+                                .AddServer(serverUrl)
+                        )
                     }
                 }
             )
         }
 
         is ServerOperation.Delete -> {
+
             SimpleAlertDialog(
-                title = stringResource(R.string.account_other_login_delete_server_title),
-                text = stringResource(
-                    R.string.account_other_login_delete_server_message,
-                    operation.server.serverName
-                ),
-                onDismiss = { actions.onIntent(AccountManageIntent.UpdateServerOp(ServerOperation.None)) },
-                onConfirm = { actions.onIntent(AccountManageIntent.DeleteServer(operation.server)) }
+
+                title =
+                    stringResource(
+                        R.string.account_other_login_delete_server_title
+                    ),
+
+                text =
+                    stringResource(
+                        R.string.account_other_login_delete_server_message,
+                        operation.server.serverName
+                    ),
+
+                onDismiss = {
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateServerOp(
+                                ServerOperation.None
+                            )
+                    )
+                },
+
+                onConfirm = {
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .DeleteServer(
+                                operation.server
+                            )
+                    )
+                }
             )
         }
 
         is ServerOperation.OnThrowable -> {
+
             LaunchedEffect(operation) {
+
                 actions.submitError(
                     ErrorViewModel.ThrowableMessage(
-                        title = androidText(R.string.account_other_login_adding_failure),
-                        message = androidText(operation.throwable.getMessageOrToString())
+                        title =
+                            androidText(
+                                R.string.account_other_login_adding_failure
+                            ),
+
+                        message =
+                            androidText(
+                                operation.throwable
+                                    .getMessageOrToString()
+                            )
                     )
                 )
-                actions.onIntent(AccountManageIntent.UpdateServerOp(ServerOperation.None))
+
+                actions.onIntent(
+                    AccountManageIntent
+                        .UpdateServerOp(
+                            ServerOperation.None
+                        )
+                )
             }
         }
 
-        is ServerOperation.None -> {}
+        is ServerOperation.None -> Unit
     }
 }
 
-
-
 /**
- * 账号皮肤操作逻辑处理
+ * Skin + cape management.
  */
 @Composable
 private fun AccountSkinOperation(
     accountSkinOperation: AccountSkinOperation,
-    skinDialogState: AccountManageViewModel.AccountSkinDialogState,
-    accountCapes: Map<String, List<PlayerProfile.Cape>>,
+    skinDialogState:
+        AccountManageViewModel.AccountSkinDialogState,
+    accountCapes:
+        Map<String, List<PlayerProfile.Cape>>,
     actions: AccountActions
 ) {
     when (accountSkinOperation) {
-        is AccountSkinOperation.None -> {}
+
+        is AccountSkinOperation.None -> Unit
+
         is AccountSkinOperation.ChangeSkin -> {
-            val account = accountSkinOperation.account
+
+            val account =
+                accountSkinOperation.account
+
             ChangeSkinDialog(
-                account = account,
-                availableCapes = accountCapes[account.uniqueUUID] ?: emptyList(),
-                skinState = skinDialogState.pendingSkinData,
-                onSkinStateChange = { skinState ->
+
+                account =
+                    account,
+
+                availableCapes =
+                    accountCapes[
+                        account.uniqueUUID
+                    ] ?: emptyList(),
+
+                skinState =
+                    skinDialogState.pendingSkinData,
+
+                onSkinStateChange = {
+                    skinState ->
+
                     actions.onIntent(
-                        AccountManageIntent.UpdatePendingSkinData(
-                            skinState
-                        )
+                        AccountManageIntent
+                            .UpdatePendingSkinData(
+                                skinState
+                            )
                     )
                 },
-                capeState = skinDialogState.pendingCapeData,
-                onCapeStateChange = { capeState ->
+
+                capeState =
+                    skinDialogState.pendingCapeData,
+
+                onCapeStateChange = {
+                    capeState ->
+
                     actions.onIntent(
-                        AccountManageIntent.UpdatePendingCapeData(
-                            capeState
-                        )
+                        AccountManageIntent
+                            .UpdatePendingCapeData(
+                                capeState
+                            )
                     )
                 },
-                isImportingSkin = skinDialogState.importingSkin,
-                isImportingCape = skinDialogState.importingCape,
+
+                isImportingSkin =
+                    skinDialogState.importingSkin,
+
+                isImportingCape =
+                    skinDialogState.importingCape,
+
                 onSkinPicked = { uri ->
+
                     actions.onIntent(
-                        AccountManageIntent.OnSkinPicked(uri)
+                        AccountManageIntent
+                            .OnSkinPicked(uri)
                     )
                 },
-                onCapePicked = { account, uri ->
+
+                onCapePicked = {
+                    account,
+                    uri ->
+
                     actions.onIntent(
-                        AccountManageIntent.OnCapePicked(account, uri)
+                        AccountManageIntent
+                            .OnCapePicked(
+                                account,
+                                uri
+                            )
                     )
                 },
+
                 onDismissRequest = {
-                    actions.onIntent(AccountManageIntent.ResetAccountSkinDialogState)
-                    actions.onIntent(AccountManageIntent.UpdateAccountSkinOp(AccountSkinOperation.None))
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .ResetAccountSkinDialogState
+                    )
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateAccountSkinOp(
+                                AccountSkinOperation.None
+                            )
+                    )
                 },
+
                 onResetSkin = {
-                    actions.onIntent(AccountManageIntent.ResetSkin(account))
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .ResetSkin(account)
+                    )
                 },
+
                 onResetCape = {
-                    actions.onIntent(AccountManageIntent.ResetCape(account))
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .ResetCape(account)
+                    )
                 },
+
                 onFetchCapes = {
-                    actions.onIntent(AccountManageIntent.FetchMicrosoftCapes(account))
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .FetchMicrosoftCapes(account)
+                    )
                 },
-                onApplySkin = { file, model ->
-                    actions.onIntent(AccountManageIntent.ApplySkin(account, file, model))
+
+                onApplySkin = {
+                    file,
+                    model ->
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .ApplySkin(
+                                account,
+                                file,
+                                model
+                            )
+                    )
                 },
+
                 onApplyCape = { cape ->
-                    actions.onIntent(AccountManageIntent.ApplyMicrosoftCape(account, cape))
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .ApplyMicrosoftCape(
+                                account,
+                                cape
+                            )
+                    )
                 },
+
                 onApplyCustomCape = { file ->
-                    actions.onIntent(AccountManageIntent.ApplyCustomCape(account, file))
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .ApplyCustomCape(
+                                account,
+                                file
+                            )
+                    )
                 },
 
                 onInstallCapes = {
-                    actions.navigateToCapeGallery(account.uniqueUUID)
+
+                    actions.navigateToCapeGallery(
+                        account.uniqueUUID
+                    )
                 }
             )
         }
@@ -1096,7 +2267,7 @@ private fun AccountSkinOperation(
 }
 
 /**
- * 通用账号管理操作逻辑处理（如删除确认）
+ * General account operations.
  */
 @Composable
 private fun AccountOperation(
@@ -1104,52 +2275,133 @@ private fun AccountOperation(
     actions: AccountActions
 ) {
     when (operation) {
+
         is AccountOperation.Delete -> {
+
             SimpleAlertDialog(
-                title = stringResource(R.string.account_delete_title),
-                text = stringResource(R.string.account_delete_message, operation.account.username),
-                onConfirm = { actions.onIntent(AccountManageIntent.DeleteAccount(operation.account)) },
-                onDismiss = { actions.onIntent(AccountManageIntent.UpdateAccountOp(AccountOperation.None)) }
+
+                title =
+                    stringResource(
+                        R.string.account_delete_title
+                    ),
+
+                text =
+                    stringResource(
+                        R.string.account_delete_message,
+                        operation.account.username
+                    ),
+
+                onConfirm = {
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .DeleteAccount(
+                                operation.account
+                            )
+                    )
+                },
+
+                onDismiss = {
+
+                    actions.onIntent(
+                        AccountManageIntent
+                            .UpdateAccountOp(
+                                AccountOperation.None
+                            )
+                    )
+                }
             )
         }
 
         is AccountOperation.OnFailed -> {
+
             LaunchedEffect(operation) {
+
                 actions.submitError(
                     ErrorViewModel.ThrowableMessage(
-                        title = androidText(R.string.account_logging_in_failed),
-                        message = actions.formatError(operation.th)
+                        title =
+                            androidText(
+                                R.string.account_logging_in_failed
+                            ),
+
+                        message =
+                            actions.formatError(
+                                operation.th
+                            )
                     )
                 )
-                actions.onIntent(AccountManageIntent.UpdateAccountOp(AccountOperation.None))
+
+                actions.onIntent(
+                    AccountManageIntent
+                        .UpdateAccountOp(
+                            AccountOperation.None
+                        )
+                )
             }
         }
 
-        is AccountOperation.None -> {}
+        is AccountOperation.None -> Unit
     }
 }
 
-@Preview(showBackground = true, widthDp = 800, heightDp = 480)
+/**
+ * Preview.
+ */
+@Preview(
+    showBackground = true,
+    widthDp = 800,
+    heightDp = 480
+)
 @Composable
 private fun AccountManageContentPreview() {
-    CompositionLocalProvider(LocalBackgroundViewModel provides null) {
+
+    CompositionLocalProvider(
+        LocalBackgroundViewModel provides null
+    ) {
+
         MaterialExpressiveTheme {
+
             Surface {
+
                 AccountManageContent(
+
                     isVisible = true,
-                    loginUiState = AccountManageViewModel.LoginUiState(),
-                    profileUiState = AccountManageViewModel.ProfileUiState(),
-                    operationUiState = AccountManageViewModel.OperationUiState(),
-                    actions = AccountActions(
-                        onIntent = {},
-                        openLink = {},
-                        backToMainScreen = {},
-                        navigateToWeb = {},
-                        navigateToCapeGallery = {},
-                        checkIfInWebScreen = { false },
-                        formatError = { AndroidStringText.Text("") },
-                        submitError = {},
-                    )
+
+                    loginUiState =
+                        AccountManageViewModel
+                            .LoginUiState(),
+
+                    profileUiState =
+                        AccountManageViewModel
+                            .ProfileUiState(),
+
+                    operationUiState =
+                        AccountManageViewModel
+                            .OperationUiState(),
+
+                    actions =
+                        AccountActions(
+
+                            onIntent = {},
+
+                            openLink = {},
+
+                            backToMainScreen = {},
+
+                            navigateToWeb = {},
+
+                            navigateToCapeGallery = {},
+
+                            checkIfInWebScreen = {
+                                false
+                            },
+
+                            formatError = {
+                                AndroidStringText.Text("")
+                            },
+
+                            submitError = {}
+                        )
                 )
             }
         }
