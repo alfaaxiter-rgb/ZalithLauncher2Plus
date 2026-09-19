@@ -10,16 +10,17 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content
 
 import android.content.Context
 import android.os.Environment
+
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -27,19 +28,33 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LoadingIndicator
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.MoveDown
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.scrollbar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -51,15 +66,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.path.GamePathManager
 import com.movtery.zalithlauncher.game.version.installed.Version
@@ -70,14 +89,6 @@ import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.game.version.installed.cleanup.GameAssetCleaner
 import com.movtery.zalithlauncher.ui.activities.MainActivity
 import com.movtery.zalithlauncher.ui.base.BaseScreen
-import com.movtery.zalithlauncher.ui.components.BackgroundCard
-import com.movtery.zalithlauncher.ui.components.CardTitleLayout
-import com.movtery.zalithlauncher.ui.components.EdgeDirection
-import com.movtery.zalithlauncher.ui.components.IconTextButton
-import com.movtery.zalithlauncher.ui.components.MarqueeText
-import com.movtery.zalithlauncher.ui.components.ScalingActionButton
-import com.movtery.zalithlauncher.ui.components.ScalingLabel
-import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.CleanupOperation
 import com.movtery.zalithlauncher.ui.screens.content.elements.GameFolderOperation
@@ -97,69 +108,75 @@ import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import com.movtery.zalithlauncher.viewmodel.sendKeepScreen
+
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+private val AlfaaBlack = Color(0xFF050608)
+private val AlfaaPanel = Color(0xFF0A0D11)
+private val AlfaaPanel2 = Color(0xFF10141A)
+private val AlfaaBorder = Color(0xFF1D252E)
+private val AlfaaCyan = Color(0xFF00E5FF)
+private val AlfaaGreen = Color(0xFF00FF9C)
+private val AlfaaPurple = Color(0xFF9B6CFF)
+private val AlfaaText = Color(0xFFF3F7FA)
+private val AlfaaMuted = Color(0xFF8B96A3)
+
 private class VersionsScreenViewModel : ViewModel() {
-    /** 版本类别分类 */
+
     var versionCategory by mutableStateOf(VersionCategory.ALL)
         private set
-    /** 重排序刷新key */
+
     var resortKey by mutableIntStateOf(0)
         private set
 
-    /** 游戏路径相关操作 */
-    var gamePathOperation by mutableStateOf<GamePathOperation>(GamePathOperation.None)
+    var gamePathOperation by mutableStateOf<GamePathOperation>(
+        GamePathOperation.None
+    )
 
-    /** 全部版本的数量 */
     var allVersionsCount by mutableIntStateOf(0)
-    /** 原版版本数量 */
     var vanillaVersionsCount by mutableIntStateOf(0)
-    /** 模组加载器版本数量 */
     var modloaderVersionsCount by mutableIntStateOf(0)
+
+    var cleanupOperation by mutableStateOf<CleanupOperation>(
+        CleanupOperation.None
+    )
+
+    var cleaner by mutableStateOf<GameAssetCleaner?>(null)
+
+    var gameFolderOperation by mutableStateOf<GameFolderOperation>(
+        GameFolderOperation.None
+    )
+
+    var mover by mutableStateOf<VersionMover?>(null)
+
+    private var currentJob: Job? = null
+    private val mutex = Mutex()
 
     fun startRefreshVersions() {
         if (!VersionsManager.isRefreshing.value) {
-            VersionsManager.refresh("VersionsScreenViewModel.startRefreshVersions")
+            VersionsManager.refresh(
+                "VersionsScreenViewModel.startRefreshVersions"
+            )
         }
     }
 
-    private var currentJob: Job? = null
-    private var mutex: Mutex = Mutex()
-
-    /**
-     * 变更当前版本列表的过滤类型
-     */
     fun changeCategory(category: VersionCategory) {
         currentJob?.cancel()
+
         currentJob = viewModelScope.launch {
             mutex.withLock {
-                this@VersionsScreenViewModel.versionCategory = category
+                versionCategory = category
             }
         }
     }
 
-    /**
-     * 重新排序当前版本列表
-     */
     fun resortVersions() {
         resortKey++
     }
-
-    /** 清理游戏文件操作 */
-    var cleanupOperation by mutableStateOf<CleanupOperation>(CleanupOperation.None)
-
-    /** 游戏无用资源清理者 */
-    var cleaner by mutableStateOf<GameAssetCleaner?>(null)
-
-    /** 游戏文件夹操作（移动版本） */
-    var gameFolderOperation by mutableStateOf<GameFolderOperation>(GameFolderOperation.None)
-
-    /** 版本移动器 */
-    var mover by mutableStateOf<VersionMover?>(null)
 
     fun startMoveVersions(
         context: Context,
@@ -175,23 +192,35 @@ private class VersionsScreenViewModel : ViewModel() {
             versions = versions,
             sourceGameHome = GamePathManager.currentPath.value,
             targetGamePath = targetPath,
-            changeState = { gameFolderOperation = it }
+            changeState = {
+                gameFolderOperation = it
+            }
         ).also {
-            gameFolderOperation = GameFolderOperation.MoveVersionsProgress(it)
+            gameFolderOperation =
+                GameFolderOperation.MoveVersionsProgress(it)
+
             it.start(
                 onEnd = { moved, failed ->
                     mover = null
-                    gameFolderOperation = GameFolderOperation.MoveVersionsResult(moved, failed)
+
+                    gameFolderOperation =
+                        GameFolderOperation.MoveVersionsResult(
+                            moved,
+                            failed
+                        )
+
                     onComplete?.invoke(moved, failed)
                     onStop()
                 },
-                onThrowable = { th ->
+                onThrowable = {
                     mover = null
-                    gameFolderOperation = GameFolderOperation.None
+                    gameFolderOperation =
+                        GameFolderOperation.None
                     onStop()
                 }
             )
         }
+
         onStart()
     }
 
@@ -209,19 +238,23 @@ private class VersionsScreenViewModel : ViewModel() {
             scope = viewModelScope
         ).also {
             cleanupOperation = CleanupOperation.Clean
+
             it.start(
                 onEnd = { count, size ->
                     cleaner = null
-                    cleanupOperation = CleanupOperation.Success(count, size)
+                    cleanupOperation =
+                        CleanupOperation.Success(count, size)
                     onStop()
                 },
                 onThrowable = { th ->
                     cleaner = null
-                    cleanupOperation = CleanupOperation.Error(th)
+                    cleanupOperation =
+                        CleanupOperation.Error(th)
                     onStop()
                 }
             )
         }
+
         onStart()
     }
 
@@ -239,7 +272,7 @@ private class VersionsScreenViewModel : ViewModel() {
 }
 
 @Composable
-private fun rememberVersionViewModel() : VersionsScreenViewModel {
+private fun rememberVersionViewModel(): VersionsScreenViewModel {
     return viewModel(
         key = NormalNavKey.VersionsManager.toString()
     ) {
@@ -250,27 +283,46 @@ private fun rememberVersionViewModel() : VersionsScreenViewModel {
 @Composable
 private fun rememberVersions(
     versions: StateFlow<List<Version>>,
-    viewModel: VersionsScreenViewModel,
+    viewModel: VersionsScreenViewModel
 ): State<List<Version>> {
+
     val vers by versions.collectAsStateWithLifecycle()
     val category = viewModel.versionCategory
     val resortKey = viewModel.resortKey
 
-    return remember(vers, category, resortKey) {
+    return remember(
+        vers,
+        category,
+        resortKey
+    ) {
         derivedStateOf {
+
             viewModel.allVersionsCount = vers.size
 
-            val vanillaVersions = vers
-                .filter { ver -> ver.versionType == VersionType.VANILLA }
-                .also { viewModel.vanillaVersionsCount = it.size }
-            val modloaderVersions = vers
-                .filter { ver -> ver.versionType == VersionType.MODLOADERS }
-                .also { viewModel.modloaderVersionsCount = it.size }
+            val vanillaVersions =
+                vers.filter {
+                    it.versionType == VersionType.VANILLA
+                }.also {
+                    viewModel.vanillaVersionsCount = it.size
+                }
+
+            val modloaderVersions =
+                vers.filter {
+                    it.versionType == VersionType.MODLOADERS
+                }.also {
+                    viewModel.modloaderVersionsCount = it.size
+                }
 
             when (category) {
-                VersionCategory.ALL -> vers
-                VersionCategory.VANILLA -> vanillaVersions
-                VersionCategory.MODLOADER -> modloaderVersions
+
+                VersionCategory.ALL ->
+                    vers
+
+                VersionCategory.VANILLA ->
+                    vanillaVersions
+
+                VersionCategory.MODLOADER ->
+                    modloaderVersions
             }.sortedWith(VersionComparator)
         }
     }
@@ -284,30 +336,47 @@ fun VersionsManageScreen(
     eventViewModel: EventViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
+
     val viewModel = rememberVersionViewModel()
     val context = LocalContext.current
 
-    val versions by rememberVersions(VersionsManager.versions, viewModel)
-    val currentVersion by VersionsManager.currentVersion.collectAsStateWithLifecycle()
-    val isRefreshing by VersionsManager.isRefreshing.collectAsStateWithLifecycle()
+    val versions by rememberVersions(
+        VersionsManager.versions,
+        viewModel
+    )
+
+    val currentVersion by
+        VersionsManager.currentVersion.collectAsStateWithLifecycle()
+
+    val isRefreshing by
+        VersionsManager.isRefreshing.collectAsStateWithLifecycle()
 
     GamePathOperation(
         gamePathOperation = viewModel.gamePathOperation,
-        changeState = { viewModel.gamePathOperation = it },
+        changeState = {
+            viewModel.gamePathOperation = it
+        },
         submitError = submitError
     )
 
     GameFolderOperationDialog(
         operation = viewModel.gameFolderOperation,
-        changeState = { viewModel.gameFolderOperation = it },
+        changeState = {
+            viewModel.gameFolderOperation = it
+        },
         versions = versions,
         onStartMove = { selectedVersions, targetPath ->
+
             viewModel.startMoveVersions(
                 context = context,
                 versions = selectedVersions,
                 targetPath = targetPath,
-                onStart = { eventViewModel.sendKeepScreen(true) },
-                onStop = { eventViewModel.sendKeepScreen(false) }
+                onStart = {
+                    eventViewModel.sendKeepScreen(true)
+                },
+                onStop = {
+                    eventViewModel.sendKeepScreen(false)
+                }
             )
         }
     )
@@ -316,67 +385,112 @@ fun VersionsManageScreen(
         screenKey = NormalNavKey.VersionsManager,
         currentKey = backScreenViewModel.mainScreen.currentKey
     ) { isVisible ->
-        Row {
-            LeftMenu(
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AlfaaBlack)
+        ) {
+
+            AlfaaVersionsSidebar(
                 isVisible = isVisible,
                 isRefreshing = isRefreshing,
-                swapToFileSelector = { path ->
-                    backScreenViewModel.mainScreen.backStack.navigateToFileSelector(
-                        startPath = path,
-                        selectFile = false,
-                        saveKey = NormalNavKey.VersionsManager
-                    ) { path ->
-                        viewModel.gamePathOperation = GamePathOperation.AddNewPath(path)
-                    }
-                },
-                onCleanupGameFiles = {
-                    if (viewModel.cleanupOperation == CleanupOperation.None) {
-                        viewModel.cleanupOperation = CleanupOperation.Tip
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(220.dp),
+                onAddPath = {
+
+                    (context as? MainActivity)?.let { activity ->
+
+                        checkStoragePermissions(
+                            activity = activity,
+                            message = activity.getString(
+                                R.string.versions_manage_game_path_storage_permissions
+                            ),
+                            messageSdk30 = activity.getString(
+                                R.string.versions_manage_game_path_storage_permissions_sdk30
+                            ),
+                            hasPermission = {
+
+                                backScreenViewModel
+                                    .mainScreen
+                                    .backStack
+                                    .navigateToFileSelector(
+                                        startPath = Environment
+                                            .getExternalStorageDirectory()
+                                            .absolutePath,
+                                        selectFile = false,
+                                        saveKey = NormalNavKey.VersionsManager
+                                    ) { path ->
+
+                                        viewModel.gamePathOperation =
+                                            GamePathOperation.AddNewPath(
+                                                path
+                                            )
+                                    }
+                            }
+                        )
                     }
                 },
                 onMoveVersions = {
-                    viewModel.gameFolderOperation = GameFolderOperation.MoveVersionsSelect
+                    viewModel.gameFolderOperation =
+                        GameFolderOperation.MoveVersionsSelect
+                },
+                onCleanup = {
+
+                    if (
+                        viewModel.cleanupOperation ==
+                        CleanupOperation.None
+                    ) {
+                        viewModel.cleanupOperation =
+                            CleanupOperation.Tip
+                    }
                 },
                 changePathOperation = {
                     viewModel.gamePathOperation = it
-                },
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(2.5f)
+                }
             )
 
-            VersionsLayout(
-                isVisible = isVisible,
+            AlfaaVersionsContent(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .padding(
+                        top = 12.dp,
+                        bottom = 12.dp,
+                        end = 12.dp
+                    ),
                 isRefreshing = isRefreshing,
                 versions = versions,
                 currentVersion = currentVersion,
                 versionCategory = viewModel.versionCategory,
-                onCategoryChange = { viewModel.changeCategory(it) },
                 allVersionsCount = viewModel.allVersionsCount,
-                vanillaVersionsCount = viewModel.vanillaVersionsCount,
-                modloaderVersionsCount = viewModel.modloaderVersionsCount,
-                navigateToVersions = navigateToVersions,
-                navigateToExport = navigateToExport,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(7.5f)
-                    .padding(vertical = 12.dp)
-                    .padding(end = 12.dp),
-                submitError = submitError,
+                vanillaVersionsCount =
+                    viewModel.vanillaVersionsCount,
+                modloaderVersionsCount =
+                    viewModel.modloaderVersionsCount,
+                onCategoryChange = {
+                    viewModel.changeCategory(it)
+                },
                 onRefresh = {
                     viewModel.startRefreshVersions()
                 },
-                onVersionPinned = {
-                    viewModel.resortVersions()
-                },
                 onInstall = {
                     backScreenViewModel.navigateToDownload()
+                },
+                navigateToVersions = navigateToVersions,
+                navigateToExport = navigateToExport,
+                submitError = submitError,
+                onVersionPinned = {
+                    viewModel.resortVersions()
                 }
             )
 
             CleanupOperation(
                 operation = viewModel.cleanupOperation,
-                changeOperation = { viewModel.cleanupOperation = it },
+                changeOperation = {
+                    viewModel.cleanupOperation = it
+                },
                 cleaner = viewModel.cleaner,
                 onClean = {
                     viewModel.cleanUnusedFiles(
@@ -398,263 +512,928 @@ fun VersionsManageScreen(
     }
 }
 
+/*
+ * ============================================================
+ * ALFAA SIDEBAR
+ * ============================================================
+ */
+
 @Composable
-private fun LeftMenu(
+private fun AlfaaVersionsSidebar(
     isVisible: Boolean,
     isRefreshing: Boolean,
-    swapToFileSelector: (path: String) -> Unit,
-    onCleanupGameFiles: () -> Unit,
+    modifier: Modifier = Modifier,
+    onAddPath: () -> Unit,
     onMoveVersions: () -> Unit,
-    changePathOperation: (GamePathOperation) -> Unit,
-    modifier: Modifier = Modifier
+    onCleanup: () -> Unit,
+    changePathOperation: (GamePathOperation) -> Unit
 ) {
-    val surfaceXOffset by swapAnimateDpAsState(
-        targetValue = (-40).dp,
+
+    val context = LocalContext.current
+
+    val paths by
+        GamePathManager.gamePathData.collectAsStateWithLifecycle()
+
+    val currentPath by
+        GamePathManager.currentPath.collectAsStateWithLifecycle()
+
+    val xOffset by swapAnimateDpAsState(
+        targetValue = (-35).dp,
         swapIn = isVisible,
         isHorizontal = true
     )
 
     Column(
-        modifier = modifier.offset { IntOffset(x = surfaceXOffset.roundToPx(), y = 0) },
+        modifier = modifier
+            .offset {
+                IntOffset(
+                    x = xOffset.roundToPx(),
+                    y = 0
+                )
+            }
+            .padding(
+                start = 12.dp,
+                top = 12.dp,
+                bottom = 12.dp
+            )
     ) {
-        val gamePaths by GamePathManager.gamePathData.collectAsStateWithLifecycle()
-        val currentPath by GamePathManager.currentPath.collectAsStateWithLifecycle()
-        val context = LocalContext.current
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(all = 12.dp)
-                .fillMaxWidth()
-                .weight(1f)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(22.dp),
+            color = AlfaaPanel,
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                AlfaaBorder
+            )
         ) {
-            items(gamePaths, key = { it.id }) { pathItem ->
-                GamePathItemLayout(
-                    item = pathItem,
-                    selected = currentPath == pathItem.path,
-                    enabled = canHandlePermission,
-                    onClick = {
-                        if (!isRefreshing) { //避免频繁刷新，防止currentGameInfo意外重置
-                            if (pathItem.id == GamePathManager.DEFAULT_ID) {
-                                GamePathManager.saveDefaultPath()
-                            } else {
-                                (context as? MainActivity)?.let { activity ->
-                                    checkStoragePermissions(
-                                        activity = activity,
-                                        message = activity.getString(R.string.versions_manage_game_storage_permissions),
-                                        messageSdk30 = activity.getString(R.string.versions_manage_game_storage_permissions_sdk30),
-                                        hasPermission = {
-                                            GamePathManager.saveCurrentPath(pathItem.id)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    },
-                    onDelete = {
-                        changePathOperation(GamePathOperation.DeletePath(pathItem))
-                    },
-                    onRename = {
-                        changePathOperation(GamePathOperation.RenamePath(pathItem))
-                    }
+
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
+                Text(
+                    text = "ALFAA",
+                    color = AlfaaCyan,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 11.sp,
+                    letterSpacing = 2.sp
+                )
+
+                Spacer(
+                    modifier = Modifier.height(3.dp)
+                )
+
+                Text(
+                    text = "VERSIONS",
+                    color = AlfaaText,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp
+                )
+
+                Text(
+                    text = "MINECRAFT INSTALLATIONS",
+                    color = AlfaaMuted,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 7.sp,
+                    letterSpacing = 0.8.sp
                 )
             }
         }
 
-        ScalingActionButton(
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        Surface(
             modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .padding(top = 8.dp)
-                .fillMaxWidth(),
-            onClick = {
-                (context as? MainActivity)?.let { activity ->
-                    checkStoragePermissions(
-                        activity = activity,
-                        message = activity.getString(R.string.versions_manage_game_path_storage_permissions),
-                        messageSdk30 = activity.getString(R.string.versions_manage_game_path_storage_permissions_sdk30),
-                        hasPermission = {
-                            swapToFileSelector(Environment.getExternalStorageDirectory().absolutePath)
+                .fillMaxWidth()
+                .weight(1f),
+            shape = RoundedCornerShape(20.dp),
+            color = AlfaaPanel,
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                AlfaaBorder
+            )
+        ) {
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement =
+                    Arrangement.spacedBy(6.dp)
+            ) {
+
+                items(
+                    paths,
+                    key = { it.id }
+                ) { pathItem ->
+
+                    GamePathItemLayout(
+                        item = pathItem,
+                        selected =
+                            currentPath == pathItem.path,
+                        enabled = canHandlePermission,
+                        onClick = {
+
+                            if (!isRefreshing) {
+
+                                if (
+                                    pathItem.id ==
+                                    GamePathManager.DEFAULT_ID
+                                ) {
+
+                                    GamePathManager
+                                        .saveDefaultPath()
+
+                                } else {
+
+                                    (context as? MainActivity)
+                                        ?.let { activity ->
+
+                                            checkStoragePermissions(
+                                                activity = activity,
+                                                message =
+                                                    activity.getString(
+                                                        R.string.versions_manage_game_storage_permissions
+                                                    ),
+                                                messageSdk30 =
+                                                    activity.getString(
+                                                        R.string.versions_manage_game_storage_permissions_sdk30
+                                                    ),
+                                                hasPermission = {
+
+                                                    GamePathManager
+                                                        .saveCurrentPath(
+                                                            pathItem.id
+                                                        )
+                                                }
+                                            )
+                                        }
+                                }
+                            }
+                        },
+                        onDelete = {
+
+                            changePathOperation(
+                                GamePathOperation.DeletePath(
+                                    pathItem
+                                )
+                            )
+                        },
+                        onRename = {
+
+                            changePathOperation(
+                                GamePathOperation.RenamePath(
+                                    pathItem
+                                )
+                            )
                         }
                     )
                 }
-            },
-            enabled = canHandlePermission
-        ) {
-            MarqueeText(text = stringResource(R.string.versions_manage_game_path_add_new))
+            }
         }
 
-        ScalingActionButton(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 12.dp, vertical = 8.dp))
-                .fillMaxWidth(),
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        AlfaaSideButton(
+            icon = Icons.Default.Add,
+            text = stringResource(
+                R.string.versions_manage_game_path_add_new
+            ),
+            accent = AlfaaCyan,
+            enabled = canHandlePermission,
+            onClick = onAddPath
+        )
+
+        AlfaaSideButton(
+            icon = Icons.Default.MoveDown,
+            text = stringResource(
+                R.string.versions_manage_move_versions
+            ),
+            accent = AlfaaPurple,
             onClick = onMoveVersions
-        ) {
-            MarqueeText(text = stringResource(R.string.versions_manage_move_versions))
-        }
+        )
 
-        ScalingActionButton(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 12.dp, vertical = 8.dp))
-                .fillMaxWidth(),
-            onClick = onCleanupGameFiles
+        AlfaaSideButton(
+            icon = Icons.Default.CleaningServices,
+            text = stringResource(
+                R.string.versions_manage_cleanup
+            ),
+            accent = AlfaaGreen,
+            onClick = onCleanup
+        )
+    }
+}
+
+@Composable
+private fun AlfaaSideButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    accent: Color,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp),
+        enabled = enabled,
+        onClick = onClick,
+        shape = RoundedCornerShape(15.dp),
+        color = AlfaaPanel2,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            accent.copy(alpha = 0.28f)
+        )
+    ) {
+
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 12.dp,
+                vertical = 11.dp
+            ),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            MarqueeText(text = stringResource(R.string.versions_manage_cleanup))
+
+            Icon(
+                modifier = Modifier.size(19.dp),
+                imageVector = icon,
+                contentDescription = null,
+                tint = accent
+            )
+
+            Spacer(
+                modifier = Modifier.width(10.dp)
+            )
+
+            Text(
+                text = text,
+                color = AlfaaText,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/*
+ * ============================================================
+ * MAIN VERSION CONTENT
+ * ============================================================
+ */
+
 @Composable
-private fun VersionsLayout(
-    modifier: Modifier = Modifier,
-    isVisible: Boolean,
+private fun AlfaaVersionsContent(
+    modifier: Modifier,
     isRefreshing: Boolean,
     versions: List<Version>,
     currentVersion: Version?,
     versionCategory: VersionCategory,
-    onCategoryChange: (VersionCategory) -> Unit,
     allVersionsCount: Int,
     vanillaVersionsCount: Int,
     modloaderVersionsCount: Int,
+    onCategoryChange: (VersionCategory) -> Unit,
+    onRefresh: () -> Unit,
+    onInstall: () -> Unit,
     navigateToVersions: (Version) -> Unit,
     navigateToExport: (Version) -> Unit,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
-    onRefresh: () -> Unit,
-    onVersionPinned: () -> Unit,
-    onInstall: () -> Unit,
+    onVersionPinned: () -> Unit
 ) {
-    val context = LocalContext.current
-    val surfaceYOffset by swapAnimateDpAsState(
-        targetValue = (-40).dp,
-        swapIn = isVisible
+
+    var versionsOperation by remember {
+        mutableStateOf<VersionsOperation>(
+            VersionsOperation.None
+        )
+    }
+
+    VersionsOperation(
+        versionsOperation = versionsOperation,
+        updateVersionsOperation = {
+            versionsOperation = it
+        },
+        submitError = submitError
     )
 
-    BackgroundCard(
-        modifier = modifier.offset { IntOffset(x = 0, y = surfaceYOffset.roundToPx()) },
-        shape = MaterialTheme.shapes.extraLarge
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        color = AlfaaPanel,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            AlfaaBorder
+        )
     ) {
-        if (isRefreshing) { //版本正在刷新中
+
+        if (isRefreshing) {
+
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                LoadingIndicator()
-            }
-        } else {
-            var versionsOperation by remember { mutableStateOf<VersionsOperation>(VersionsOperation.None) }
-            VersionsOperation(
-                versionsOperation = versionsOperation,
-                updateVersionsOperation = { versionsOperation = it },
-                submitError = submitError
-            )
 
-            Column(modifier = Modifier.fillMaxSize()) {
-                CardTitleLayout {
-                    val scrollState = rememberScrollState()
-                    Row(
-                        modifier = Modifier
-                            .fadeEdge(
-                                state = scrollState,
-                                length = 32.dp,
-                                direction = EdgeDirection.Horizontal
-                            )
-                            .fillMaxWidth()
-                            .horizontalScroll(state = scrollState)
-                            .padding(all = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                Column(
+                    horizontalAlignment =
+                        Alignment.CenterHorizontally,
+                    verticalArrangement =
+                        Arrangement.spacedBy(12.dp)
+                ) {
+
+                    CircularProgressIndicator(
+                        color = AlfaaCyan
+                    )
+
+                    Text(
+                        text = "REFRESHING VERSIONS",
+                        color = AlfaaMuted,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 9.sp
+                    )
+                }
+            }
+
+        } else {
+
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+
+                /*
+                 * HEADER
+                 */
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 20.dp,
+                            end = 12.dp,
+                            top = 18.dp,
+                            bottom = 12.dp
+                        ),
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+
+                    Column(
+                        modifier = Modifier.weight(1f)
                     ) {
-                        IconTextButton(
-                            onClick = onRefresh,
-                            painter = painterResource(R.drawable.ic_refresh),
-                            contentDescription = stringResource(R.string.generic_refresh),
-                            text = stringResource(R.string.generic_refresh)
+
+                        Text(
+                            text = "INSTALLED MINECRAFT",
+                            color = AlfaaText,
+                            fontWeight =
+                                FontWeight.ExtraBold,
+                            fontSize = 19.sp
                         )
-                        IconTextButton(
-                            onClick = onInstall,
-                            painter = painterResource(R.drawable.ic_download),
-                            contentDescription = stringResource(R.string.versions_manage_install_new),
-                            text = stringResource(R.string.versions_manage_install_new),
+
+                        Text(
+                            text =
+                                "${versions.size} VERSION${if (versions.size == 1) "" else "S"} AVAILABLE",
+                            color = AlfaaMuted,
+                            fontFamily =
+                                FontFamily.Monospace,
+                            fontSize = 8.sp,
+                            letterSpacing = 0.8.sp
                         )
-                        //版本分类
-                        VersionCategoryItem(
-                            value = VersionCategory.ALL,
-                            versionsCount = allVersionsCount,
-                            selected = versionCategory == VersionCategory.ALL,
-                            onClick = { onCategoryChange(VersionCategory.ALL) }
-                        )
-                        VersionCategoryItem(
-                            value = VersionCategory.VANILLA,
-                            versionsCount = vanillaVersionsCount,
-                            selected = versionCategory == VersionCategory.VANILLA,
-                            onClick = { onCategoryChange(VersionCategory.VANILLA) }
-                        )
-                        VersionCategoryItem(
-                            value = VersionCategory.MODLOADER,
-                            versionsCount = modloaderVersionsCount,
-                            selected = versionCategory == VersionCategory.MODLOADER,
-                            onClick = { onCategoryChange(VersionCategory.MODLOADER) }
-                        )
+                    }
+
+                    Surface(
+                        onClick = onRefresh,
+                        shape =
+                            RoundedCornerShape(13.dp),
+                        color = AlfaaPanel2,
+                        border =
+                            androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                AlfaaBorder
+                            )
+                    ) {
+
+                        Row(
+                            modifier = Modifier.padding(
+                                horizontal = 12.dp,
+                                vertical = 9.dp
+                            ),
+                            verticalAlignment =
+                                Alignment.CenterVertically
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    Icons.Default.Refresh,
+                                contentDescription =
+                                    stringResource(
+                                        R.string.generic_refresh
+                                    ),
+                                tint = AlfaaCyan,
+                                modifier =
+                                    Modifier.size(17.dp)
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.width(6.dp)
+                            )
+
+                            Text(
+                                text = "REFRESH",
+                                color = AlfaaText,
+                                fontSize = 9.sp,
+                                fontWeight =
+                                    FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(
+                        modifier = Modifier.width(7.dp)
+                    )
+
+                    Surface(
+                        onClick = onInstall,
+                        shape =
+                            RoundedCornerShape(13.dp),
+                        color = AlfaaCyan
+                    ) {
+
+                        Row(
+                            modifier = Modifier.padding(
+                                horizontal = 13.dp,
+                                vertical = 10.dp
+                            ),
+                            verticalAlignment =
+                                Alignment.CenterVertically
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    Icons.Default.Add,
+                                contentDescription = null,
+                                tint = Color.Black,
+                                modifier =
+                                    Modifier.size(17.dp)
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.width(5.dp)
+                            )
+
+                            Text(
+                                text = "INSTALL",
+                                color = Color.Black,
+                                fontSize = 9.sp,
+                                fontWeight =
+                                    FontWeight.ExtraBold
+                            )
+                        }
                     }
                 }
 
+                /*
+                 * CATEGORY FILTER
+                 */
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(
+                            rememberScrollState()
+                        )
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 4.dp
+                        ),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(7.dp)
+                ) {
+
+                    AlfaaCategory(
+                        title = "ALL",
+                        count = allVersionsCount,
+                        selected =
+                            versionCategory ==
+                                    VersionCategory.ALL,
+                        accent = AlfaaCyan,
+                        onClick = {
+                            onCategoryChange(
+                                VersionCategory.ALL
+                            )
+                        }
+                    )
+
+                    AlfaaCategory(
+                        title = "VANILLA",
+                        count = vanillaVersionsCount,
+                        selected =
+                            versionCategory ==
+                                    VersionCategory.VANILLA,
+                        accent = AlfaaGreen,
+                        onClick = {
+                            onCategoryChange(
+                                VersionCategory.VANILLA
+                            )
+                        }
+                    )
+
+                    AlfaaCategory(
+                        title = "MODLOADER",
+                        count = modloaderVersionsCount,
+                        selected =
+                            versionCategory ==
+                                    VersionCategory.MODLOADER,
+                        accent = AlfaaPurple,
+                        onClick = {
+                            onCategoryChange(
+                                VersionCategory.MODLOADER
+                            )
+                        }
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier.height(7.dp)
+                )
+
+                /*
+                 * VERSION LIST
+                 */
+
                 if (versions.isNotEmpty()) {
-                    val scrollState = rememberLazyListState()
+
+                    val listState =
+                        rememberLazyListState()
+
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-                            .scrollbar(
-                                state = scrollState.scrollIndicatorState,
-                                orientation = Orientation.Vertical,
-                            )
                             .clipToBounds(),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                        state = scrollState,
+                        state = listState,
+                        contentPadding =
+                            PaddingValues(
+                                horizontal = 14.dp,
+                                vertical = 8.dp
+                            ),
+                        verticalArrangement =
+                            Arrangement.spacedBy(8.dp)
                     ) {
-                        items(versions, key = { it.toString() }) { version ->
-                            val callbacks = remember(version) {
-                                VersionItemCallbacks(
-                                    submitError = submitError,
-                                    onSelected = {
-                                        if (version == currentVersion) return@VersionItemCallbacks
-                                        if (!VersionsManager.saveVersion(version)) {
-                                            //不允许选择无效版本
-                                            versionsOperation = VersionsOperation.InvalidDelete(version)
-                                        }
-                                    },
-                                    onSettingsClick = { navigateToVersions(version) },
-                                    onRenameClick = { versionsOperation = VersionsOperation.Rename(version) },
-                                    onCopyClick = { versionsOperation = VersionsOperation.Copy(version) },
-                                    onExportClick = { navigateToExport(version) },
-                                    onDeleteClick = { versionsOperation = VersionsOperation.Delete(version) },
-                                    onPinned = onVersionPinned,
-                                    onAddShortcutClick = { ShortcutUtils.pinVersion(context, version) }
-                                )
+
+                        items(
+                            items = versions,
+                            key = {
+                                it.toString()
                             }
-                            VersionItemLayout(
+                        ) { version ->
+
+                            val callbacks =
+                                remember(version) {
+
+                                    VersionItemCallbacks(
+
+                                        submitError =
+                                            submitError,
+
+                                        onSelected = {
+
+                                            if (
+                                                version ==
+                                                currentVersion
+                                            ) {
+                                                return@VersionItemCallbacks
+                                            }
+
+                                            if (
+                                                !VersionsManager
+                                                    .saveVersion(
+                                                        version
+                                                    )
+                                            ) {
+
+                                                versionsOperation =
+                                                    VersionsOperation
+                                                        .InvalidDelete(
+                                                            version
+                                                        )
+                                            }
+                                        },
+
+                                        onSettingsClick = {
+                                            navigateToVersions(
+                                                version
+                                            )
+                                        },
+
+                                        onRenameClick = {
+                                            versionsOperation =
+                                                VersionsOperation
+                                                    .Rename(
+                                                        version
+                                                    )
+                                        },
+
+                                        onCopyClick = {
+                                            versionsOperation =
+                                                VersionsOperation
+                                                    .Copy(
+                                                        version
+                                                    )
+                                        },
+
+                                        onExportClick = {
+                                            navigateToExport(
+                                                version
+                                            )
+                                        },
+
+                                        onDeleteClick = {
+                                            versionsOperation =
+                                                VersionsOperation
+                                                    .Delete(
+                                                        version
+                                                    )
+                                        },
+
+                                        onPinned =
+                                            onVersionPinned,
+
+                                        onAddShortcutClick = {
+    ShortcutUtils.pinVersion(
+        context = context,
+        version = version
+    )
+                                        }
+                                    )
+                                }
+
+                            AlfaaVersionCard(
                                 version = version,
-                                selected = version == currentVersion,
-                                callbacks = callbacks,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp)
-                                    .animateItem()
+                                selected =
+                                    version ==
+                                            currentVersion,
+                                callbacks = callbacks
                             )
                         }
                     }
+
                 } else {
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment =
+                            Alignment.Center
                     ) {
-                        ScalingLabel(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = stringResource(R.string.versions_manage_no_versions)
+
+                        Column(
+                            horizontalAlignment =
+                                Alignment.CenterHorizontally
+                        ) {
+
+                            Surface(
+                                shape =
+                                    RoundedCornerShape(20.dp),
+                                color = AlfaaPanel2,
+                                border =
+                                    androidx.compose.foundation.BorderStroke(
+                                        1.dp,
+                                        AlfaaBorder
+                                    )
+                            ) {
+
+                                Column(
+                                    modifier =
+                                        Modifier.padding(
+                                            horizontal = 30.dp,
+                                            vertical = 25.dp
+                                        ),
+                                    horizontalAlignment =
+                                        Alignment.CenterHorizontally
+                                ) {
+
+                                    Icon(
+                                        imageVector =
+                                            Icons.Default.Folder,
+                                        contentDescription =
+                                            null,
+                                        tint = AlfaaMuted,
+                                        modifier =
+                                            Modifier.size(35.dp)
+                                    )
+
+                                    Spacer(
+                                        modifier =
+                                            Modifier.height(10.dp)
+                                    )
+
+                                    Text(
+                                        text = "NO VERSIONS",
+                                        color = AlfaaText,
+                                        fontWeight =
+                                            FontWeight.ExtraBold,
+                                        fontSize = 13.sp
+                                    )
+
+                                    Spacer(
+                                        modifier =
+                                            Modifier.height(4.dp)
+                                    )
+
+                                    Text(
+                                        text =
+                                            "Install a Minecraft version to get started.",
+                                        color = AlfaaMuted,
+                                        fontSize = 9.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
+ * ============================================================
+ * CATEGORY CHIP
+ * ============================================================
+ */
+
+@Composable
+private fun AlfaaCategory(
+    title: String,
+    count: Int,
+    selected: Boolean,
+    accent: Color,
+    onClick: () -> Unit
+) {
+
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = if (selected) {
+            accent.copy(alpha = 0.14f)
+        } else {
+            AlfaaPanel2
+        },
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (selected) {
+                accent.copy(alpha = 0.7f)
+            } else {
+                AlfaaBorder
+            }
+        )
+    ) {
+
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 12.dp,
+                vertical = 8.dp
+            ),
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = title,
+                color = if (selected) {
+                    accent
+                } else {
+                    AlfaaMuted
+                },
+                fontFamily =
+                    FontFamily.Monospace,
+                fontWeight =
+                    FontWeight.Bold,
+                fontSize = 8.sp
+            )
+
+            Spacer(
+                modifier = Modifier.width(6.dp)
+            )
+
+            Text(
+                text = count.toString(),
+                color = if (selected) {
+                    AlfaaText
+                } else {
+                    AlfaaMuted
+                },
+                fontSize = 8.sp,
+                fontWeight =
+                    FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
+/*
+ * ============================================================
+ * VERSION CARD
+ *
+ * VersionItemLayout tetap digunakan supaya seluruh aksi lama
+ * tetap tersedia.
+ * ============================================================
+ */
+
+@Composable
+private fun AlfaaVersionCard(
+    version: Version,
+    selected: Boolean,
+    callbacks: VersionItemCallbacks
+) {
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = if (selected) {
+            Color(0xFF0D1718)
+        } else {
+            AlfaaPanel2
+        },
+        border = androidx.compose.foundation.BorderStroke(
+            width = if (selected) 1.5.dp else 1.dp,
+            color = if (selected) {
+                AlfaaCyan.copy(alpha = 0.8f)
+            } else {
+                AlfaaBorder
+            }
+        )
+    ) {
+
+        Column(
+            modifier = Modifier.padding(7.dp)
+        ) {
+
+            if (selected) {
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 7.dp,
+                            vertical = 4.dp
+                        ),
+                    shape =
+                        RoundedCornerShape(10.dp),
+                    color =
+                        AlfaaCyan.copy(alpha = 0.08f)
+                ) {
+
+                    Row(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 10.dp,
+                                vertical = 6.dp
+                            ),
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .background(
+                                    AlfaaGreen,
+                                    RoundedCornerShape(50)
+                                )
+                        )
+
+                        Spacer(
+                            modifier =
+                                Modifier.width(7.dp)
+                        )
+
+                        Text(
+                            text = "ACTIVE VERSION",
+                            color = AlfaaCyan,
+                            fontFamily =
+                                FontFamily.Monospace,
+                            fontWeight =
+                                FontWeight.Bold,
+                            fontSize = 7.sp,
+                            letterSpacing = 0.8.sp
                         )
                     }
                 }
             }
+
+            VersionItemLayout(
+                version = version,
+                selected = selected,
+                callbacks = callbacks,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
