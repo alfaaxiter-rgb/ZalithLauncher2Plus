@@ -1086,48 +1086,7 @@ ActionCard(
         shadowElevation = 4.dp
     ) {
 
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
-
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = accent.copy(alpha = .10f),
-                border = BorderStroke(
-                    1.dp,
-                    accent.copy(alpha = .22f)
-                )
-            ) {
-
-                Icon(
-                    painter = painterResource(icon),
-                    contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(17.dp)
-                )
-            }
-
-            Spacer(Modifier.height(9.dp))
-
-            Text(
-                text = title,
-                color = Color.White,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                fontSize = 9.sp,
-                letterSpacing = .5.sp
-            )
-
-            Text(
-                text = subtitle,
-                color = Color.White.copy(alpha = .55f),
-                fontSize = 8.sp
-            )
-        }
-    }
-}
+        
 
 
 /* ========================================================= */
