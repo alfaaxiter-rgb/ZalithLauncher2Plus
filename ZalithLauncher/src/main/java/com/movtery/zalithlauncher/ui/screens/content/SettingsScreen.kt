@@ -185,13 +185,6 @@ private val settingItems = listOf(
     ),
 
     NeonSettingItem(
-        key = NormalNavKey.Settings.JavaManager,
-        icon = R.drawable.ic_java,
-        title = R.string.settings_tab_java_manage,
-        accent = NeonColors.Green
-    ),
-
-    NeonSettingItem(
         key = NormalNavKey.Settings.ControlManager,
         icon = R.drawable.ic_videogame_asset_outlined,
         title = R.string.settings_tab_control_manage,
@@ -367,9 +360,9 @@ private fun NeonSettingsItem(
             ) {
 
                 CategoryIcon(
-                    iconRes = item.icon,
-                    contentDescriptionRes = item.title
-                )
+    icon = item.icon,
+    textRes = item.title
+)
             }
 
             Spacer(
