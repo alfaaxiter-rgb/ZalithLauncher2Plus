@@ -145,30 +145,30 @@ fun LauncherScreen(
     ) { _ ->
 
         var showAboutDialog by remember {
-            mutableStateOf(false)
-        }
+    mutableStateOf(false)
+}
 
-        var performanceSettingsState by remember {
-            mutableStateOf(
-                PerformanceSettingsOperation.None
-            )
-        }
+var performanceSettingsState by remember {
+    mutableStateOf<PerformanceSettingsOperation>(
+        PerformanceSettingsOperation.None
+    )
+}
 
-        if (showAboutDialog) {
-            AboutDialog(
-                onDismissRequest = {
-                    showAboutDialog = false
-                }
-            )
+if (showAboutDialog) {
+    AboutDialog(
+        onDismissRequest = {
+            showAboutDialog = false
         }
+    )
+}
 
-        PerformanceSettingsDialog(
-            operation = performanceSettingsState,
-            onDismissRequest = {
-                performanceSettingsState =
-                    PerformanceSettingsOperation.None
-            }
-        )
+PerformanceSettingsDialog(
+    operation = performanceSettingsState,
+    onDismissRequest = {
+        performanceSettingsState =
+            PerformanceSettingsOperation.None
+    }
+)
 
         CompositionLocalProvider(
             LocalUriHandler provides object : UriHandler {
