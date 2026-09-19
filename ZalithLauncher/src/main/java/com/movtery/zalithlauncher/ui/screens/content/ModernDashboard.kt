@@ -602,7 +602,9 @@ private fun HeroCard(
                 .align(Alignment.CenterEnd)
                 .padding(end = 18.dp)
                 .clickable {
-                    onLaunchGame(version)
+    if (version != null) {
+        onLaunchGame(version)
+    }
                 },
             shape = RoundedCornerShape(20.dp),
             color = Accent,
