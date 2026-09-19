@@ -57,6 +57,13 @@ fun ModernDashboard(
     onAccountClick: () -> Unit,
     onVersionsClick: () -> Unit,
     onVersionSettingsClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onFileManagerClick: () -> Unit,
+    onMultiplayerClick: () -> Unit,
+    onDownloadClick: () -> Unit,
+    onRecordingsClick: () -> Unit,
+    onFpsClick: () -> Unit,
+    onAboutClick: () -> Unit,
 ) {
     val account by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
     val version by VersionsManager.currentVersion.collectAsStateWithLifecycle()
@@ -76,9 +83,16 @@ fun ModernDashboard(
     ) {
 
         Header(
-            version = version,
-            hasAccount = account != null
-        )
+    version = version,
+    hasAccount = account != null,
+    onSettingsClick = onSettingsClick,
+    onFileManagerClick = onFileManagerClick,
+    onMultiplayerClick = onMultiplayerClick,
+    onDownloadClick = onDownloadClick,
+    onRecordingsClick = onRecordingsClick,
+    onFpsClick = onFpsClick,
+    onAboutClick = onAboutClick
+)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
