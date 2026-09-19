@@ -217,29 +217,31 @@ fun MainScreen(
                 screenKey = screenBackStackModel.settingsScreen
             )
         },
-                toDownloadScreen = {
-                    screenBackStackModel.navigateToDownload()
-                },
-                toMultiplayerScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = NormalNavKey.Multiplayer
-                    )
-                },
-                toFileManagerScreen = {
-                    screenBackStackModel.mainScreen.navigateTo(
-                        screenKey = NormalNavKey.BuiltInFileManager()
-                    )
-                },
-                toRecordingsScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = NormalNavKey.Recordings
-                    )
-                },
-                changeExpandedState = {
-                    changeTasksExpandedState()
-                },
+        toDownloadScreen = {
+            screenBackStackModel.navigateToDownload()
+        },
+        toMultiplayerScreen = {
+            screenBackStackModel.mainScreen.removeAndNavigateTo(
+                removes = screenBackStackModel.clearBeforeNavKeys,
+                screenKey = NormalNavKey.Multiplayer
+            )
+        },
+        toFileManagerScreen = {
+            screenBackStackModel.mainScreen.navigateTo(
+                screenKey = NormalNavKey.BuiltInFileManager()
+            )
+        },
+        toRecordingsScreen = {
+            screenBackStackModel.mainScreen.removeAndNavigateTo(
+                removes = screenBackStackModel.clearBeforeNavKeys,
+                screenKey = NormalNavKey.Recordings
+            )
+        },
+        changeExpandedState = {
+            changeTasksExpandedState()
+        }
+    )
+            },
             )
 
             Box(
