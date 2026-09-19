@@ -806,6 +806,8 @@ private fun AlfaaVersionsContent(
     onVersionPinned: () -> Unit
 ) {
 
+    val context = LocalContext.current
+
     var versionsOperation by remember {
         mutableStateOf<VersionsOperation>(
             VersionsOperation.None
