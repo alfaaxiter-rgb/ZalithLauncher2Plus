@@ -1434,25 +1434,24 @@ private fun AccountCard(
             tint = NeonColors.Cyan
         )
     }
-
+$
     /*
      * DELETE
      */
 
     IconButton(
-        IconButton(
-        onClick = onDeleteClick
-    ) {
-        Icon(
-            painter = painterResource(
-                R.drawable.ic_delete_outlined
+    onClick = onDeleteClick
+) {
+    Icon(
+        painter = painterResource(
+            R.drawable.ic_delete_outlined
+        ),
+        contentDescription =
+            stringResource(
+                R.string.generic_delete
             ),
-            contentDescription =
-                stringResource(
-                    R.string.generic_delete
-                ),
-            tint = NeonColors.Orange
-        )
+        tint = NeonColors.Orange
+    )
     }
     }
         }
