@@ -1440,6 +1440,7 @@ private fun AccountCard(
      */
 
     IconButton(
+        IconButton(
         onClick = onDeleteClick
     ) {
         Icon(
@@ -1453,7 +1454,8 @@ private fun AccountCard(
             tint = NeonColors.Orange
         )
     }
-}
+    }
+        }
 
 /**
  * Nama tipe akun.
