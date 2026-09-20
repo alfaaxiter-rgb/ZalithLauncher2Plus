@@ -955,7 +955,7 @@ private fun LibraryInfoItem(
         ),
         tint = NeonColors.Cyan
     )
-            }
+}
         }
     }
 }
