@@ -1132,18 +1132,19 @@ private fun AccountManageContent(
                                             R.string.account_no_account
                                         ),
 
-                                    color =
+                                                                        color =
                                         neonMutedColor(),
 
-                                            fontSize = 11.sp
+                                    fontSize = 11.sp
                                 )
                             }
                         }
                     }
                 }
-             }
-         }
-      }
+            }
+        }
+    }
+}
 
 /*
  * =========================================================
