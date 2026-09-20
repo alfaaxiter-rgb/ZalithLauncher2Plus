@@ -752,23 +752,29 @@ private fun AboutLinkItem(
 
                 if (openLicense != null) {
 
-                    NeonIconButton(
-                        icon = R.drawable.ic_copyright_outlined,
-                        contentDescription = "License",
-                        onClick = openLicense
-                    )
-                }
+                    IconButton(
+    onClick = openLicense
+) {
+    Icon(
+        painter = painterResource(R.drawable.ic_copyright_outlined),
+        contentDescription = "License",
+        tint = NeonColors.Cyan
+    )
+                    }
 
                 if (openLink != null) {
 
-                    NeonIconButton(
-                        icon = R.drawable.ic_link,
-                        contentDescription = stringResource(
-                            R.string.generic_open_link
-                        ),
-                        onClick = openLink
-                    )
-                }
+                    IconButton(
+    onClick = openLink
+) {
+    Icon(
+        painter = painterResource(R.drawable.ic_link),
+        contentDescription = stringResource(
+            R.string.generic_open_link
+        ),
+        tint = NeonColors.Cyan
+    )
+                    }
             }
         }
     }
@@ -937,15 +943,19 @@ private fun LibraryInfoItem(
                 )
             }
 
-            NeonIconButton(
-                icon = R.drawable.ic_link,
-                contentDescription = stringResource(
-                    R.string.generic_open_link
-                ),
-                onClick = {
-                    openLink(info.webUrl)
-                }
-            )
+            IconButton(
+    onClick = {
+        openLink(info.webUrl)
+    }
+) {
+    Icon(
+        painter = painterResource(R.drawable.ic_link),
+        contentDescription = stringResource(
+            R.string.generic_open_link
+        ),
+        tint = NeonColors.Cyan
+    )
+            }
         }
     }
 }
