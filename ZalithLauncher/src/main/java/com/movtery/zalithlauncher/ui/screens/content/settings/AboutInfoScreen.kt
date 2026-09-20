@@ -391,7 +391,7 @@ fun AboutInfoScreen(
                             R.string.about_acknowledgements_mcmod_text,
                             BuildKeys.LAUNCHER_SHORT_NAME
                         ),
-                        accent = NeonColors.Green,
+                        accent = NeonColors.CyanBright,
                         openLink = {
                             openLink(URL_MCMOD)
                         }
