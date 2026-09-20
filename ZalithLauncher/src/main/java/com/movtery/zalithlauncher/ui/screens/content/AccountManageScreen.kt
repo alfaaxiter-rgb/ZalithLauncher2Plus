@@ -1126,7 +1126,7 @@ private fun AccountManageContent(
                                         1.5.sp
                                 )
 
-                                                                Text(
+                                                                                                Text(
                                     text =
                                         stringResource(
                                             R.string.account_no_account
@@ -1150,11 +1150,6 @@ private fun AccountManageContent(
  * ALL EXISTING ACCOUNT OPERATIONS
  * =========================================================
  */
-
-    AccountOperation(
-        operationUiState.accountOp,
-        actions
-    )
 
     AccountOperation(
         operationUiState.accountOp,
