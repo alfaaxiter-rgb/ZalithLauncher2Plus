@@ -276,7 +276,7 @@ fun AccountManageScreen(
         }
     }
 
-    BaseScreen(
+        BaseScreen(
         screenKey = key,
         currentKey = backStackViewModel.mainScreen.currentKey
     ) { isVisible ->
@@ -287,6 +287,57 @@ fun AccountManageScreen(
             profileUiState = profileUiState,
             operationUiState = operationUiState,
             actions = actions
+        )
+
+        /*
+         * =====================================================
+         * ACCOUNT OPERATIONS
+         * =====================================================
+         */
+
+        AccountOperationUi(
+            operationUiState.accountOp,
+            actions
+        )
+
+        LoginMenuOperationUi(
+            loginUiState.menuOp,
+            actions,
+            profileUiState.authServers
+        )
+
+        MicrosoftLoginOperationUi(
+            loginUiState.microsoftOp,
+            actions
+        )
+
+        LocalLoginOperationUi(
+            loginUiState.localOp,
+            actions
+        )
+
+        OtherLoginOperationUi(
+            loginUiState.otherOp,
+            actions
+        )
+
+        ServerTypeOperationUi(
+            operationUiState.serverOp,
+            actions
+        )
+
+        AccountSkinOperationUi(
+            accountSkinOperation =
+                operationUiState.accountSkinOp,
+
+            skinDialogState =
+                operationUiState.accountSkinDialogState,
+
+            accountCapes =
+                profileUiState.accountCapeOpMap,
+
+            actions =
+                actions
         )
     }
 }
@@ -461,10 +512,10 @@ private fun AccountManageContent(
                             Text(
                                 text =
                                     currentAccount?.let {
-                                        getAccountTypeName(
-                                            context,
-                                            it
-                                        )
+                                        accountTypeName(
+    context,
+    it
+)
                                     }
                                         ?: "NO ACTIVE ACCOUNT",
 
@@ -629,10 +680,10 @@ private fun AccountManageContent(
 
                             Text(
                                 text =
-                                    getAccountTypeName(
-                                        context,
-                                        currentAccount
-                                    ),
+                                    accountTypeName(
+    context,
+    currentAccount
+),
 
                                 color =
                                     neonMutedColor(),
@@ -1145,57 +1196,6 @@ private fun AccountManageContent(
         }
     }
 
-/*
- * =========================================================
- * ALL EXISTING ACCOUNT OPERATIONS
- * =========================================================
- */
-
-    AccountOperation(
-        operationUiState.accountOp,
-        actions
-    )
-
-    LoginMenuOperation(
-        loginUiState.menuOp,
-        actions,
-        profileUiState.authServers
-    )
-
-    MicrosoftLoginOperation(
-        loginUiState.microsoftOp,
-        actions
-    )
-
-    LocalLoginOperation(
-        loginUiState.localOp,
-        actions
-    )
-
-    OtherLoginOperation(
-        loginUiState.otherOp,
-        actions
-    )
-
-    ServerTypeOperation(
-        operationUiState.serverOp,
-        actions
-    )
-
-    AccountSkinOperation(
-        accountSkinOperation =
-            operationUiState.accountSkinOp,
-
-        skinDialogState =
-            operationUiState.accountSkinDialogState,
-
-        accountCapes =
-            profileUiState.accountCapeOpMap,
-
-        actions =
-            actions
-    )
-}
 
 /**
  * Card satu akun.
@@ -1341,10 +1341,10 @@ private fun AccountCard(
 
                 Text(
                     text =
-                        getAccountTypeName(
-                            context,
-                            account
-                        ),
+                        accountTypeName(
+    context,
+    account
+),
 
                     color =
                         if (isSelected) {
@@ -1439,29 +1439,31 @@ private fun AccountCard(
      * DELETE
      */
 
-                IconButton(
-                onClick = onDeleteClick
-            ) {
-                Icon(
-                    painter = painterResource(
-                        R.drawable.ic_delete_outlined
-                    ),
-                    contentDescription =
-                        stringResource(
-                            R.string.generic_delete
+                                IconButton(
+                    onClick = onDeleteClick
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            R.drawable.ic_delete_outlined
                         ),
-                    tint = NeonColors.Orange
-                )
+                        contentDescription =
+                            stringResource(
+                                R.string.generic_delete
+                            ),
+                        tint = NeonColors.Orange
+                    )
+                }
             }
         }
+    }
     }
 }
 
 /**
  * Nama tipe akun.
  */
-@Composable
-private fun getAccountTypeName(
+@@Composable
+private fun accountTypeName(
     context: Context,
     account: Account
 ): String {
@@ -1469,12 +1471,11 @@ private fun getAccountTypeName(
         .game.account
         .getAccountTypeName(account)
 }
-
 /**
  * Login menu.
  */
 @Composable
-private fun LoginMenuOperation(
+private fun LoginMenuOperationUi(
     operation: LoginMenuOperation,
     actions: AccountActions,
     authServers: List<AuthServer>
@@ -1564,7 +1565,7 @@ private fun LoginMenuOperation(
  * Microsoft login.
  */
 @Composable
-private fun MicrosoftLoginOperation(
+private fun MicrosoftLoginOperationUi(
     operation: MicrosoftLoginOperation,
     actions: AccountActions
 ) {
@@ -1621,7 +1622,7 @@ private fun MicrosoftLoginOperation(
  * Offline login.
  */
 @Composable
-private fun LocalLoginOperation(
+private fun LocalLoginOperationUi(
     operation: LocalLoginOperation,
     actions: AccountActions
 ) {
@@ -1799,7 +1800,7 @@ private fun LocalLoginOperation(
  * Third-party authentication server login.
  */
 @Composable
-private fun OtherLoginOperation(
+private fun OtherLoginOperationUi(
     operation: OtherLoginOperation,
     actions: AccountActions
 ) {
@@ -1940,7 +1941,7 @@ private fun OtherLoginOperation(
  * Authentication server management.
  */
 @Composable
-private fun ServerTypeOperation(
+private fun ServerTypeOperationUi(
     operation: ServerOperation,
     actions: AccountActions
 ) {
@@ -2107,7 +2108,7 @@ private fun ServerTypeOperation(
  * Skin + cape management.
  */
 @Composable
-private fun AccountSkinOperation(
+private fun AccountSkinOperationUi(
     accountSkinOperation: AccountSkinOperation,
     skinDialogState:
         AccountManageViewModel.AccountSkinDialogState,
@@ -2279,7 +2280,7 @@ private fun AccountSkinOperation(
  * General account operations.
  */
 @Composable
-private fun AccountOperation(
+private fun AccountOperationUi(
     operation: AccountOperation,
     actions: AccountActions
 ) {
