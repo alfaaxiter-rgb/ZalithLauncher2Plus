@@ -1119,50 +1119,7 @@ private fun AccountManageContent(
     }
 ),
 
-                                    onRefreshClick = {
-
-                                        actions.onIntent(
-                                            AccountManageIntent
-                                                .RefreshAccount(
-                                                    account
-                                                )
-                                        )
-                                    },
-
-                                    onCopyUUID = {
-
-                                        copyText(
-                                            COPY_LABEL_ACCOUNT_UUID,
-                                            account.profileId,
-                                            context,
-                                            false
-                                        )
-
-                                        Toast.makeText(
-                                            context,
-
-                                            context.getString(
-                                                R.string.account_local_uuid_copied,
-                                                account.username
-                                            ),
-
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    },
-
-                                    onDeleteClick = {
-
-                                        actions.onIntent(
-                                            AccountManageIntent
-                                                .UpdateAccountOp(
-                                                    AccountOperation
-                                                        .Delete(
-                                                            account
-                                                        )
-                                                )
-                                        )
-                                    }
-                                )
+                                    
                             }
                         }
                     }
