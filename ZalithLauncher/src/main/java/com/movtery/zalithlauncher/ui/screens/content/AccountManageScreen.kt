@@ -1439,21 +1439,21 @@ private fun AccountCard(
      * DELETE
      */
 
-    IconButton(
-    onClick = onDeleteClick
-) {
-    Icon(
-        painter = painterResource(
-            R.drawable.ic_delete_outlined
-        ),
-        contentDescription =
-            stringResource(
-                R.string.generic_delete
-            ),
-            tint = NeonColors.Orange
-    )
-    }
-    }
+                IconButton(
+                onClick = onDeleteClick
+            ) {
+                Icon(
+                    painter = painterResource(
+                        R.drawable.ic_delete_outlined
+                    ),
+                    contentDescription =
+                        stringResource(
+                            R.string.generic_delete
+                        ),
+                    tint = NeonColors.Orange
+                )
+            }
+        }
     }
 }
 
