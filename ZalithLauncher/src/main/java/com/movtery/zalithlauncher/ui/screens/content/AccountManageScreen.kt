@@ -1117,7 +1117,7 @@ private fun AccountManageContent(
                 )
         )
     }
-),
+)
 
                                     
                             }
@@ -1455,7 +1455,6 @@ private fun AccountCard(
                 }
             }
         }
-    }
     }
 }
 
