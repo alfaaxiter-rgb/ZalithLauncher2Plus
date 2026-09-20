@@ -750,33 +750,37 @@ private fun AboutLinkItem(
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
 
-                if (openLicense != null) {
+                                if (openLicense != null) {
 
                     IconButton(
-    onClick = openLicense
-) {
-    Icon(
-        painter = painterResource(R.drawable.ic_copyright_outlined),
-        contentDescription = "License",
-        tint = NeonColors.Cyan
-    )
+                        onClick = openLicense
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                R.drawable.ic_copyright_outlined
+                            ),
+                            contentDescription = "License",
+                            tint = NeonColors.Cyan
+                        )
                     }
+                }
 
                 if (openLink != null) {
 
                     IconButton(
-    onClick = openLink
-) {
-    Icon(
-        painter = painterResource(R.drawable.ic_link),
-        contentDescription = stringResource(
-            R.string.generic_open_link
-        ),
-        tint = NeonColors.Cyan
-    )
+                        onClick = openLink
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                R.drawable.ic_link
+                            ),
+                            contentDescription = stringResource(
+                                R.string.generic_open_link
+                            ),
+                            tint = NeonColors.Cyan
+                        )
                     }
-            }
-        }
+                }
     }
 }
 
