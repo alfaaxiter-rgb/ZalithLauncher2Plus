@@ -767,7 +767,7 @@ private fun AboutLinkItem(
 
                 if (openLink != null) {
 
-                    IconButton(
+                                        IconButton(
                         onClick = openLink
                     ) {
                         Icon(
@@ -781,6 +781,8 @@ private fun AboutLinkItem(
                         )
                     }
                 }
+            }
+        }
     }
 }
 
