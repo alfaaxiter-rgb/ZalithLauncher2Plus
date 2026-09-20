@@ -1135,8 +1135,7 @@ private fun AccountManageContent(
                                     color =
                                         neonMutedColor(),
 
-                                    fontSize = 11.sp
-                                fontSize = 11.sp
+                                            fontSize = 11.sp
                                 )
                             }
                         }
@@ -1145,8 +1144,8 @@ private fun AccountManageContent(
              }
          }
       }
-    
- /*
+
+/*
  * =========================================================
  * ALL EXISTING ACCOUNT OPERATIONS
  * =========================================================
