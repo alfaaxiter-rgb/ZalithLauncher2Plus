@@ -1434,7 +1434,7 @@ private fun AccountCard(
             tint = NeonColors.Cyan
         )
     }
-$
+
     /*
      * DELETE
      */
