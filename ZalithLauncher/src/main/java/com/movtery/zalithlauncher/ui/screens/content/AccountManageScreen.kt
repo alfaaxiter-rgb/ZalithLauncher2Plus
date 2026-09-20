@@ -1450,11 +1450,12 @@ private fun AccountCard(
             stringResource(
                 R.string.generic_delete
             ),
-        tint = NeonColors.Orange
+            tint = NeonColors.Orange
     )
     }
     }
-        }
+    }
+}
 
 /**
  * Nama tipe akun.
