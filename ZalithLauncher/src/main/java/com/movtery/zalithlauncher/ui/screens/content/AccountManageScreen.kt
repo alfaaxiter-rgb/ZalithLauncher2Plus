@@ -1141,7 +1141,6 @@ private fun AccountManageContent(
                         }
                     }
                 }
-                            }
             }
         }
     }
