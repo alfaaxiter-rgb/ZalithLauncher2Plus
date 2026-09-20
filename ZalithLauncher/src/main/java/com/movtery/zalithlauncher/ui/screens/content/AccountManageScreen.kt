@@ -48,6 +48,7 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
@@ -76,6 +77,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -504,7 +506,7 @@ private fun AccountManageContent(
                                 RoundedCornerShape(20.dp)
                             )
                             .background(
-                                NeonColors.Black
+                                Color.Black
                             ),
 
                         contentAlignment =
@@ -1363,88 +1365,93 @@ private fun AccountCard(
              */
 
             Row(
-                horizontalArrangement =
-                    Arrangement.spacedBy(2.dp)
-            ) {
+    horizontalArrangement =
+        Arrangement.spacedBy(2.dp)
+) {
 
-                /*
-                 * CHANGE SKIN
-                 */
+    /*
+     * CHANGE SKIN
+     */
 
-                if (
-                    !account.isAuthServerAccount()
-                    || account.isElyByAccount()
-                ) {
+    if (
+        !account.isAuthServerAccount()
+        || account.isElyByAccount()
+    ) {
 
-                    NeonIconButton(
-                        icon =
-                            R.drawable.ic_checkroom,
-
-                        contentDescription =
-                            stringResource(
-                                R.string.account_change_skin
-                            ),
-
-                        onClick =
-                            openChangeSkinDialog
-                    )
-                }
-
-                /*
-                 * REFRESH
-                 */
-
-                if (!account.isLocalAccount()) {
-
-                    NeonIconButton(
-                        icon =
-                            R.drawable.ic_refresh,
-
-                        contentDescription =
-                            stringResource(
-                                R.string.generic_refresh
-                            ),
-
-                        onClick =
-                            onRefreshClick
-                    )
-                }
-
-                /*
-                 * COPY UUID
-                 */
-
-                NeonIconButton(
-                    icon =
-                        R.drawable.ic_copy_all_outlined,
-
-                    contentDescription =
-                        stringResource(
-                            R.string.account_local_uuid_copy
-                        ),
-
-                    onClick =
-                        onCopyUUID
-                )
-
-                /*
-                 * DELETE
-                 */
-
-                NeonIconButton(
-                    icon =
-                        R.drawable.ic_delete_outlined,
-
-                    contentDescription =
-                        stringResource(
-                            R.string.generic_delete
-                        ),
-
-                    onClick =
-                        onDeleteClick
-                )
-            }
+        IconButton(
+            onClick = openChangeSkinDialog
+        ) {
+            Icon(
+                painter = painterResource(
+                    R.drawable.ic_checkroom
+                ),
+                contentDescription =
+                    stringResource(
+                        R.string.account_change_skin
+                    ),
+                tint = NeonColors.Cyan
+            )
         }
+    }
+
+    /*
+     * REFRESH
+     */
+
+    if (!account.isLocalAccount()) {
+
+        IconButton(
+            onClick = onRefreshClick
+        ) {
+            Icon(
+                painter = painterResource(
+                    R.drawable.ic_refresh
+                ),
+                contentDescription =
+                    stringResource(
+                        R.string.generic_refresh
+                    ),
+                tint = NeonColors.Cyan
+            )
+        }
+    }
+
+    /*
+     * COPY UUID
+     */
+
+    IconButton(
+        onClick = onCopyUUID
+    ) {
+        Icon(
+            painter = painterResource(
+                R.drawable.ic_copy_all_outlined
+            ),
+            contentDescription =
+                stringResource(
+                    R.string.account_local_uuid_copy
+                ),
+            tint = NeonColors.Cyan
+        )
+    }
+
+    /*
+     * DELETE
+     */
+
+    IconButton(
+        onClick = onDeleteClick
+    ) {
+        Icon(
+            painter = painterResource(
+                R.drawable.ic_delete_outlined
+            ),
+            contentDescription =
+                stringResource(
+                    R.string.generic_delete
+                ),
+            tint = NeonColors.Orange
+        )
     }
 }
 
