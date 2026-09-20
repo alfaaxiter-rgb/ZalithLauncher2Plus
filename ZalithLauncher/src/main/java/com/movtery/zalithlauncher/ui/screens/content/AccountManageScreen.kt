@@ -1032,49 +1032,92 @@ private fun AccountManageContent(
                                     )
 
                                 AccountCard(
-                                    modifier =
-                                        Modifier.fillMaxWidth(),
+    modifier =
+        Modifier.fillMaxWidth(),
 
-                                    account =
-                                        account,
+    account =
+        account,
 
-                                    currentAccount =
-                                        currentAccount,
+    currentAccount =
+        currentAccount,
 
-                                    elevation =
-                                        elevation,
+    elevation =
+        elevation,
 
-                                    dragHandleModifier =
-                                        Modifier.draggableHandle(),
+    dragHandleModifier =
+        Modifier.draggableHandle(),
 
-                                    onSelected = {
+    onSelected = {
 
-                                        AccountsManager
-                                            .setCurrentAccount(
-                                                account
-                                            )
-                                    },
+        AccountsManager
+            .setCurrentAccount(
+                account
+            )
+    },
 
-                                    openChangeSkinDialog = {
+    openChangeSkinDialog = {
 
-                                        if (
-                                            !account
-                                                .isAuthServerAccount()
-                                            || account
-                                                .isElyByAccount()
-                                        ) {
+        if (
+            !account
+                .isAuthServerAccount()
+            || account
+                .isElyByAccount()
+        ) {
 
-                                            actions.onIntent(
-                                                AccountManageIntent
-                                                    .UpdateAccountSkinOp(
-                                                        AccountSkinOperation
-                                                            .ChangeSkin(
-                                                                account
-                                                            )
-                                                    )
-                                            )
-                                        }
-                                    },
+            actions.onIntent(
+                AccountManageIntent
+                    .UpdateAccountSkinOp(
+                        AccountSkinOperation
+                            .ChangeSkin(
+                                account
+                            )
+                    )
+            )
+        }
+    },
+
+    onRefreshClick = {
+
+        actions.onIntent(
+            AccountManageIntent
+                .RefreshAccount(
+                    account
+                )
+        )
+    },
+
+    onCopyUUID = {
+
+        copyText(
+            COPY_LABEL_ACCOUNT_UUID,
+            account.profileId,
+            context,
+            false
+        )
+
+        Toast.makeText(
+            context,
+            context.getString(
+                R.string.account_local_uuid_copied,
+                account.username
+            ),
+            Toast.LENGTH_SHORT
+        ).show()
+    },
+
+    onDeleteClick = {
+
+        actions.onIntent(
+            AccountManageIntent
+                .UpdateAccountOp(
+                    AccountOperation
+                        .Delete(
+                            account
+                        )
+                )
+        )
+    }
+),
 
                                     onRefreshClick = {
 
@@ -1195,7 +1238,7 @@ private fun AccountManageContent(
             }
         }
     }
-
+}
 
 /**
  * Card satu akun.
@@ -1462,7 +1505,7 @@ private fun AccountCard(
 /**
  * Nama tipe akun.
  */
-@@Composable
+@Composable
 private fun accountTypeName(
     context: Context,
     account: Account
