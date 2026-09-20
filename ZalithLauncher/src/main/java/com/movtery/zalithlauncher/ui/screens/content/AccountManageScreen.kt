@@ -1136,6 +1136,7 @@ private fun AccountManageContent(
                                         neonMutedColor(),
 
                                     fontSize = 11.sp
+                                fontSize = 11.sp
                                 )
                             }
                         }
@@ -1144,7 +1145,6 @@ private fun AccountManageContent(
              }
          }
       }
-     }
     
  /*
  * =========================================================
