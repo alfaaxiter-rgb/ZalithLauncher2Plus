@@ -1142,14 +1142,15 @@ private fun AccountManageContent(
                     }
                 }
             }
-        }
+                }
     }
+}
 
-    /*
-     * =========================================================
-     * ALL EXISTING ACCOUNT OPERATIONS
-     * =========================================================
-     */
+/*
+ * =========================================================
+ * ALL EXISTING ACCOUNT OPERATIONS
+ * =========================================================
+ */
 
     AccountOperation(
         operationUiState.accountOp,
