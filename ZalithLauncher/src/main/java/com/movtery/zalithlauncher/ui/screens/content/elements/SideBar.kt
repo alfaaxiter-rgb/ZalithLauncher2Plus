@@ -80,14 +80,8 @@ fun SideBar(
     }
 
     val sidebarWidth by animateDpAsState(
-        targetValue = if (expanded) {
-            ExpandedWidth
-        } else {
-            CollapsedWidth
-        },
-        animationSpec = tween(
-            durationMillis = 150
-        ),
+        targetValue = if (expanded) ExpandedWidth else CollapsedWidth,
+        animationSpec = tween(durationMillis = 150),
         label = "sidebarWidth"
     )
 
@@ -116,16 +110,11 @@ fun SideBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Sidebar title
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = if (expanded) {
-                            14.dp
-                        } else {
-                            8.dp
-                        }
+                        horizontal = if (expanded) 14.dp else 8.dp
                     ),
                 horizontalArrangement = if (expanded) {
                     Arrangement.Start
@@ -135,18 +124,10 @@ fun SideBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (expanded) {
-                        "ZALITH+"
-                    } else {
-                        "Z+"
-                    },
+                    text = if (expanded) "ZALITH+" else "Z+",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.titleMedium,
-                    fontSize = if (expanded) {
-                        16.sp
-                    } else {
-                        14.sp
-                    }
+                    fontSize = if (expanded) 16.sp else 14.sp
                 )
             }
 
@@ -155,9 +136,7 @@ fun SideBar(
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(
-                    horizontal = 12.dp
-                ),
+                modifier = Modifier.padding(horizontal = 12.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(
                     alpha = 0.15f
                 )
@@ -167,7 +146,6 @@ fun SideBar(
                 modifier = Modifier.height(8.dp)
             )
 
-            // Navigation buttons
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,9 +153,7 @@ fun SideBar(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_video_settings
-                    ),
+                    icon = painterResource(R.drawable.ic_video_settings),
                     label = stringResource(
                         R.string.game_menu_option_fps_settings
                     ),
@@ -186,9 +162,7 @@ fun SideBar(
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_assignment_filled
-                    ),
+                    icon = painterResource(R.drawable.ic_assignment_filled),
                     label = stringResource(
                         R.string.page_title_version_manage
                     ),
@@ -197,54 +171,42 @@ fun SideBar(
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_videocam_filled
-                    ),
+                    icon = painterResource(R.drawable.ic_videocam_filled),
                     label = "Recordings",
                     expanded = expanded,
                     onClick = onRecordingsClick
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_folder_filled
-                    ),
+                    icon = painterResource(R.drawable.ic_folder_filled),
                     label = "File Manager",
                     expanded = expanded,
                     onClick = onFileManagerClick
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_group_filled
-                    ),
+                    icon = painterResource(R.drawable.ic_group_filled),
                     label = "Multiplayer",
                     expanded = expanded,
                     onClick = onMultiplayerClick
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_download_2_filled
-                    ),
+                    icon = painterResource(R.drawable.ic_download_2_filled),
                     label = "Downloads",
                     expanded = expanded,
                     onClick = onDownloadsClick
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_settings_filled
-                    ),
+                    icon = painterResource(R.drawable.ic_settings_filled),
                     label = "Settings",
                     expanded = expanded,
                     onClick = onSettingsClick
                 )
 
                 SideBarShortcut(
-                    icon = painterResource(
-                        R.drawable.ic_info_outlined
-                    ),
+                    icon = painterResource(R.drawable.ic_info_outlined),
                     label = stringResource(
                         R.string.about_launcher_title
                     ),
@@ -253,12 +215,10 @@ fun SideBar(
                 )
             }
 
-            // Theme switch
             ThemeToggle(
                 expanded = expanded
             )
 
-            // Expand / collapse
             SideBarToggle(
                 expanded = expanded,
                 onClick = {
@@ -283,42 +243,29 @@ private fun SideBarShortcut(
     val pressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-    targetValue = if (pressed) 0.97f else 1f,
-    animationSpec = tween(70),
-    label = "sidebarItemScale"
-)
+        targetValue = if (pressed) 0.97f else 1f,
+        animationSpec = tween(durationMillis = 70),
+        label = "sidebarItemScale"
+    )
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = if (expanded) {
-                    7.dp
-                } else {
-                    6.dp
-                }
+                horizontal = if (expanded) 7.dp else 6.dp
             )
             .scale(scale)
-            .clip(
-                RoundedCornerShape(12.dp)
-            )
+            .clip(RoundedCornerShape(12.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onClick
             ),
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(
-    width = 1.dp,
-    color = MaterialTheme.colorScheme.primary.copy(
-        alpha = if (pressed) 0.75f else 0.18f
-    )
-),
-color = if (pressed) {
-    MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
-} else {
-    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.30f)
-}
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(
+                alpha = if (pressed) 0.75f else 0.18f
             )
         ),
         color = if (pressed) {
@@ -335,11 +282,7 @@ color = if (pressed) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = if (expanded) {
-                        11.dp
-                    } else {
-                        0.dp
-                    },
+                    horizontal = if (expanded) 11.dp else 0.dp,
                     vertical = 9.dp
                 ),
             horizontalArrangement = if (expanded) {
@@ -407,19 +350,17 @@ private fun SideBarToggle(
     val pressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-    targetValue = if (pressed) 0.97f else 1f,
-    animationSpec = tween(70),
-    label = "sidebarToggleScale"
-)
+        targetValue = if (pressed) 0.97f else 1f,
+        animationSpec = tween(durationMillis = 70),
+        label = "sidebarToggleScale"
+    )
 
     Surface(
         modifier = Modifier
             .padding(top = 5.dp)
             .size(40.dp)
             .scale(scale)
-            .clip(
-                RoundedCornerShape(12.dp)
-            )
+            .clip(RoundedCornerShape(12.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -429,11 +370,7 @@ private fun SideBarToggle(
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.primary.copy(
-                alpha = if (pressed) {
-                    0.75f
-                } else {
-                    0.18f
-                }
+                alpha = if (pressed) 0.75f else 0.18f
             )
         ),
         color = if (pressed) {
@@ -450,11 +387,7 @@ private fun SideBarToggle(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (expanded) {
-                    "‹"
-                } else {
-                    "›"
-                },
+                text = if (expanded) "‹" else "›",
                 fontSize = 28.sp,
                 color = if (pressed) {
                     MaterialTheme.colorScheme.primary
@@ -483,16 +416,10 @@ private fun ThemeToggle(
     Surface(
         modifier = Modifier
             .padding(
-                horizontal = if (expanded) {
-                    8.dp
-                } else {
-                    6.dp
-                },
+                horizontal = if (expanded) 8.dp else 6.dp,
                 vertical = 6.dp
             )
-            .clip(
-                RoundedCornerShape(14.dp)
-            )
+            .clip(RoundedCornerShape(14.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = null
@@ -509,11 +436,7 @@ private fun ThemeToggle(
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.primary.copy(
-                alpha = if (pressed) {
-                    0.70f
-                } else {
-                    0.16f
-                }
+                alpha = if (pressed) 0.70f else 0.16f
             )
         ),
         color = if (pressed) {
@@ -528,22 +451,14 @@ private fun ThemeToggle(
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = if (expanded) {
-                    10.dp
-                } else {
-                    8.dp
-                },
+                horizontal = if (expanded) 10.dp else 8.dp,
                 vertical = 8.dp
             ),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (dark) {
-                    "☾"
-                } else {
-                    "☀"
-                },
+                text = if (dark) "☾" else "☀",
                 fontSize = 14.sp,
                 color = if (pressed) {
                     MaterialTheme.colorScheme.primary
@@ -566,11 +481,7 @@ private fun ThemeToggle(
                 )
             ) {
                 Text(
-                    text = if (dark) {
-                        "Dark"
-                    } else {
-                        "Light"
-                    },
+                    text = if (dark) "Dark" else "Light",
                     color = MaterialTheme.colorScheme.onSurface.copy(
                         alpha = 0.82f
                     ),
