@@ -21,14 +21,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -45,10 +44,28 @@ import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 
-private val Accent = Color(0xFF20E0B2)
-private val AccentBlue = Color(0xFF43C7FF)
-private val AccentPurple = Color(0xFFA78BFA)
-private val AccentOrange = Color(0xFFFFB86B)
+/* ========================================================= */
+/* ALFAA NEON PALETTE */
+/* ========================================================= */
+
+private val AlfaaBlack = Color(0xFF03070B)
+private val AlfaaPanel = Color(0xFF071019)
+private val AlfaaPanel2 = Color(0xFF0B1620)
+private val AlfaaPanel3 = Color(0xFF101E29)
+
+private val AlfaaCyan = Color(0xFF43C7FF)
+private val AlfaaGreen = Color(0xFF20E0B2)
+private val AlfaaPurple = Color(0xFFA78BFA)
+private val AlfaaOrange = Color(0xFFFFB454)
+private val AlfaaRed = Color(0xFFFF5577)
+
+private val AlfaaText = Color(0xFFE8FFF8)
+private val AlfaaMuted = Color(0xFF829A98)
+private val AlfaaBorder = Color(0xFF16483F)
+
+/* ========================================================= */
+/* MAIN DASHBOARD */
+/* ========================================================= */
 
 @Composable
 fun ModernDashboard(
@@ -69,129 +86,165 @@ fun ModernDashboard(
     val version by VersionsManager.currentVersion.collectAsStateWithLifecycle()
     val versions by VersionsManager.versions.collectAsStateWithLifecycle()
 
-    val panel = MaterialTheme.colorScheme.surface
-    val panelAlt = MaterialTheme.colorScheme.surfaceVariant
-    val border = MaterialTheme.colorScheme.outlineVariant
-    val muted = MaterialTheme.colorScheme.onSurfaceVariant
-
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF03070B),
+                        AlfaaBlack,
+                        Color(0xFF061019)
+                    )
+                )
+            )
     ) {
-        DashboardTitleBar(
-            version = version,
-            hasAccount = account != null
+
+        /* subtle neon background lines */
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color.Transparent,
+                            AlfaaCyan.copy(alpha = .45f),
+                            AlfaaGreen.copy(alpha = .65f),
+                            Color.Transparent
+                        )
+                    )
+                )
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.Top
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    top = 8.dp,
+                    bottom = 8.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(9.dp)
         ) {
 
-            /*
-             * LEFT / MAIN AREA
-             */
-            Column(
-                modifier = Modifier.weight(1.62f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            DashboardTitleBar(
+                version = version,
+                hasAccount = account != null
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(9.dp),
+                verticalAlignment = Alignment.Top
             ) {
 
-                HeroCard(
-                    accountName = account?.username,
-                    version = version,
-                    onLaunchGame = onLaunchGame
-                )
+                /* ================= LEFT ================= */
 
-                QuickActions(
-    panel = panelAlt,
-    border = border,
-    onVersionsClick = onVersionsClick,
-    onAccountClick = onAccountClick,
-    onVersionSettingsClick = onVersionSettingsClick,
-    onSettingsClick = onSettingsClick
-)
-            }
-
-            /*
-             * RIGHT / SIDEBAR AREA
-             */
-            Column(
-                modifier = Modifier.weight(.76f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-
-                /*
-                 * Hanya SATU area akun.
-                 */
-                AccountCard(
-                    accountName = account?.username,
-                    hasAccount = account != null,
-                    panel = panel,
-                    border = border,
-                    muted = muted,
-                    onAccountClick = onAccountClick
+                Column(
+                    modifier = Modifier.weight(1.65f),
+                    verticalArrangement = Arrangement.spacedBy(9.dp)
                 ) {
-                    AccountAvatar(
-                        account = account,
-                        avatarSize = 48.dp,
-                        onClick = onAccountClick
+
+                    HeroCard(
+                        accountName = account?.username,
+                        version = version,
+                        onLaunchGame = onLaunchGame
+                    )
+
+                    QuickActions(
+                        panel = AlfaaPanel2,
+                        border = AlfaaBorder,
+                        onVersionsClick = onVersionsClick,
+                        onAccountClick = onAccountClick,
+                        onVersionSettingsClick = onVersionSettingsClick,
+                        onSettingsClick = onSettingsClick
                     )
                 }
 
-                InstancesCard(
-                    versions = versions,
-                    selected = version,
-                    panel = panel,
-                    border = border,
-                    muted = muted,
-                    onVersionsClick = onVersionsClick
-                )
+                /* ================= RIGHT ================= */
 
-                SessionCard(
-                    panel = panelAlt,
-                    border = border,
-                    muted = muted,
-                    version = version,
-                    onClick = onVersionSettingsClick
-                )
+                Column(
+                    modifier = Modifier.weight(.82f),
+                    verticalArrangement = Arrangement.spacedBy(9.dp)
+                ) {
+
+                    AccountCard(
+                        accountName = account?.username,
+                        hasAccount = account != null,
+                        onAccountClick = onAccountClick
+                    ) {
+                        AccountAvatar(
+                            account = account,
+                            avatarSize = 48.dp,
+                            onClick = onAccountClick
+                        )
+                    }
+
+                    InstancesCard(
+                        versions = versions,
+                        selected = version,
+                        muted = AlfaaMuted,
+                        onVersionsClick = onVersionsClick
+                    )
+
+                    SessionCard(
+                        version = version,
+                        onClick = onVersionSettingsClick
+                    )
+                }
             }
-        }
 
-        /*
-         * FOOTER
-         */
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Text(
-                text = "// PLAY  •  EXPLORE  •  CREATE",
-                color = AccentBlue,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 8.sp,
-                letterSpacing = .4.sp
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            Text(
-                text = "TikTok: @alfathgpp",
-                color = muted,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 8.sp
-            )
+            FooterBar()
         }
     }
 }
 
+/* ========================================================= */
+/* GENERIC NEON PANEL */
+/* ========================================================= */
+
+@Composable
+private fun NeonPanel(
+    modifier: Modifier = Modifier,
+    accent: Color,
+    content: @Composable () -> Unit
+) {
+    val shape = RoundedCornerShape(19.dp)
+
+    Box(
+        modifier = modifier
+            .shadow(
+                elevation = 10.dp,
+                shape = shape,
+                ambientColor = accent.copy(alpha = .16f),
+                spotColor = accent.copy(alpha = .22f)
+            )
+            .clip(shape)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        AlfaaPanel3,
+                        AlfaaPanel2,
+                        AlfaaPanel
+                    )
+                )
+            )
+            .border(
+                width = 1.dp,
+                color = accent.copy(alpha = .28f),
+                shape = shape
+            )
+            .padding(11.dp)
+    ) {
+        content()
+    }
+}
 
 /* ========================================================= */
-/* DASHBOARD TITLE */
+/* TITLE BAR */
 /* ========================================================= */
 
 @Composable
@@ -200,100 +253,115 @@ private fun DashboardTitleBar(
     hasAccount: Boolean
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 4.dp,
+                vertical = 2.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(
-                text = "DASHBOARD",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 21.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = .7.sp
-            )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = Accent.copy(alpha = .10f),
-                    border = BorderStroke(
-                        1.dp,
-                        Accent.copy(alpha = .35f)
-                    )
-                ) {
-                    Text(
-                        text = "ZL2+",
-                        modifier = Modifier.padding(
-                            horizontal = 9.dp,
-                            vertical = 4.dp
-                        ),
-                        color = Accent,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 8.sp
-                    )
-                }
 
-                Spacer(Modifier.width(7.dp))
-
-                Text(
-                    text = version?.getVersionName() ?: "NO INSTANCE",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 9.sp
-                )
-            }
-        }
-
-        Surface(
-            shape = RoundedCornerShape(15.dp),
-            color = if (hasAccount) {
-                Accent.copy(alpha = .10f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-            border = BorderStroke(
-                1.dp,
-                if (hasAccount) {
-                    Accent.copy(alpha = .35f)
-                } else {
-                    MaterialTheme.colorScheme.outlineVariant
-                }
-            ),
-            shadowElevation = 7.dp
-        ) {
-            Row(
-                modifier = Modifier.padding(
-                    horizontal = 11.dp,
-                    vertical = 8.dp
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 Box(
                     modifier = Modifier
-                        .size(7.dp)
-                        .clip(RoundedCornerShape(50))
+                        .width(4.dp)
+                        .height(25.dp)
+                        .clip(RoundedCornerShape(5.dp))
                         .background(
-                            if (hasAccount) Accent
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                            Brush.verticalGradient(
+                                listOf(
+                                    AlfaaCyan,
+                                    AlfaaGreen
+                                )
+                            )
                         )
                 )
 
-                Spacer(Modifier.width(7.dp))
+                Spacer(Modifier.width(9.dp))
 
-                Text(
-                    text = if (hasAccount) "READY" else "OFFLINE",
-                    color = if (hasAccount) Accent
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 8.sp
-                )
+                Column {
+
+                    Text(
+                        text = "ALFAA // LAUNCH",
+                        color = AlfaaText,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 18.sp,
+                        letterSpacing = 1.sp
+                    )
+
+                    Text(
+                        text = version?.getVersionName()
+                            ?: "NO INSTANCE SELECTED",
+                        color = AlfaaMuted,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 8.sp,
+                        letterSpacing = .5.sp
+                    )
+                }
             }
+        }
+
+        NeonStatus(
+            active = hasAccount
+        )
+    }
+}
+
+/* ========================================================= */
+/* STATUS */
+/* ========================================================= */
+
+@Composable
+private fun NeonStatus(
+    active: Boolean
+) {
+    val accent = if (active) AlfaaGreen else AlfaaRed
+
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(13.dp))
+            .background(accent.copy(alpha = .08f))
+            .border(
+                1.dp,
+                accent.copy(alpha = .32f),
+                RoundedCornerShape(13.dp)
+            )
+            .padding(
+                horizontal = 10.dp,
+                vertical = 7.dp
+            )
+    ) {
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .size(7.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(accent)
+            )
+
+            Spacer(Modifier.width(7.dp))
+
+            Text(
+                text = if (active) "ONLINE" else "OFFLINE",
+                color = accent,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                fontSize = 8.sp,
+                letterSpacing = .7.sp
+            )
         }
     }
 }
@@ -308,25 +376,26 @@ private fun HeroCard(
     version: Version?,
     onLaunchGame: (Version?) -> Unit
 ) {
-    val shape = RoundedCornerShape(28.dp)
+    val shape = RoundedCornerShape(23.dp)
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(245.dp)
+            .height(285.dp)
+            .shadow(
+                elevation = 15.dp,
+                shape = shape,
+                ambientColor = AlfaaCyan.copy(alpha = .18f),
+                spotColor = AlfaaCyan.copy(alpha = .25f)
+            )
             .clip(shape)
             .border(
-                BorderStroke(
-                    1.dp,
-                    Color.White.copy(alpha = .08f)
-                ),
+                1.dp,
+                AlfaaCyan.copy(alpha = .30f),
                 shape
             )
     ) {
 
-        /*
-         * BACKGROUND
-         */
         Image(
             painter = painterResource(
                 R.drawable.img_star1xr
@@ -336,128 +405,160 @@ private fun HeroCard(
             contentScale = ContentScale.Crop
         )
 
-        /*
-         * DARK GRADIENT
-         */
+        /* dark overlay */
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.horizontalGradient(
                         listOf(
-                            Color(0xF4070D12),
-                            Color(0xD0070D12),
-                            Color(0x66070D12),
-                            Color(0x18070D12)
+                            Color(0xF903070B),
+                            Color(0xE5070E15),
+                            Color(0x990A131C),
+                            Color(0x4008131A)
                         )
                     )
                 )
         )
 
-        /*
-         * BOTTOM VIGNETTE
-         */
+        /* cyan/green atmospheric glow */
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
                         listOf(
+                            AlfaaCyan.copy(alpha = .07f),
                             Color.Transparent,
-                            Color(0x77000000)
+                            AlfaaGreen.copy(alpha = .10f)
                         )
                     )
                 )
         )
 
-        /*
-         * HERO TEXT
-         */
+        /* top neon line */
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .align(Alignment.TopCenter)
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color.Transparent,
+                            AlfaaCyan,
+                            AlfaaGreen,
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+
+        /* content */
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(
-                    start = 24.dp,
-                    end = 220.dp
+                    start = 22.dp,
+                    end = 205.dp
                 ),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
 
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Accent.copy(alpha = .12f),
-                border = BorderStroke(
-                    1.dp,
-                    Accent.copy(alpha = .35f)
-                )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(
+                        AlfaaCyan.copy(alpha = .10f)
+                    )
+                    .border(
+                        1.dp,
+                        AlfaaCyan.copy(alpha = .38f),
+                        RoundedCornerShape(50)
+                    )
+                    .padding(
+                        horizontal = 9.dp,
+                        vertical = 5.dp
+                    )
             ) {
-
                 Text(
-                    text = "JAVA EDITION  •  ${
+                    text = "JAVA // ${
                         version?.getVersionSummary()
                             ?: "NO INSTANCE"
                     }",
-                    modifier = Modifier.padding(
-                        horizontal = 10.dp,
-                        vertical = 5.dp
-                    ),
-                    color = Accent,
+                    color = AlfaaCyan,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     fontSize = 8.sp,
-                    letterSpacing = .5.sp
+                    letterSpacing = .6.sp
                 )
             }
 
             Text(
                 text = "WELCOME BACK",
-                color = Color.White.copy(alpha = .64f),
+                color = AlfaaGreen,
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
-                fontSize = 10.sp,
-                letterSpacing = 1.1.sp
+                fontSize = 9.sp,
+                letterSpacing = 1.4.sp
             )
 
             Text(
                 text = accountName ?: "PLAYER",
                 color = Color.White,
-                fontSize = 31.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Black,
+                maxLines = 1
             )
 
             Text(
                 text = version?.let {
                     "${it.getVersionName()}  •  ${it.getVersionSummary()}"
-                } ?: "Pilih atau install instance untuk mulai bermain.",
-                color = Color.White.copy(alpha = .78f),
-                fontSize = 11.sp,
-                lineHeight = 16.sp,
-                maxLines = 2
+                } ?: "Pilih instance atau install versi Minecraft untuk mulai bermain.",
+                color = Color.White.copy(alpha = .72f),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+                maxLines = 3
             )
         }
 
-        /*
-         * PLAY BUTTON
-         */
-        Surface(
+        /* play button */
+        Box(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 18.dp)
+                .padding(end = 15.dp)
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(18.dp),
+                    ambientColor = AlfaaGreen.copy(alpha = .35f),
+                    spotColor = AlfaaGreen.copy(alpha = .45f)
+                )
+                .clip(RoundedCornerShape(18.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color(0xFF39F2C2),
+                            AlfaaGreen
+                        )
+                    )
+                )
+                .border(
+                    1.dp,
+                    Color.White.copy(alpha = .38f),
+                    RoundedCornerShape(18.dp)
+                )
                 .clickable {
-    if (version != null) {
-        onLaunchGame(version)
-    }
-                },
-            shape = RoundedCornerShape(20.dp),
-            color = Accent,
-            shadowElevation = 12.dp
+                    if (version != null) {
+                        onLaunchGame(version)
+                    }
+                }
+                .padding(
+                    horizontal = 21.dp,
+                    vertical = 17.dp
+                )
         ) {
 
             Row(
-                modifier = Modifier.padding(
-                    horizontal = 28.dp,
-                    vertical = 17.dp
-                ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -466,37 +567,37 @@ private fun HeroCard(
                         R.drawable.ic_play_arrow_filled
                     ),
                     contentDescription = null,
-                    tint = Color(0xFF07100E),
-                    modifier = Modifier.size(24.dp)
+                    tint = Color(0xFF03100D),
+                    modifier = Modifier.size(25.dp)
                 )
 
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(8.dp))
 
                 Column {
 
                     Text(
                         text = "PLAY",
-                        color = Color(0xFF07100E),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = .6.sp
+                        color = Color(0xFF03100D),
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = .8.sp
                     )
 
                     Text(
                         text = if (version == null)
-                            "Pilih instance"
+                            "SELECT INSTANCE"
                         else
-                            "Launch instance",
-                        color = Color(0xFF16453B),
+                            "LAUNCH GAME",
+                        color = Color(0xFF155447),
                         fontFamily = FontFamily.Monospace,
-                        fontSize = 8.sp
+                        fontSize = 7.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
         }
     }
 }
-
 
 /* ========================================================= */
 /* ACCOUNT */
@@ -506,100 +607,83 @@ private fun HeroCard(
 private fun AccountCard(
     accountName: String?,
     hasAccount: Boolean,
-    panel: Color,
-    border: Color,
-    muted: Color,
     onAccountClick: () -> Unit,
     avatar: @Composable () -> Unit
 ) {
-    Surface(
+    NeonPanel(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = onAccountClick
-            ),
-        shape = RoundedCornerShape(24.dp),
-        color = panel,
-        border = BorderStroke(
-            1.dp,
-            border.copy(alpha = .85f)
-        ),
-        shadowElevation = 6.dp
+            .clickable(onClick = onAccountClick),
+        accent = AlfaaGreen
     ) {
 
-        Column(
-            modifier = Modifier.padding(14.dp)
+        SectionTitle(
+            text = "ACTIVE ACCOUNT",
+            accent = AlfaaGreen
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            SectionTitle("ACTIVE ACCOUNT")
+            if (hasAccount) {
+                avatar()
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(
+                            AlfaaGreen.copy(alpha = .08f)
+                        )
+                        .border(
+                            1.dp,
+                            AlfaaGreen.copy(alpha = .30f),
+                            RoundedCornerShape(14.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "+",
+                        color = AlfaaGreen,
+                        fontSize = 27.sp
+                    )
+                }
+            }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.width(10.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
 
-                if (hasAccount) {
+                Text(
+                    text = accountName ?: "ADD ACCOUNT",
+                    color = AlfaaText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
 
-                    avatar()
-
-                } else {
-
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = Accent.copy(alpha = .10f),
-                        border = BorderStroke(
-                            1.dp,
-                            Accent.copy(alpha = .28f)
-                        )
-                    ) {
-
-                        Box(
-                            modifier = Modifier.size(48.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-
-                            Text(
-                                text = "+",
-                                color = Accent,
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Light
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.width(11.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-
-                    Text(
-                        text = accountName ?: "Tambahkan Akun",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = if (hasAccount)
-                            "Microsoft / active"
-                        else
-                            "Sign in / offline profile",
-                        color = if (hasAccount)
-                            Accent
-                        else
-                            muted,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 8.sp
-                    )
-                }
+                Text(
+                    text = if (hasAccount)
+                        "MICROSOFT // ACTIVE"
+                    else
+                        "SIGN IN // OFFLINE",
+                    color = if (hasAccount)
+                        AlfaaGreen
+                    else
+                        AlfaaMuted,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 7.sp,
+                    letterSpacing = .3.sp
+                )
             }
         }
     }
 }
-
 
 /* ========================================================= */
 /* INSTANCES */
@@ -609,93 +693,80 @@ private fun AccountCard(
 private fun InstancesCard(
     versions: List<Version>,
     selected: Version?,
-    panel: Color,
-    border: Color,
     muted: Color,
     onVersionsClick: () -> Unit
 ) {
-    Surface(
+    NeonPanel(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = panel,
-        border = BorderStroke(
-            1.dp,
-            border.copy(alpha = .85f)
-        )
+        accent = AlfaaCyan
     ) {
 
-        Column(
-            modifier = Modifier.padding(14.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            SectionTitle(
+                text = "INSTANCES",
+                accent = AlfaaCyan
+            )
 
-                SectionTitle("INSTANCES")
+            Spacer(Modifier.weight(1f))
 
-                Spacer(Modifier.weight(1f))
-
-                Surface(
-                    modifier = Modifier.clickable(
-                        onClick = onVersionsClick
-                    ),
-                    shape = RoundedCornerShape(50),
-                    color = Accent.copy(alpha = .10f),
-                    border = BorderStroke(
-                        1.dp,
-                        Accent.copy(alpha = .28f)
-                    )
-                ) {
-
-                    Text(
-                        text = "+ NEW",
-                        modifier = Modifier.padding(
-                            horizontal = 9.dp,
-                            vertical = 5.dp
-                        ),
-                        color = Accent,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 8.sp
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            /*
-             * HORIZONTAL SCROLL
-             */
-            Row(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(
-                        rememberScrollState()
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(
+                        AlfaaCyan.copy(alpha = .09f)
+                    )
+                    .border(
+                        1.dp,
+                        AlfaaCyan.copy(alpha = .28f),
+                        RoundedCornerShape(50)
+                    )
+                    .clickable(onClick = onVersionsClick)
+                    .padding(
+                        horizontal = 8.dp,
+                        vertical = 5.dp
+                    )
             ) {
-
-                versions
-                    .take(8)
-                    .forEach { item ->
-
-                        InstanceChip(
-                            version = item,
-                            selected = item == selected,
-                            muted = muted,
-                            onClick = onVersionsClick
-                        )
-                    }
-
-                AddInstanceChip(
-                    onClick = onVersionsClick
+                Text(
+                    text = "+ NEW",
+                    color = AlfaaCyan,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 7.sp
                 )
             }
         }
+
+        Spacer(Modifier.height(9.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(
+                    rememberScrollState()
+                ),
+            horizontalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+
+            versions
+                .take(8)
+                .forEach { item ->
+                    InstanceChip(
+                        version = item,
+                        selected = item == selected,
+                        muted = muted,
+                        onClick = onVersionsClick
+                    )
+                }
+
+            AddInstanceChip(
+                onClick = onVersionsClick
+            )
+        }
     }
 }
-
 
 @Composable
 private fun InstanceChip(
@@ -704,40 +775,42 @@ private fun InstanceChip(
     muted: Color,
     onClick: () -> Unit
 ) {
-    val shape = RoundedCornerShape(17.dp)
+    val accent = if (selected) AlfaaGreen else AlfaaCyan
+    val shape = RoundedCornerShape(15.dp)
 
-    Surface(
+    Box(
         modifier = Modifier
-            .width(170.dp)
-            .height(74.dp)
-            .clickable(
-                onClick = onClick
-            ),
-        shape = shape,
-        color = if (selected)
-            Accent.copy(alpha = .09f)
-        else
-            Color(0xFF172128),
-        border = BorderStroke(
-            1.dp,
-            if (selected)
-                Accent.copy(alpha = .42f)
-            else
-                Color.White.copy(alpha = .06f)
-        )
+            .width(165.dp)
+            .height(70.dp)
+            .clip(shape)
+            .background(
+                if (selected)
+                    accent.copy(alpha = .09f)
+                else
+                    AlfaaPanel3
+            )
+            .border(
+                1.dp,
+                if (selected)
+                    accent.copy(alpha = .48f)
+                else
+                    Color.White.copy(alpha = .07f),
+                shape
+            )
+            .clickable(onClick = onClick)
+            .padding(9.dp)
     ) {
 
         Row(
-            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             VersionIconImage(
                 version = version,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(46.dp)
             )
 
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(9.dp))
 
             Column(
                 modifier = Modifier.weight(1f)
@@ -745,69 +818,83 @@ private fun InstanceChip(
 
                 Text(
                     text = version.getVersionName(),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    color = AlfaaText,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
 
                 Text(
                     text = version.getVersionSummary(),
                     color = if (selected)
-                        Accent
+                        accent
                     else
                         muted,
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 8.sp,
+                    fontSize = 7.sp,
                     maxLines = 1
+                )
+
+                Spacer(Modifier.height(5.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(
+                            accent.copy(
+                                alpha = if (selected) .55f else .14f
+                            )
+                        )
                 )
             }
         }
     }
 }
 
-
 @Composable
 private fun AddInstanceChip(
     onClick: () -> Unit
 ) {
-    Surface(
+    Box(
         modifier = Modifier
-            .width(110.dp)
-            .height(74.dp)
-            .clickable(
-                onClick = onClick
-            ),
-        shape = RoundedCornerShape(17.dp),
-        color = Color(0xFF172128),
-        border = BorderStroke(
-            1.dp,
-            Accent.copy(alpha = .20f)
-        )
+            .width(105.dp)
+            .height(70.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .background(
+                AlfaaPanel3
+            )
+            .border(
+                1.dp,
+                AlfaaPurple.copy(alpha = .25f),
+                RoundedCornerShape(15.dp)
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Text(
                 text = "+",
-                color = Accent,
-                fontSize = 26.sp,
+                color = AlfaaPurple,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Light
             )
 
             Text(
                 text = "NEW INSTANCE",
-                color = Color.White,
+                color = AlfaaText,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 7.sp,
-                letterSpacing = .4.sp
+                letterSpacing = .3.sp
             )
         }
     }
 }
-
 
 /* ========================================================= */
 /* QUICK ACTIONS */
@@ -822,87 +909,76 @@ private fun QuickActions(
     onVersionSettingsClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    Surface(
+    NeonPanel(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = panel,
-        border = BorderStroke(
-            1.dp,
-            border.copy(alpha = .85f)
-        )
+        accent = AlfaaPurple
     ) {
 
-        Column(
-            modifier = Modifier.padding(14.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            SectionTitle(
+                text = "QUICK ACTIONS",
+                accent = AlfaaPurple
+            )
 
-                SectionTitle("QUICK ACTIONS")
+            Spacer(Modifier.weight(1f))
 
-                Spacer(Modifier.weight(1f))
+            Text(
+                text = "SWIPE →",
+                color = AlfaaPurple,
+                fontFamily = FontFamily.Monospace,
+                fontSize = 7.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
-                Text(
-                    text = "SWIPE →",
-                    color = Accent,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 7.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        Spacer(Modifier.height(9.dp))
 
-            Spacer(Modifier.height(10.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(
+                    rememberScrollState()
+                ),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
 
-            /*
-             * INI YANG MEMPERBAIKI BUG QUICK ACTION
-             */
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(
-                        rememberScrollState()
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
+            ActionCard(
+                title = "VERSIONS",
+                subtitle = "MANAGE INSTANCES",
+                icon = R.drawable.ic_assignment_filled,
+                accent = AlfaaGreen,
+                onClick = onVersionsClick
+            )
 
-                ActionCard(
-                    title = "VERSIONS",
-                    subtitle = "Manage instances",
-                    icon = R.drawable.ic_assignment_filled,
-                    accent = Accent,
-                    onClick = onVersionsClick
-                )
+            ActionCard(
+                title = "ACCOUNT",
+                subtitle = "MANAGE PROFILE",
+                icon = R.drawable.ic_person_outlined,
+                accent = AlfaaCyan,
+                onClick = onAccountClick
+            )
 
-                ActionCard(
-                    title = "ACCOUNT",
-                    subtitle = "Manage profile",
-                    icon = R.drawable.ic_person_outlined,
-                    accent = AccentBlue,
-                    onClick = onAccountClick
-                )
+            ActionCard(
+                title = "INSTANCE",
+                subtitle = "EDIT SELECTED",
+                icon = R.drawable.ic_settings_filled,
+                accent = AlfaaPurple,
+                onClick = onVersionSettingsClick
+            )
 
-                ActionCard(
-                    title = "INSTANCE",
-                    subtitle = "Edit selected",
-                    icon = R.drawable.ic_settings_filled,
-                    accent = AccentPurple,
-                    onClick = onVersionSettingsClick
-                )
-
-                ActionCard(
-                    title = "SETTINGS",
-                    subtitle = "Launcher options",
-                    icon = R.drawable.ic_settings_filled,
-                    accent = AccentOrange,
-                    onClick = onSettingsClick
-                )
-            }
+            ActionCard(
+                title = "SETTINGS",
+                subtitle = "LAUNCHER OPTIONS",
+                icon = R.drawable.ic_settings_filled,
+                accent = AlfaaOrange,
+                onClick = onSettingsClick
+            )
         }
     }
 }
-
 
 @Composable
 private fun ActionCard(
@@ -912,67 +988,90 @@ private fun ActionCard(
     accent: Color,
     onClick: () -> Unit
 ) {
-    Surface(
+    val shape = RoundedCornerShape(16.dp)
+
+    Box(
         modifier = Modifier
-            .width(150.dp)
-            .height(96.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(19.dp),
-        color = Color(0xFF141D24),
-        border = BorderStroke(
-            1.dp,
-            accent.copy(alpha = .16f)
-        ),
-        shadowElevation = 4.dp
+            .width(148.dp)
+            .height(88.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = shape,
+                ambientColor = accent.copy(alpha = .12f),
+                spotColor = accent.copy(alpha = .18f)
+            )
+            .clip(shape)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        AlfaaPanel3,
+                        AlfaaPanel2
+                    )
+                )
+            )
+            .border(
+                1.dp,
+                accent.copy(alpha = .22f),
+                shape
+            )
+            .clickable(onClick = onClick)
+            .padding(10.dp)
     ) {
+
         Row(
-            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                shape = RoundedCornerShape(13.dp),
-                color = accent.copy(alpha = .10f),
-                border = BorderStroke(
-                    1.dp,
-                    accent.copy(alpha = .22f)
-                )
-            ) {
-                Box(
-                    modifier = Modifier.size(40.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        tint = accent,
-                        modifier = Modifier.size(20.dp)
+
+            Box(
+                modifier = Modifier
+                    .size(39.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        accent.copy(alpha = .09f)
                     )
-                }
+                    .border(
+                        1.dp,
+                        accent.copy(alpha = .25f),
+                        RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(19.dp)
+                )
             }
 
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(9.dp))
 
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
                 Text(
                     text = title,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = AlfaaText,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp
+                    fontSize = 9.sp,
+                    maxLines = 1
                 )
+
+                Spacer(Modifier.height(2.dp))
 
                 Text(
                     text = subtitle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = AlfaaMuted,
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 7.sp
+                    fontSize = 6.sp,
+                    maxLines = 2
                 )
             }
         }
     }
 }
-
-        
-
 
 /* ========================================================= */
 /* SESSION */
@@ -980,42 +1079,44 @@ private fun ActionCard(
 
 @Composable
 private fun SessionCard(
-    panel: Color,
-    border: Color,
-    muted: Color,
     version: Version?,
     onClick: () -> Unit
 ) {
-    Surface(
+    NeonPanel(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = onClick
-            ),
-        shape = RoundedCornerShape(24.dp),
-        color = panel,
-        border = BorderStroke(
-            1.dp,
-            border.copy(alpha = .75f)
-        )
+            .clickable(onClick = onClick),
+        accent = AlfaaOrange
     ) {
 
         Row(
-            modifier = Modifier.padding(
-                horizontal = 14.dp,
-                vertical = 13.dp
-            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Icon(
-                painter = painterResource(
-                    R.drawable.ic_assignment_filled
-                ),
-                contentDescription = null,
-                tint = Accent,
-                modifier = Modifier.size(18.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(11.dp))
+                    .background(
+                        AlfaaOrange.copy(alpha = .08f)
+                    )
+                    .border(
+                        1.dp,
+                        AlfaaOrange.copy(alpha = .25f),
+                        RoundedCornerShape(11.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Icon(
+                    painter = painterResource(
+                        R.drawable.ic_assignment_filled
+                    ),
+                    contentDescription = null,
+                    tint = AlfaaOrange,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
 
             Spacer(Modifier.width(9.dp))
 
@@ -1025,30 +1126,30 @@ private fun SessionCard(
 
                 Text(
                     text = "SESSION",
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = AlfaaText,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     fontSize = 9.sp,
-                    letterSpacing = .7.sp
+                    letterSpacing = .8.sp
                 )
 
                 Text(
                     text = version?.getVersionName()
-                        ?: "No active instance",
-                    color = muted,
+                        ?: "NO ACTIVE INSTANCE",
+                    color = AlfaaMuted,
                     fontSize = 8.sp
                 )
             }
 
             Text(
                 text = "›",
-                color = muted,
-                fontSize = 20.sp
+                color = AlfaaOrange,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
 }
-
 
 /* ========================================================= */
 /* SECTION TITLE */
@@ -1056,14 +1157,72 @@ private fun SessionCard(
 
 @Composable
 private fun SectionTitle(
-    text: String
+    text: String,
+    accent: Color = AlfaaCyan
 ) {
-    Text(
-        text = text,
-        color = MaterialTheme.colorScheme.onSurface,
-        fontFamily = FontFamily.Monospace,
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.sp,
-        letterSpacing = 1.1.sp
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Box(
+            modifier = Modifier
+                .width(3.dp)
+                .height(12.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            accent,
+                            accent.copy(alpha = .45f)
+                        )
+                    )
+                )
+        )
+
+        Spacer(Modifier.width(7.dp))
+
+        Text(
+            text = text,
+            color = AlfaaText,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            fontSize = 9.sp,
+            letterSpacing = 1.sp
+        )
+    }
+}
+
+/* ========================================================= */
+/* FOOTER */
+/* ========================================================= */
+
+@Composable
+private fun FooterBar() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 5.dp,
+                vertical = 2.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            text = "// PLAY  •  EXPLORE  •  CREATE",
+            color = AlfaaCyan.copy(alpha = .75f),
+            fontFamily = FontFamily.Monospace,
+            fontSize = 7.sp,
+            letterSpacing = .35.sp
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        Text(
+            text = "ALFAA // @alfathgpp",
+            color = AlfaaMuted,
+            fontFamily = FontFamily.Monospace,
+            fontSize = 7.sp
+        )
+    }
 }
