@@ -31,6 +31,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import kotlin.math.roundToInt
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -1380,5 +1382,62 @@ private fun NeonIconButton(
                     .padding(9.dp)
                     .size(20.dp)
         )
+    }
+}
+
+
+/*
+ * ============================================================
+ * NEON SECTION HEADER
+ * ============================================================
+ */
+
+ @Composable
+private fun NeonSectionHeader(
+    title: String,
+    subtitle: String
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = AlfaaSurface,
+        border = BorderStroke(
+            1.dp,
+            AlfaaCyan.copy(alpha = 0.35f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(
+                horizontal = 16.dp,
+                vertical = 14.dp
+            )
+        ) {
+            Text(
+                text = title,
+                color = AlfaaCyan,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 1.5.sp
+            )
+
+            Text(
+                text = subtitle,
+                modifier = Modifier.padding(top = 3.dp),
+                color = AlfaaMuted,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 1.sp
+            )
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp)
+                    .height(2.dp),
+                color = AlfaaCyan
+            ) {}
+        }
     }
 }
