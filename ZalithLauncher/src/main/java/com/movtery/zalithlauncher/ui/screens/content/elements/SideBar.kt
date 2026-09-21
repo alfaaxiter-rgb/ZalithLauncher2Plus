@@ -283,16 +283,10 @@ private fun SideBarShortcut(
     val pressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-        targetValue = if (pressed) {
-            0.97f
-        } else {
-            1f
-        },
-        animationSpec = tween(
-            durationMillis = 70
-        ),
-        label = "sidebarItemScale"
-    )
+    targetValue = if (pressed) 0.97f else 1f,
+    animationSpec = tween(70),
+    label = "sidebarItemScale"
+)
 
     Surface(
         modifier = Modifier
@@ -314,14 +308,17 @@ private fun SideBarShortcut(
                 onClick = onClick
             ),
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.copy(
-                alpha = if (pressed) {
-                    0.75f
-                } else {
-                    0.18f
-                }
+        border = androidx.compose.foundation.BorderStroke(
+    width = 1.dp,
+    color = MaterialTheme.colorScheme.primary.copy(
+        alpha = if (pressed) 0.75f else 0.18f
+    )
+),
+color = if (pressed) {
+    MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+} else {
+    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.30f)
+}
             )
         ),
         color = if (pressed) {
@@ -410,16 +407,10 @@ private fun SideBarToggle(
     val pressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-        targetValue = if (pressed) {
-            0.97f
-        } else {
-            1f
-        },
-        animationSpec = tween(
-            durationMillis = 70
-        ),
-        label = "sidebarToggleScale"
-    )
+    targetValue = if (pressed) 0.97f else 1f,
+    animationSpec = tween(70),
+    label = "sidebarToggleScale"
+)
 
     Surface(
         modifier = Modifier
