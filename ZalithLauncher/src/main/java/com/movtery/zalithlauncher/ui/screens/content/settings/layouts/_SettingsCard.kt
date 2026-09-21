@@ -10,14 +10,14 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content.settings.layouts
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -28,128 +28,51 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.TitleAndSummary
 
 /**
- * 根据卡片在UI组中的位置，选择不同的圆角形状
+ * ALFAA NEON SETTINGS
+ *
+ * Semua SettingsCard memakai style neon yang sama.
+ * Logic asli tetap dipertahankan.
+ */
+
+private val AlfaaBackground = Color(0xFF05080D)
+private val AlfaaSurface = Color(0xFF0A1118)
+private val AlfaaSurface2 = Color(0xFF0E1821)
+private val AlfaaCyan = Color(0xFF20E0B2)
+private val AlfaaBlue = Color(0xFF43C7FF)
+private val AlfaaText = Color(0xFFE8FFF8)
+private val AlfaaMuted = Color(0xFF829A98)
+private val AlfaaBorder = Color(0xFF16483F)
+private val AlfaaDisabled = Color(0xFF263238)
+
+/**
+ * 根据卡片在 UI 组中的位置，选择不同的圆角形状
  */
 enum class CardPosition {
-    /**
-     * 位于 UI 组的顶部
-     * ``` txt
-     *   _______
-     *  +       +
-     * |         |
-     * |         |
-     * |         |
-     *  ---------
-     * ```
-     */
     Top,
-
-    /**
-     * 位于 UI 组的顶部左侧
-     * ``` txt
-     *   ________
-     *  +        |
-     * |         |
-     * |         |
-     * |         |
-     *  ---------
-     * ```
-     */
     TopStart,
-
-    /**
-     * 位于 UI 组的顶部右侧
-     * ``` txt
-     *  ________
-     * |        +
-     * |         |
-     * |         |
-     * |         |
-     *  ---------
-     * ```
-     */
     TopEnd,
-
-    /**
-     * 位于 UI 组的中部
-     * ``` txt
-     *  _________
-     * |         |
-     * |         |
-     * |         |
-     * |         |
-     *  ---------
-     * ```
-     */
     Middle,
-
-    /**
-     * 位于 UI 组的底部
-     * ``` txt
-     *  _________
-     * |         |
-     * |         |
-     * |         |
-     *  +       +
-     *   -------
-     * ```
-     */
     Bottom,
-
-    /**
-     * 位于 UI 组的底部左侧
-     * ``` txt
-     *  _________
-     * |         |
-     * |         |
-     * |         |
-     *  +        |
-     *   --------
-     * ```
-     */
     BottomStart,
-
-    /**
-     * 位于 UI 组的底部右侧
-     * ``` txt
-     *  _________
-     * |         |
-     * |         |
-     * |         |
-     * |        +
-     *  --------
-     * ```
-     */
     BottomEnd,
-
-    /**
-     * 单个 UI 组件
-     * ``` txt
-     *   _______
-     *  +       +
-     * |         |
-     * |         |
-     *  +       +
-     *   -------
-     * ```
-     */
     Single
 }
 
 /**
- * 根据 UI 组件在组中的位置决定的形状
+ * 根据 UI 组件在组中的位置决定形状
  */
 @Composable
 fun rememberSettingsCardShape(
@@ -165,42 +88,102 @@ fun rememberSettingsCardShape(
                 bottomStart = innerShape,
                 bottomEnd = innerShape
             )
+
             CardPosition.TopStart -> RoundedCornerShape(
                 topStart = outerShape,
                 topEnd = innerShape,
                 bottomStart = innerShape,
                 bottomEnd = innerShape
             )
+
             CardPosition.TopEnd -> RoundedCornerShape(
                 topStart = innerShape,
                 topEnd = outerShape,
                 bottomStart = innerShape,
                 bottomEnd = innerShape
             )
+
             CardPosition.Middle -> RoundedCornerShape(innerShape)
+
             CardPosition.Bottom -> RoundedCornerShape(
                 topStart = innerShape,
                 topEnd = innerShape,
                 bottomStart = outerShape,
                 bottomEnd = outerShape
             )
+
             CardPosition.BottomStart -> RoundedCornerShape(
                 topStart = innerShape,
                 topEnd = innerShape,
                 bottomStart = outerShape,
                 bottomEnd = innerShape
             )
+
             CardPosition.BottomEnd -> RoundedCornerShape(
                 topStart = innerShape,
                 topEnd = innerShape,
                 bottomStart = innerShape,
                 bottomEnd = outerShape
             )
+
             CardPosition.Single -> RoundedCornerShape(outerShape)
         }
     }
 }
 
+/**
+ * Base neon card.
+ */
+@Composable
+private fun NeonSettingsSurface(
+    modifier: Modifier,
+    shape: Shape,
+    enabled: Boolean,
+    onClick: (() -> Unit)?,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val interactionSource = remember {
+        MutableInteractionSource()
+    }
+
+    val backgroundColor = when {
+        !enabled -> AlfaaDisabled.copy(alpha = 0.55f)
+        onClick != null -> AlfaaSurface2
+        else -> AlfaaSurface
+    }
+
+    val borderColor = when {
+        !enabled -> AlfaaBorder.copy(alpha = 0.35f)
+        onClick != null -> AlfaaCyan.copy(alpha = 0.45f)
+        else -> AlfaaBorder.copy(alpha = 0.75f)
+    }
+
+    Surface(
+        modifier = modifier.then(
+            if (onClick != null) {
+                Modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    enabled = enabled,
+                    onClick = onClick
+                )
+            } else {
+                Modifier
+            }
+        ),
+        shape = shape,
+        color = backgroundColor,
+        border = BorderStroke(
+            width = 1.dp,
+            color = borderColor
+        ),
+        content = content
+    )
+}
+
+/**
+ * SettingsCard tanpa click.
+ */
 @Composable
 fun SettingsCard(
     modifier: Modifier = Modifier,
@@ -209,15 +192,24 @@ fun SettingsCard(
     innerShape: Dp = 4.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = rememberSettingsCardShape(position, outerShape, innerShape)
+    val shape = rememberSettingsCardShape(
+        position = position,
+        outerShape = outerShape,
+        innerShape = innerShape
+    )
 
-    BackgroundCard(
+    NeonSettingsSurface(
         modifier = modifier,
         shape = shape,
+        enabled = true,
+        onClick = null,
         content = content
     )
 }
 
+/**
+ * SettingsCard dengan click.
+ */
 @Composable
 fun SettingsCard(
     modifier: Modifier = Modifier,
@@ -228,25 +220,36 @@ fun SettingsCard(
     enabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = rememberSettingsCardShape(position, outerShape, innerShape)
+    val shape = rememberSettingsCardShape(
+        position = position,
+        outerShape = outerShape,
+        innerShape = innerShape
+    )
 
-    BackgroundCard(
+    NeonSettingsSurface(
         modifier = modifier,
         shape = shape,
-        onClick = onClick,
         enabled = enabled,
+        onClick = onClick,
         content = content
     )
 }
 
+/**
+ * SettingsCard dengan title + summary + trailing component.
+ */
 @Composable
 fun SettingsCard(
     position: CardPosition,
     title: String,
     modifier: Modifier = Modifier,
     summary: String? = null,
-    titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
-    summaryStyle: TextStyle = MaterialTheme.typography.labelSmall,
+    titleStyle: TextStyle = MaterialTheme.typography.titleSmall.copy(
+        color = AlfaaText
+    ),
+    summaryStyle: TextStyle = MaterialTheme.typography.labelSmall.copy(
+        color = AlfaaMuted
+    ),
     outerShape: Dp = 28.dp,
     innerShape: Dp = 4.dp,
     innerPadding: PaddingValues = PaddingValues(all = 16.dp),
@@ -254,19 +257,24 @@ fun SettingsCard(
     trailingIcon: (@Composable RowScope.() -> Unit)? = null,
     enabled: Boolean = true
 ) {
-    val shape = rememberSettingsCardShape(position, outerShape, innerShape)
+    val shape = rememberSettingsCardShape(
+        position = position,
+        outerShape = outerShape,
+        innerShape = innerShape
+    )
 
-    BackgroundCard(
+    NeonSettingsSurface(
         modifier = modifier,
         shape = shape,
-        onClick = onClick,
-        enabled = enabled
+        enabled = enabled,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(innerPadding),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             TitleAndSummary(
                 modifier = Modifier.weight(1f),
@@ -275,9 +283,11 @@ fun SettingsCard(
                 titleStyle = titleStyle,
                 summaryStyle = summaryStyle
             )
+
             trailingIcon?.let { trailing ->
                 Row(
                     modifier = Modifier.align(Alignment.CenterVertically),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     content = trailing
                 )
             }
@@ -285,6 +295,9 @@ fun SettingsCard(
     }
 }
 
+/**
+ * Container untuk kumpulan SettingsCard.
+ */
 @Composable
 fun SettingsCardColumn(
     modifier: Modifier = Modifier,
