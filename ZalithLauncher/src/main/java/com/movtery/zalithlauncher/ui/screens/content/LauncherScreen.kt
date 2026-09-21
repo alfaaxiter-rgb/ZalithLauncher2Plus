@@ -209,15 +209,9 @@ fun LauncherScreen(
                 }
             ) {
                 ModernDashboard(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(
-                            start = 12.dp,
-                            top = 12.dp,
-                            end = 12.dp,
-                            bottom = 12.dp
-                        ),
+    modifier = Modifier
+        .weight(1f)
+        .fillMaxHeight(),
                     onLaunchGame = onLaunchGame,
                     onAccountClick = {
                         backStackViewModel.mainScreen.navigateTo(
