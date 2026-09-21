@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -146,47 +147,53 @@ private fun ActionMenu(
             ) {
 
                 Text(
-                    text = "ALFAA LAUNCHER",
-                    color = NeonColors.CyanBright,
-                    fontSize = 12.sp,
-                    letterSpacing = 2.sp
-                )
+    text = "ALFAA LAUNCHER",
+    color = NeonColors.CyanBright,
+    fontSize = 12.sp,
+    fontWeight = FontWeight.Bold,
+    letterSpacing = 2.5.sp
+)
 
-                Text(
-                    text = "COMPONENT SETUP",
-                    color = neonTextColor(),
-                    fontSize = 25.sp
-                )
+Text(
+    text = "COMPONENT SETUP",
+    color = neonTextColor(),
+    fontSize = 25.sp,
+    fontWeight = FontWeight.ExtraBold,
+    letterSpacing = 1.2.sp
+)
 
-                Text(
-                    text = if (installing) {
-                        stringResource(
-                            R.string.splash_screen_installing
-                        )
-                    } else {
-                        stringResource(
-                            R.string.splash_screen_unpack_desc
-                        )
-                    },
-                    color = neonMutedColor(),
-                    fontSize = 14.sp,
-                    lineHeight = 21.sp
-                )
+Text(
+    text = if (installing) {
+        stringResource(
+            R.string.splash_screen_installing
+        )
+    } else {
+        stringResource(
+            R.string.splash_screen_unpack_desc
+        )
+    },
+    color = neonMutedColor(),
+    fontSize = 13.sp,
+    fontWeight = FontWeight.Normal,
+    letterSpacing = 0.3.sp,
+    lineHeight = 20.sp
+)
 
-                Text(
-                    text = if (installing) {
-                        "INSTALLING..."
-                    } else {
-                        "READY TO SET UP"
-                    },
-                    color = if (installing) {
-                        NeonColors.Orange
-                    } else {
-                        NeonColors.CyanBright
-                    },
-                    fontSize = 11.sp,
-                    letterSpacing = 1.2.sp
-                )
+Text(
+    text = if (installing) {
+        "INSTALLING..."
+    } else {
+        "READY TO SET UP"
+    },
+    color = if (installing) {
+        NeonColors.Orange
+    } else {
+        NeonColors.CyanBright
+    },
+    fontSize = 10.sp,
+    fontWeight = FontWeight.Bold,
+    letterSpacing = 1.8.sp
+)
             }
         }
 
