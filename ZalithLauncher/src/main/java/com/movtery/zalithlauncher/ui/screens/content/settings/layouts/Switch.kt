@@ -6,14 +6,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content.settings.layouts
@@ -57,18 +49,24 @@ fun SwitchSettingsCard(
         position = position,
         outerShape = outerShape,
         innerShape = innerShape,
-        onClick = { onCheckedChange(!checked) },
+        onClick = {
+            if (enabled) {
+                onCheckedChange(!checked)
+            }
+        },
         enabled = enabled
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 16.dp),
+                .padding(16.dp)
         ) {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = verticalAlignment
             ) {
+
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -91,7 +89,9 @@ fun SwitchSettingsCard(
                 DefaultSwitch(
                     checked = checked,
                     enabled = enabled,
-                    onCheckedChange = { value -> onCheckedChange(value) }
+                    onCheckedChange = { value ->
+                        onCheckedChange(value)
+                    }
                 )
             }
 
@@ -134,6 +134,6 @@ fun SwitchSettingsCard(
         titleStyle = titleStyle,
         summaryStyle = summaryStyle,
         trailingIcon = trailingIcon,
-        columnLayout = columnLayout,
+        columnLayout = columnLayout
     )
 }
