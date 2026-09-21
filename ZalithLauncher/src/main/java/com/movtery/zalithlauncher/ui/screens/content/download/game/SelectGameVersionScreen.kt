@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -63,7 +64,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.round
@@ -248,21 +248,20 @@ fun SelectGameVersionScreen(
     ) { isVisible ->
 
         val yOffset by androidx.compose.animation.core.animateDpAsState(
-            targetValue = if (isVisible) 0.dp else (-24).dp,
-            animationSpec = tween(220),
-            label = "versionScreenOffset"
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(AlfaaBlack)
-                .offset(
-    x = 0.dp,
-    y = yOffset
+    targetValue = if (isVisible) 0.dp else (-24).dp,
+    animationSpec = tween(220),
+    label = "versionScreenOffset"
 )
-                }
-        ) {
+
+Column(
+    modifier = Modifier
+        .fillMaxSize()
+        .background(AlfaaBlack)
+        .offset(
+            x = 0.dp,
+            y = yOffset
+        )
+) {
             when (val state = viewModel.versionState) {
 
                 is VersionState.Loading -> {
