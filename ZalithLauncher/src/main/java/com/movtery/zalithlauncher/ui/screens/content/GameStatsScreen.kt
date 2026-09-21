@@ -6,18 +6,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,26 +26,39 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.version.installed.PlayTimeRepository
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.ui.base.BaseScreen
-import com.movtery.zalithlauncher.ui.components.BackgroundCard
-import com.movtery.zalithlauncher.ui.components.CardTitleLayout
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 import com.movtery.zalithlauncher.utils.PlayTimeUtils
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
+
+private val AlfaaBlack = Color(0xFF050608)
+private val AlfaaPanel = Color(0xFF0A0D11)
+private val AlfaaPanel2 = Color(0xFF10141A)
+
+private val AlfaaCyan = Color(0xFF00E5FF)
+private val AlfaaGreen = Color(0xFF00FF9D)
+
+private val AlfaaText = Color(0xFFF1F5F9)
+private val AlfaaMuted = Color(0xFF7D8996)
+private val AlfaaBorder = Color(0xFF1B3035)
 
 @Composable
 fun GameStatsScreen(
@@ -62,81 +69,426 @@ fun GameStatsScreen(
         currentKey = backStackViewModel.mainScreen.currentKey
     ) {
         val context = LocalContext.current
-        val versions = remember { VersionsManager.versions.value }
+        val versions = remember {
+            VersionsManager.versions.value
+        }
 
-        data class VersionStat(val name: String, val version: com.movtery.zalithlauncher.game.version.installed.Version, val totalMs: Long)
+        data class VersionStat(
+            val name: String,
+            val version: com.movtery.zalithlauncher.game.version.installed.Version,
+            val totalMs: Long
+        )
 
         val stats = remember(versions) {
             versions
-                .map { v -> VersionStat(v.getVersionName(), v, PlayTimeRepository.getTotalPlayTime(v.getVersionName())) }
-                .sortedByDescending { it.totalMs }
-        }
-        val maxMs = stats.firstOrNull()?.totalMs?.takeIf { it > 0 } ?: 1L
-
-        BackgroundCard(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                CardTitleLayout {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        text = stringResource(R.string.stats_game_stats),
-                        style = MaterialTheme.typography.titleMedium
+                .map {
+                    VersionStat(
+                        it.getVersionName(),
+                        it,
+                        PlayTimeRepository.getTotalPlayTime(
+                            it.getVersionName()
+                        )
                     )
                 }
+                .sortedByDescending {
+                    it.totalMs
+                }
+        }
+
+        val maxMs = stats
+            .firstOrNull()
+            ?.totalMs
+            ?.takeIf { it > 0 }
+            ?: 1L
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AlfaaBlack)
+                .padding(12.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                AlfaaPanel2,
+                                AlfaaPanel,
+                                AlfaaBlack
+                            )
+                        )
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = AlfaaBorder,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+
+                // ─────────────────────────────
+                // HEADER
+                // ─────────────────────────────
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 4.dp,
+                            vertical = 4.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(4.dp)
+                            .height(42.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        AlfaaCyan,
+                                        AlfaaGreen
+                                    )
+                                )
+                            )
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(12.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(
+                                R.string.stats_game_stats
+                            ),
+                            color = AlfaaText,
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 0.6.sp
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(2.dp)
+                        )
+
+                        Text(
+                            text = "PLAYTIME / INSTANCE",
+                            color = AlfaaCyan,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.5.sp
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(
+                                RoundedCornerShape(50)
+                            )
+                            .background(
+                                AlfaaGreen.copy(alpha = 0.08f)
+                            )
+                            .border(
+                                1.dp,
+                                AlfaaGreen.copy(alpha = 0.35f),
+                                RoundedCornerShape(50)
+                            )
+                            .padding(
+                                horizontal = 10.dp,
+                                vertical = 6.dp
+                            )
+                    ) {
+                        Text(
+                            text = "${stats.size} INSTANCES",
+                            color = AlfaaGreen,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+
+                // ─────────────────────────────
+                // CONTENT
+                // ─────────────────────────────
 
                 if (stats.all { it.totalMs == 0L }) {
+
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = stringResource(R.string.stats_no_data),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(
+                                        RoundedCornerShape(18.dp)
+                                    )
+                                    .background(
+                                        AlfaaCyan.copy(
+                                            alpha = 0.07f
+                                        )
+                                    )
+                                    .border(
+                                        1.dp,
+                                        AlfaaCyan.copy(
+                                            alpha = 0.25f
+                                        ),
+                                        RoundedCornerShape(18.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "0",
+                                    color = AlfaaCyan,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                            }
+
+                            Spacer(
+                                modifier = Modifier.height(12.dp)
+                            )
+
+                            Text(
+                                text = stringResource(
+                                    R.string.stats_no_data
+                                ),
+                                color = AlfaaText,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(
+                                modifier = Modifier.height(4.dp)
+                            )
+
+                            Text(
+                                text = "PLAY A VERSION TO CREATE STATISTICS",
+                                color = AlfaaMuted,
+                                fontSize = 9.sp,
+                                letterSpacing = 1.sp
+                            )
+                        }
                     }
+
                 } else {
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(
+                            vertical = 4.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(
+                            10.dp
+                        )
                     ) {
-                        itemsIndexed(stats, key = { _, s -> s.name }) { _, stat ->
+                        itemsIndexed(
+                            stats,
+                            key = { _, stat -> stat.name }
+                        ) { index, stat ->
+
+                            val progress = (
+                                stat.totalMs.toFloat() /
+                                    maxMs.toFloat()
+                                ).coerceIn(0f, 1f)
+
+                            // ─────────────────────
+                            // INSTANCE CARD
+                            // ─────────────────────
+
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(
+                                        RoundedCornerShape(18.dp)
+                                    )
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(
+                                                AlfaaPanel2,
+                                                AlfaaPanel
+                                            )
+                                        )
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (index == 0) {
+                                            AlfaaCyan.copy(
+                                                alpha = 0.42f
+                                            )
+                                        } else {
+                                            AlfaaBorder
+                                        },
+                                        shape = RoundedCornerShape(
+                                            18.dp
+                                        )
+                                    )
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                VersionIconImage(
-                                    version = stat.version,
-                                    modifier = Modifier.size(32.dp)
+
+                                // VERSION ICON
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(
+                                            RoundedCornerShape(
+                                                14.dp
+                                            )
+                                        )
+                                        .background(
+                                            AlfaaBlack
+                                        )
+                                        .border(
+                                            1.dp,
+                                            if (index == 0) {
+                                                AlfaaCyan.copy(
+                                                    alpha = 0.45f
+                                                )
+                                            } else {
+                                                AlfaaBorder
+                                            },
+                                            RoundedCornerShape(
+                                                14.dp
+                                            )
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    VersionIconImage(
+                                        version = stat.version,
+                                        modifier = Modifier.size(
+                                            34.dp
+                                        )
+                                    )
+                                }
+
+                                Spacer(
+                                    modifier = Modifier.width(12.dp)
                                 )
-                                Column(modifier = Modifier.weight(1f)) {
+
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+
+                                    // NAME + TIME
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = stat.name,
+                                            color = AlfaaText,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            modifier = Modifier.weight(1f)
+                                        )
+
+                                        Spacer(
+                                            modifier = Modifier.width(8.dp)
+                                        )
+
+                                        Text(
+                                            text = PlayTimeUtils.formatPlayTime(
+                                                context,
+                                                stat.totalMs
+                                            ),
+                                            color = if (index == 0) {
+                                                AlfaaGreen
+                                            } else {
+                                                AlfaaCyan
+                                            },
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+
+                                    Spacer(
+                                        modifier = Modifier.height(8.dp)
+                                    )
+
+                                    // NEON PROGRESS BAR
+
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(7.dp)
+                                            .clip(
+                                                RoundedCornerShape(50)
+                                            )
+                                            .background(
+                                                AlfaaBlack
+                                            )
+                                            .border(
+                                                1.dp,
+                                                AlfaaBorder.copy(
+                                                    alpha = 0.7f
+                                                ),
+                                                RoundedCornerShape(50)
+                                            )
+                                    ) {
+                                        if (progress > 0f) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(
+                                                        progress
+                                                    )
+                                                    .height(7.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(
+                                                            50
+                                                        )
+                                                    )
+                                                    .background(
+                                                        Brush.horizontalGradient(
+                                                            listOf(
+                                                                AlfaaCyan,
+                                                                AlfaaGreen
+                                                            )
+                                                        )
+                                                    )
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(
+                                        modifier = Modifier.height(5.dp)
+                                    )
+
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = stat.name,
-                                            style = MaterialTheme.typography.labelMedium,
-                                            maxLines = 1,
-                                            modifier = Modifier.weight(1f)
+                                            text = "PLAYTIME",
+                                            color = AlfaaMuted,
+                                            fontSize = 8.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            letterSpacing = 1.sp
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
+
                                         Text(
-                                            text = PlayTimeUtils.formatPlayTime(context, stat.totalMs),
-                                            style = MaterialTheme.typography.labelSmall
+                                            text = "${(progress * 100).toInt()}%",
+                                            color = AlfaaMuted,
+                                            fontSize = 8.sp,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    LinearProgressIndicator(
-                                        progress = { stat.totalMs.toFloat() / maxMs },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
                                 }
                             }
                         }
