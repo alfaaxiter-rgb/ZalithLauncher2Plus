@@ -6,59 +6,59 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.main
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,7 +69,6 @@ import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.AndroidStringText
-import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.CardTitleLayout
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
@@ -81,20 +80,20 @@ import com.movtery.zalithlauncher.ui.screens.content.BuiltInFileManagerScreen
 import com.movtery.zalithlauncher.ui.screens.content.DownloadScreen
 import com.movtery.zalithlauncher.ui.screens.content.FileEditorScreen
 import com.movtery.zalithlauncher.ui.screens.content.FileSelectorScreen
+import com.movtery.zalithlauncher.ui.screens.content.GameStatsScreen
 import com.movtery.zalithlauncher.ui.screens.content.HomePageEditorScreen
 import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
-import com.movtery.zalithlauncher.ui.screens.content.GameStatsScreen
-import com.movtery.zalithlauncher.ui.screens.content.CapeGalleryScreen
-import com.movtery.zalithlauncher.ui.screens.content.PlayTimeStatsScreen
-import com.movtery.zalithlauncher.ui.screens.content.RecordingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
+import com.movtery.zalithlauncher.ui.screens.content.PlayTimeStatsScreen
+import com.movtery.zalithlauncher.ui.screens.content.RecordingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionExportScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionsManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.WebViewScreen
+import com.movtery.zalithlauncher.ui.screens.content.CapeGalleryScreen
 import com.movtery.zalithlauncher.ui.screens.content.assetinfo.AssetInfoScreen
 import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.onBack
@@ -122,13 +121,10 @@ fun MainScreen(
 ) {
     val tasks by TaskSystem.tasksFlow.collectAsStateWithLifecycle()
 
-    // Monitor running tasks.
     LaunchedEffect(tasks) {
-        if (tasks.isEmpty()) {
-            eventViewModel.sendKeepScreen(false)
-        } else {
-            eventViewModel.sendKeepScreen(true)
-        }
+        eventViewModel.sendKeepScreen(
+            tasks.isNotEmpty()
+        )
     }
 
     val isTaskMenuExpanded =
@@ -170,17 +166,11 @@ fun MainScreen(
         )
     }
 
-    /**
-     * Return to launcher main screen.
-     */
     val toMainScreen: () -> Unit = {
         screenBackStackModel.mainScreen.clearWith(
             NormalNavKey.LauncherMain
         )
     }
-
-    val mainScreenKey =
-        screenBackStackModel.mainScreen.currentKey
 
     val isBackgroundValid =
         LocalBackgroundViewModel.current?.isValid == true
@@ -201,34 +191,28 @@ fun MainScreen(
         color = backgroundColor,
         contentColor = onBackgroundColor()
     ) {
-        Column(
+        Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                NavigationUI(
-                    modifier = Modifier.fillMaxSize(),
-                    screenBackStackModel = screenBackStackModel,
-                    toMainScreen = toMainScreen,
-                    eventViewModel = eventViewModel,
-                    modpackImportViewModel = modpackImportViewModel,
-                    submitError = submitError
-                )
+            NavigationUI(
+                modifier = Modifier.fillMaxSize(),
+                screenBackStackModel = screenBackStackModel,
+                toMainScreen = toMainScreen,
+                eventViewModel = eventViewModel,
+                modpackImportViewModel = modpackImportViewModel,
+                submitError = submitError
+            )
 
-                TaskMenu(
-                    tasks = tasks,
-                    isExpanded = isTaskMenuExpanded,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.3f)
-                        .align(Alignment.CenterStart)
-                        .padding(6.dp)
-                ) {
-                    changeTasksExpandedState()
-                }
+            TaskMenu(
+                tasks = tasks,
+                isExpanded = isTaskMenuExpanded,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.3f)
+                    .align(Alignment.CenterStart)
+                    .padding(6.dp)
+            ) {
+                changeTasksExpandedState()
             }
         }
     }
@@ -237,9 +221,8 @@ fun MainScreen(
 /*
  * Navigation content.
  *
- * TopBar has intentionally been removed.
- * All launcher navigation is handled by the custom
- * persistent left sidebar.
+ * Tidak ada TopBar bawaan Zalith.
+ * Back/Home ditambahkan sebagai overlay neon.
  */
 @Composable
 private fun NavigationUI(
@@ -263,9 +246,6 @@ private fun NavigationUI(
 
     if (backStack.isNotEmpty()) {
 
-        /**
-         * Navigate to version settings.
-         */
         val navigateToVersions: (Version) -> Unit =
             remember(screenBackStackModel) {
                 { version ->
@@ -278,9 +258,6 @@ private fun NavigationUI(
                 }
             }
 
-        /**
-         * Navigate to modpack export.
-         */
         val navigateToExport: (Version) -> Unit =
             remember(screenBackStackModel) {
                 { version ->
@@ -577,19 +554,165 @@ private fun NavigationUI(
             }
         }
 
-        NavDisplay(
-            backStack = backStack,
-            modifier = modifier,
-            onBack = {
-                onBack(backStack)
-            },
-            transitionSpec = rememberTransitionSpec(),
-            popTransitionSpec = rememberTransitionSpec(),
-            entryProvider = provider
-        )
+        Box(
+            modifier = modifier.fillMaxSize()
+        ) {
+            NavDisplay(
+                backStack = backStack,
+                modifier = Modifier.fillMaxSize(),
+                onBack = {
+                    onBack(backStack)
+                },
+                transitionSpec = rememberTransitionSpec(),
+                popTransitionSpec = rememberTransitionSpec(),
+                entryProvider = provider
+            )
+
+            /*
+             * NEON BACK + HOME
+             *
+             * Tidak ditampilkan di Dashboard.
+             */
+            AnimatedVisibility(
+                visible = currentKey != null &&
+                        currentKey != NormalNavKey.LauncherMain,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = 14.dp,
+                        end = 16.dp
+                    ),
+                enter = fadeIn(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ),
+                exit = fadeOut(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
+            ) {
+                NeonNavigationButtons(
+                    onBack = {
+                        onBack(backStack)
+                    },
+                    onHome = {
+                        toMainScreen()
+                    }
+                )
+            }
+        }
     } else {
         Box(
             modifier = modifier
+        )
+    }
+}
+
+/*
+ * Neon navigation controls.
+ */
+@Composable
+private fun NeonNavigationButtons(
+    onBack: () -> Unit,
+    onHome: () -> Unit
+) {
+    Row(
+        horizontalArrangement =
+            Arrangement.spacedBy(8.dp),
+        verticalAlignment =
+            Alignment.CenterVertically
+    ) {
+        NeonNavButton(
+            text = "‹  BACK",
+            onClick = onBack
+        )
+
+        NeonNavButton(
+            text = "⌂  HOME",
+            onClick = onHome
+        )
+    }
+}
+
+@Composable
+private fun NeonNavButton(
+    text: String,
+    onClick: () -> Unit
+) {
+    val interactionSource =
+        remember {
+            androidx.compose.foundation.interaction.MutableInteractionSource()
+        }
+
+    val pressed by
+        interactionSource.collectIsPressedAsState()
+
+    val scale by
+        androidx.compose.animation.core.animateFloatAsState(
+            targetValue =
+                if (pressed) 0.95f else 1f,
+            animationSpec = spring(
+                dampingRatio =
+                    Spring.DampingRatioNoBouncy,
+                stiffness =
+                    Spring.StiffnessHigh
+            ),
+            label = "neonNavButtonScale"
+        )
+
+    Surface(
+        modifier = Modifier
+            .scale(scale)
+            .clip(
+                RoundedCornerShape(12.dp)
+            )
+            .clickable(
+                interactionSource =
+                    interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color =
+                MaterialTheme.colorScheme.primary.copy(
+                    alpha =
+                        if (pressed) 0.90f
+                        else 0.45f
+                )
+        ),
+        color =
+            if (pressed) {
+                MaterialTheme.colorScheme.primary.copy(
+                    alpha = 0.20f
+                )
+            } else {
+                MaterialTheme.colorScheme.surface.copy(
+                    alpha = 0.92f
+                )
+            }
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(
+                horizontal = 14.dp,
+                vertical = 9.dp
+            ),
+            color =
+                if (pressed) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+            fontSize = 11.sp,
+            fontWeight =
+                androidx.compose.ui.text.font.FontWeight.Bold,
+            letterSpacing = 1.2.sp
         )
     }
 }
@@ -605,7 +728,8 @@ private fun TaskMenu(
         isExpanded && tasks.isNotEmpty()
 
     val isRtl =
-        LocalLayoutDirection.current == LayoutDirection.Rtl
+        LocalLayoutDirection.current ==
+                LayoutDirection.Rtl
 
     AnimatedVisibility(
         modifier = modifier,
@@ -630,12 +754,16 @@ private fun TaskMenu(
             influencedByBackground = false,
             shape = MaterialTheme.shapes.extraLarge,
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor(),
-                contentColor = onBackgroundColor()
+                containerColor =
+                    backgroundColor().copy(
+                        alpha = 0.96f
+                    ),
+                contentColor =
+                    onBackgroundColor()
             ),
             elevation =
                 CardDefaults.elevatedCardElevation(
-                    defaultElevation = 6.dp
+                    defaultElevation = 0.dp
                 )
         ) {
             Column {
@@ -669,11 +797,15 @@ private fun TaskMenu(
                                 contentDescription =
                                     stringResource(
                                         R.string.generic_collapse
-                                    )
+                                    ),
+                                tint =
+                                    MaterialTheme
+                                        .colorScheme
+                                        .primary
                             )
                         }
 
-                        androidx.compose.material3.Text(
+                        Text(
                             modifier =
                                 Modifier.align(
                                     Alignment.Center
@@ -681,7 +813,11 @@ private fun TaskMenu(
                             text =
                                 stringResource(
                                     R.string.main_task_menu
-                                )
+                                ),
+                            color =
+                                MaterialTheme
+                                    .colorScheme
+                                    .primary
                         )
                     }
                 }
@@ -744,7 +880,7 @@ private fun TaskItem(
     taskMessage: AndroidStringText?,
     rateBytesPerSec: Long?,
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.large,
+    shape: Shape = RoundedCornerShape(14.dp),
     color: Color = cardColor(false),
     contentColor: Color = onCardColor(),
     onCancelClick: () -> Unit = {}
@@ -753,7 +889,13 @@ private fun TaskItem(
         modifier = modifier,
         shape = shape,
         color = color,
-        contentColor = contentColor
+        contentColor = contentColor,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(
+                alpha = 0.18f
+            )
+        )
     ) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -778,7 +920,9 @@ private fun TaskItem(
                     contentDescription =
                         stringResource(
                             R.string.generic_cancel
-                        )
+                        ),
+                    tint =
+                        MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -801,7 +945,15 @@ private fun TaskItem(
                 if (taskProgress < 0) {
                     LinearProgressIndicator(
                         modifier =
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
+                        color =
+                            MaterialTheme
+                                .colorScheme
+                                .primary,
+                        trackColor =
+                            MaterialTheme
+                                .colorScheme
+                                .surfaceVariant
                     )
                 } else {
                     LinearProgressIndicator(
@@ -809,7 +961,15 @@ private fun TaskItem(
                             taskProgress
                         },
                         modifier =
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
+                        color =
+                            MaterialTheme
+                                .colorScheme
+                                .primary,
+                        trackColor =
+                            MaterialTheme
+                                .colorScheme
+                                .surfaceVariant
                     )
                 }
 
@@ -828,11 +988,17 @@ private fun TaskItem(
                         }
                         ?.let { progress ->
 
-                            androidx.compose.material3.Text(
+                            Text(
                                 text =
                                     "${(progress * 100).toInt()}%",
                                 style =
-                                    MaterialTheme.typography.labelMedium
+                                    MaterialTheme
+                                        .typography
+                                        .labelMedium,
+                                color =
+                                    MaterialTheme
+                                        .colorScheme
+                                        .primary
                             )
                         }
 
@@ -843,10 +1009,16 @@ private fun TaskItem(
                                 "${formatFileSize(bytes)}/s"
                             }
 
-                        androidx.compose.material3.Text(
+                        Text(
                             text = text,
                             style =
-                                MaterialTheme.typography.labelMedium
+                                MaterialTheme
+                                    .typography
+                                    .labelMedium,
+                            color =
+                                MaterialTheme
+                                    .colorScheme
+                                    .onSurfaceVariant
                         )
                     }
                 }
