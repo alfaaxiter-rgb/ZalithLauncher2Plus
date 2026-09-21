@@ -69,6 +69,11 @@ private val AlfaaPanel3 = Color(0xFF14212B)
 private val AlfaaCyan = Color(0xFF43C7FF)
 private val AlfaaGreen = Color(0xFF20E0B2)
 private val AlfaaPurple = Color(0xFFA78BFA)
+private val AlfaaOrange = Color(0xFFFFB454)
+
+private val AlfaaText = Color(0xFFE8FFF8)
+private val AlfaaMuted = Color(0xFF829A98)
+private val AlfaaBorder = Color(0xFF16483F)
 
 private val AlfaaText = Color(0xFFE8FFF8)
 private val AlfaaMuted = Color(0xFF829A98)
