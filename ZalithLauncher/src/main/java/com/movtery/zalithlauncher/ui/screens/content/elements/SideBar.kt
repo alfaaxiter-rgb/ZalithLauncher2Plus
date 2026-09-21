@@ -6,9 +6,10 @@
 package com.movtery.zalithlauncher.ui.screens.content.elements
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
@@ -79,9 +80,21 @@ fun SideBar(
         mutableStateOf(false)
     }
 
+    /*
+     * Smooth spring animation.
+     * Tidak memakai tween supaya buka/tutup sidebar
+     * tidak terasa patah.
+     */
     val sidebarWidth by animateDpAsState(
-        targetValue = if (expanded) ExpandedWidth else CollapsedWidth,
-        animationSpec = tween(durationMillis = 150),
+        targetValue = if (expanded) {
+            ExpandedWidth
+        } else {
+            CollapsedWidth
+        },
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "sidebarWidth"
     )
 
@@ -137,8 +150,8 @@ fun SideBar(
 
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 12.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = 0.15f
+                color = MaterialTheme.colorScheme.primary.copy(
+                    alpha = 0.20f
                 )
             )
 
@@ -152,6 +165,7 @@ fun SideBar(
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
+
                 SideBarShortcut(
                     icon = painterResource(R.drawable.ic_video_settings),
                     label = stringResource(
@@ -242,9 +256,16 @@ private fun SideBarShortcut(
 
     val pressed by interactionSource.collectIsPressedAsState()
 
+    /*
+     * Spring press animation.
+     * Lebih halus daripada tween 70ms.
+     */
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.97f else 1f,
-        animationSpec = tween(durationMillis = 70),
+        targetValue = if (pressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
         label = "sidebarItemScale"
     )
 
@@ -265,12 +286,12 @@ private fun SideBarShortcut(
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.primary.copy(
-                alpha = if (pressed) 0.75f else 0.18f
+                alpha = if (pressed) 0.80f else 0.22f
             )
         ),
         color = if (pressed) {
             MaterialTheme.colorScheme.primary.copy(
-                alpha = 0.16f
+                alpha = 0.18f
             )
         } else {
             MaterialTheme.colorScheme.surfaceVariant.copy(
@@ -300,7 +321,7 @@ private fun SideBarShortcut(
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.75f
+                        alpha = 0.78f
                     )
                 }
             )
@@ -308,13 +329,15 @@ private fun SideBarShortcut(
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn(
-                    animationSpec = tween(
-                        durationMillis = 160
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
                     )
                 ),
                 exit = fadeOut(
-                    animationSpec = tween(
-                        durationMillis = 100
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
                     )
                 )
             ) {
@@ -326,7 +349,7 @@ private fun SideBarShortcut(
                     Text(
                         text = label,
                         color = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = 0.82f
+                            alpha = 0.88f
                         ),
                         style = MaterialTheme.typography.labelMedium,
                         fontSize = 11.sp,
@@ -350,8 +373,11 @@ private fun SideBarToggle(
     val pressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.97f else 1f,
-        animationSpec = tween(durationMillis = 70),
+        targetValue = if (pressed) 0.94f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
         label = "sidebarToggleScale"
     )
 
@@ -370,12 +396,12 @@ private fun SideBarToggle(
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.primary.copy(
-                alpha = if (pressed) 0.75f else 0.18f
+                alpha = if (pressed) 0.80f else 0.22f
             )
         ),
         color = if (pressed) {
             MaterialTheme.colorScheme.primary.copy(
-                alpha = 0.16f
+                alpha = 0.18f
             )
         } else {
             MaterialTheme.colorScheme.surfaceVariant.copy(
@@ -393,7 +419,7 @@ private fun SideBarToggle(
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.75f
+                        alpha = 0.78f
                     )
                 }
             )
@@ -436,12 +462,12 @@ private fun ThemeToggle(
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.primary.copy(
-                alpha = if (pressed) 0.70f else 0.16f
+                alpha = if (pressed) 0.75f else 0.20f
             )
         ),
         color = if (pressed) {
             MaterialTheme.colorScheme.primary.copy(
-                alpha = 0.14f
+                alpha = 0.16f
             )
         } else {
             MaterialTheme.colorScheme.surfaceVariant.copy(
@@ -470,20 +496,22 @@ private fun ThemeToggle(
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn(
-                    animationSpec = tween(
-                        durationMillis = 150
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
                     )
                 ),
                 exit = fadeOut(
-                    animationSpec = tween(
-                        durationMillis = 100
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
                     )
                 )
             ) {
                 Text(
                     text = if (dark) "Dark" else "Light",
                     color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.82f
+                        alpha = 0.88f
                     ),
                     style = MaterialTheme.typography.labelSmall,
                     maxLines = 1
