@@ -134,6 +134,7 @@ fun rememberSettingsCardShape(
 /**
  * Base neon card.
  */
+
 @Composable
 private fun NeonSettingsSurface(
     modifier: Modifier,
@@ -176,9 +177,13 @@ private fun NeonSettingsSurface(
         border = BorderStroke(
             width = 1.dp,
             color = borderColor
-        ),
-        content = content
-    )
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            content = content
+        )
+    }
 }
 
 /**
