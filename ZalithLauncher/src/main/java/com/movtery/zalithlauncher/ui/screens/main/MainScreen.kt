@@ -155,9 +155,9 @@ val context = androidx.compose.ui.platform.LocalContext.current
 if (!showDisclaimer) {
     SimpleAlertDialog(
         title = "UI Re-make by AlfaaBEJIRR",
-        text = "Tampilan depan launcher ini telah di-remake oleh AlfaaBEJIRR.\n\n" +
-                "Terima kasih sudah membantu remake UI bagian depan launcher ini.\n\n" +
-                "TikTok: @alfathgpp",
+        text = "Tampilan launcher ini telah di-remake oleh AlfaaBEJIRR.\n\n" +
+                "Terima kasih sudah membantu remake UI launcher ini.\n\n" +
+                "Follow TikTok: @alfathgpp",
         confirmText = stringResource(R.string.generic_got_it),
         dismissText = "TikTok",
         onConfirm = {
@@ -195,83 +195,38 @@ if (!showDisclaimer) {
     } else backgroundColor()
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = backgroundColor,
-        contentColor = onBackgroundColor()
+    modifier = Modifier.fillMaxSize(),
+    color = backgroundColor,
+    contentColor = onBackgroundColor()
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            TopBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                mainScreenKey = mainScreenKey,
-                inLauncherScreen = inLauncherScreen,
-                taskRunning = tasks.isEmpty(),
-                isTasksExpanded = isTaskMenuExpanded,
-                contentColor = onBackgroundColor(),
-                onScreenBack = {
-                    screenBackStackModel.mainScreen.backStack.removeFirstOrNull()
-                },
+            NavigationUI(
+                modifier = Modifier.fillMaxSize(),
+                screenBackStackModel = screenBackStackModel,
                 toMainScreen = toMainScreen,
-                toSettingsScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = screenBackStackModel.settingsScreen
-                    )
-                },
-                toDownloadScreen = {
-                    screenBackStackModel.navigateToDownload()
-                },
-                toMultiplayerScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = NormalNavKey.Multiplayer
-                    )
-                },
-                toFileManagerScreen = {
-                    screenBackStackModel.mainScreen.navigateTo(
-                        screenKey = NormalNavKey.BuiltInFileManager()
-                    )
-                },
-                toRecordingsScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = NormalNavKey.Recordings
-                    )
-                },
-                changeExpandedState = {
-                    changeTasksExpandedState()
-                },
+                eventViewModel = eventViewModel,
+                modpackImportViewModel = modpackImportViewModel,
+                submitError = submitError
             )
 
-            Box(
+            TaskMenu(
+                tasks = tasks,
+                isExpanded = isTaskMenuExpanded,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.3f)
+                    .align(Alignment.CenterStart)
+                    .padding(all = 6.dp)
             ) {
-                NavigationUI(
-                    modifier = Modifier.fillMaxSize(),
-                    screenBackStackModel = screenBackStackModel,
-                    toMainScreen = toMainScreen,
-                    eventViewModel = eventViewModel,
-                    modpackImportViewModel = modpackImportViewModel,
-                    submitError = submitError
-                )
-
-                TaskMenu(
-                    tasks = tasks,
-                    isExpanded = isTaskMenuExpanded,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.3f)
-                        .align(Alignment.CenterStart)
-                        .padding(all = 6.dp)
-                ) {
-                    changeTasksExpandedState()
-                }
+                changeTasksExpandedState()
             }
         }
     }
