@@ -75,9 +75,6 @@ private val AlfaaText = Color(0xFFE8FFF8)
 private val AlfaaMuted = Color(0xFF829A98)
 private val AlfaaBorder = Color(0xFF16483F)
 
-private val AlfaaText = Color(0xFFE8FFF8)
-private val AlfaaMuted = Color(0xFF829A98)
-private val AlfaaBorder = Color(0xFF16483F)
 
 /* ========================================================= */
 /* SIDEBAR DIMENSIONS */
