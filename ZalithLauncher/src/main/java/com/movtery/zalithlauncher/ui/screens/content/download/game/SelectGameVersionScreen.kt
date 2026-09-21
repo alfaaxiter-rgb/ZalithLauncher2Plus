@@ -10,7 +10,10 @@
 
 package com.movtery.zalithlauncher.ui.screens.content.download.game
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -25,7 +28,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,14 +37,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.scrollbar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,7 +59,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -79,15 +78,10 @@ import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.buildAppendedText
 import com.movtery.zalithlauncher.ui.components.EdgeDirection
-import com.movtery.zalithlauncher.ui.components.LittleTextLabel
-import com.movtery.zalithlauncher.ui.components.ScalingLabel
-import com.movtery.zalithlauncher.ui.components.SimpleTextInputField
 import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
-import com.movtery.zalithlauncher.utils.animation.getAnimateTween
-import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.utils.classes.Quadruple
 import com.movtery.zalithlauncher.utils.formatDate
 import com.movtery.zalithlauncher.utils.logging.Logger
@@ -104,14 +98,16 @@ import java.nio.channels.UnresolvedAddressException
 
 private const val TAG = "SelectGameVersion"
 
-private val AlfaaBlack = Color(0xFF050608)
-private val AlfaaPanel = Color(0xFF0A0D11)
-private val AlfaaPanel2 = Color(0xFF10141A)
-private val AlfaaBorder = Color(0xFF202832)
-private val AlfaaText = Color(0xFFF1F5F9)
-private val AlfaaMuted = Color(0xFF7D8996)
-private val AlfaaCyan = Color(0xFF00E5FF)
-private val AlfaaGreen = Color(0xFF00FF9D)
+private val AlfaaBlack = Color(0xFF05080D)
+private val AlfaaSurface = Color(0xFF0B1118)
+private val AlfaaSurface2 = Color(0xFF101923)
+private val AlfaaCyan = Color(0xFF43C7FF)
+private val AlfaaGreen = Color(0xFF20E0B2)
+private val AlfaaText = Color(0xFFE8FFF8)
+private val AlfaaMuted = Color(0xFF829A98)
+private val AlfaaBorder = Color(0xFF16483F)
+private val AlfaaPurple = Color(0xFFA78BFA)
+private val AlfaaError = Color(0xFFFF5577)
 
 /** 版本列表加载状态 */
 private sealed interface VersionState {
@@ -250,9 +246,10 @@ fun SelectGameVersionScreen(
         )
     ) { isVisible ->
 
-        val yOffset by swapAnimateDpAsState(
-            targetValue = (-40).dp,
-            swapIn = isVisible
+        val yOffset by androidx.compose.animation.core.animateDpAsState(
+            targetValue = if (isVisible) 0.dp else (-24).dp,
+            animationSpec = tween(220),
+            label = "versionScreenOffset"
         )
 
         Column(
@@ -266,7 +263,6 @@ fun SelectGameVersionScreen(
                     )
                 }
         ) {
-
             when (val state = viewModel.versionState) {
 
                 is VersionState.Loading -> {
@@ -286,14 +282,13 @@ fun SelectGameVersionScreen(
                     Column(
                         modifier = Modifier.fillMaxSize()
                     ) {
-
                         VersionHeader(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = 14.dp,
+                                    start = 18.dp,
+                                    end = 18.dp,
+                                    top = 16.dp,
                                     bottom = 8.dp
                                 ),
                             versionFilter = viewModel.versionFilter,
@@ -322,13 +317,9 @@ fun SelectGameVersionScreen(
     }
 }
 
-/**
- * Filter versi.
- */
 private fun List<MinecraftVersion>.filterVersions(
     versionFilter: VersionFilter
 ): List<MinecraftVersion> {
-
     return this
         .filter { version ->
             version.isType(
@@ -354,40 +345,60 @@ private fun VersionLoading() {
             .background(AlfaaBlack),
         contentAlignment = Alignment.Center
     ) {
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            Box(
-                modifier = Modifier
-                    .size(58.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(AlfaaPanel2),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "A",
-                    color = AlfaaCyan,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Black
+            Surface(
+                shape = RoundedCornerShape(22.dp),
+                color = AlfaaSurface,
+                border = BorderStroke(
+                    1.dp,
+                    AlfaaCyan.copy(alpha = 0.55f)
                 )
+            ) {
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = 26.dp,
+                        vertical = 22.dp
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "ALFAA",
+                        color = AlfaaCyan,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 3.sp
+                    )
+
+                    Text(
+                        text = "SYNCING VERSIONS",
+                        color = AlfaaText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 1.2.sp
+                    )
+
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .width(190.dp)
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(50)),
+                        color = AlfaaCyan,
+                        trackColor = AlfaaSurface2
+                    )
+
+                    Text(
+                        text = "CONNECTING TO VERSION DATABASE",
+                        color = AlfaaMuted,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+                }
             }
-
-            Text(
-                text = "LOADING VERSIONS",
-                color = AlfaaMuted,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.5.sp
-            )
-
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .width(180.dp)
-                    .clip(RoundedCornerShape(50))
-            )
         }
     }
 }
@@ -403,29 +414,35 @@ private fun VersionError(
             .background(AlfaaBlack),
         contentAlignment = Alignment.Center
     ) {
-
         Surface(
             modifier = Modifier
                 .padding(24.dp)
                 .widthIn(max = 520.dp),
-            shape = RoundedCornerShape(22.dp),
-            color = AlfaaPanel,
-            border = androidx.compose.foundation.BorderStroke(
+            shape = RoundedCornerShape(24.dp),
+            color = AlfaaSurface,
+            border = BorderStroke(
                 1.dp,
-                AlfaaBorder
+                AlfaaError.copy(alpha = 0.55f)
             )
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(26.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(13.dp)
             ) {
+                Text(
+                    text = "SYSTEM ERROR",
+                    color = AlfaaError,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 2.5.sp
+                )
 
                 Text(
-                    text = "DOWNLOAD ERROR",
+                    text = "VERSION DATABASE",
                     color = AlfaaText,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
 
                 AndroidStringText(
@@ -437,15 +454,27 @@ private fun VersionError(
                     }
                 )
 
-                TextButton(
-                    onClick = onRetry
+                Surface(
+                    onClick = onRetry,
+                    shape = RoundedCornerShape(12.dp),
+                    color = AlfaaCyan.copy(alpha = 0.12f),
+                    border = BorderStroke(
+                        1.dp,
+                        AlfaaCyan.copy(alpha = 0.55f)
+                    )
                 ) {
                     Text(
+                        modifier = Modifier.padding(
+                            horizontal = 20.dp,
+                            vertical = 10.dp
+                        ),
                         text = stringResource(
                             R.string.generic_refresh
                         ),
                         color = AlfaaCyan,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 1.sp
                     )
                 }
             }
@@ -463,39 +492,54 @@ private fun VersionHeader(
     Column(
         modifier = modifier
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "GAME / VERSIONS",
+                    color = AlfaaCyan,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 2.4.sp
+                )
 
-        Text(
-            text = "MINECRAFT VERSIONS",
-            color = AlfaaText,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Black,
-            letterSpacing = 0.5.sp
-        )
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                Text(
+                    text = "SELECT VERSION",
+                    color = AlfaaText,
+                    fontSize = 23.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 0.8.sp
+                )
+
+                Text(
+                    text = "Choose a Minecraft version to continue",
+                    color = AlfaaMuted,
+                    fontSize = 11.sp,
+                    letterSpacing = 0.25.sp
+                )
+            }
+        }
 
         Spacer(
-            modifier = Modifier.height(4.dp)
-        )
-
-        Text(
-            text = "Choose a version to install",
-            color = AlfaaMuted,
-            fontSize = 12.sp
-        )
-
-        Spacer(
-            modifier = Modifier.height(14.dp)
+            modifier = Modifier.height(15.dp)
         )
 
         BoxWithConstraints(
             modifier = Modifier.fillMaxWidth()
         ) {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(9.dp)
             ) {
-
                 val scrollState = rememberScrollState()
 
                 Row(
@@ -506,15 +550,15 @@ private fun VersionHeader(
                             direction = EdgeDirection.Horizontal
                         )
                         .horizontalScroll(scrollState),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     VersionFilterChip(
                         selected = versionFilter.release,
                         text = stringResource(
                             R.string.download_game_type_release
                         ),
+                        accent = AlfaaGreen,
                         onClick = {
                             onVersionFilterChange(
                                 versionFilter.copy(
@@ -529,6 +573,7 @@ private fun VersionHeader(
                         text = stringResource(
                             R.string.download_game_type_snapshot
                         ),
+                        accent = AlfaaCyan,
                         onClick = {
                             onVersionFilterChange(
                                 versionFilter.copy(
@@ -543,6 +588,7 @@ private fun VersionHeader(
                         text = stringResource(
                             R.string.download_game_type_april_fools
                         ),
+                        accent = AlfaaPurple,
                         onClick = {
                             onVersionFilterChange(
                                 versionFilter.copy(
@@ -557,6 +603,7 @@ private fun VersionHeader(
                         text = stringResource(
                             R.string.download_game_type_old
                         ),
+                        accent = AlfaaMuted,
                         onClick = {
                             onVersionFilterChange(
                                 versionFilter.copy(
@@ -585,44 +632,42 @@ private fun VersionHeader(
 private fun VersionFilterChip(
     selected: Boolean,
     text: String,
+    accent: Color,
     onClick: () -> Unit
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(11.dp),
         color = if (selected) {
-            AlfaaCyan.copy(alpha = 0.14f)
+            accent.copy(alpha = 0.12f)
         } else {
-            AlfaaPanel
+            AlfaaSurface
         },
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             1.dp,
             if (selected) {
-                AlfaaCyan.copy(alpha = 0.7f)
+                accent.copy(alpha = 0.65f)
             } else {
                 AlfaaBorder
             }
         )
     ) {
-
         Row(
             modifier = Modifier.padding(
-                horizontal = 13.dp,
+                horizontal = 12.dp,
                 vertical = 8.dp
             ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
-                    .size(6.dp)
+                    .size(
+                        width = if (selected) 13.dp else 6.dp,
+                        height = 6.dp
+                    )
                     .clip(RoundedCornerShape(50))
                     .background(
-                        if (selected) {
-                            AlfaaCyan
-                        } else {
-                            AlfaaMuted
-                        }
+                        if (selected) accent else AlfaaMuted
                     )
             )
 
@@ -631,14 +676,15 @@ private fun VersionFilterChip(
             )
 
             Text(
-                text = text,
+                text = text.uppercase(),
                 color = if (selected) {
-                    AlfaaCyan
+                    accent
                 } else {
                     AlfaaMuted
                 },
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 9.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 0.6.sp
             )
         }
     }
@@ -652,53 +698,75 @@ private fun SearchBox(
 ) {
     Row(
         modifier = Modifier.widthIn(
-            min = 180.dp,
-            max = 300.dp
+            min = 190.dp,
+            max = 310.dp
         ),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Surface(
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(13.dp),
-            color = AlfaaPanel,
-            border = androidx.compose.foundation.BorderStroke(
+            shape = RoundedCornerShape(12.dp),
+            color = AlfaaSurface,
+            border = BorderStroke(
                 1.dp,
-                AlfaaBorder
+                if (value.isNotEmpty()) {
+                    AlfaaCyan.copy(alpha = 0.6f)
+                } else {
+                    AlfaaBorder
+                }
             )
         ) {
-
             Row(
                 modifier = Modifier.padding(
                     start = 10.dp,
-                    end = 4.dp
+                    end = 5.dp
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
-                    tint = AlfaaMuted,
+                    tint = if (value.isNotEmpty()) {
+                        AlfaaCyan
+                    } else {
+                        AlfaaMuted
+                    },
                     modifier = Modifier.size(17.dp)
                 )
 
-                SimpleTextInputField(
-                    modifier = Modifier.weight(1f),
+                BasicTextField(
                     value = value,
                     onValueChange = onValueChange,
-                    color = Color.Transparent,
-                    contentColor = AlfaaText,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(
+                            horizontal = 8.dp,
+                            vertical = 9.dp
+                        ),
                     singleLine = true,
-                    hint = {
-                        Text(
-                            text = stringResource(
-                                R.string.generic_search
-                            ),
-                            color = AlfaaMuted,
-                            fontSize = 12.sp
-                        )
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text
+                    ),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        color = AlfaaText,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    decorationBox = { innerTextField ->
+                        Box {
+                            if (value.isEmpty()) {
+                                Text(
+                                    text = stringResource(
+                                        R.string.generic_search
+                                    ),
+                                    color = AlfaaMuted,
+                                    fontSize = 11.sp
+                                )
+                            }
+
+                            innerTextField()
+                        }
                     }
                 )
             }
@@ -706,9 +774,9 @@ private fun SearchBox(
 
         Surface(
             onClick = onRefreshClick,
-            shape = RoundedCornerShape(13.dp),
-            color = AlfaaPanel,
-            border = androidx.compose.foundation.BorderStroke(
+            shape = RoundedCornerShape(12.dp),
+            color = AlfaaSurface,
+            border = BorderStroke(
                 1.dp,
                 AlfaaBorder
             )
@@ -723,7 +791,7 @@ private fun SearchBox(
                 tint = AlfaaCyan,
                 modifier = Modifier
                     .padding(10.dp)
-                    .size(19.dp)
+                    .size(18.dp)
             )
         }
     }
@@ -736,26 +804,23 @@ private fun VersionList(
     onVersionSelect: (String) -> Unit,
     openLink: (url: String) -> Unit
 ) {
-
     val scrollState = rememberLazyListState()
 
     LazyColumn(
-    modifier = modifier,
-    contentPadding = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 8.dp
-    ),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    state = scrollState
-) {
-
+        modifier = modifier,
+        contentPadding = PaddingValues(
+            horizontal = 18.dp,
+            vertical = 9.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        state = scrollState
+    ) {
         items(
             items = versions,
             key = {
                 it.version.id
             }
         ) { version ->
-
             VersionItemLayout(
                 modifier = Modifier.fillMaxWidth(),
                 version = version,
@@ -776,17 +841,16 @@ private fun VersionItemLayout(
     version: MinecraftVersion,
     onClick: () -> Unit = {},
     onAccessWiki: (String) -> Unit = {},
-    shape: Shape = RoundedCornerShape(18.dp)
+    shape: Shape = RoundedCornerShape(17.dp)
 ) {
-
     val scale = remember {
-        Animatable(0.96f)
+        Animatable(0.97f)
     }
 
     LaunchedEffect(Unit) {
         scale.animateTo(
             targetValue = 1f,
-            animationSpec = getAnimateTween()
+            animationSpec = tween(180)
         )
     }
 
@@ -797,6 +861,18 @@ private fun VersionItemLayout(
         summary
     ) = getVersionComponents(version)
 
+    val isRelease = version.type ==
+            MinecraftVersion.Type.Release
+
+    val accent = when (version.type) {
+        MinecraftVersion.Type.Release -> AlfaaGreen
+        MinecraftVersion.Type.Snapshot -> AlfaaCyan
+        MinecraftVersion.Type.AprilFools -> AlfaaPurple
+        MinecraftVersion.Type.OldBeta,
+        MinecraftVersion.Type.OldAlpha -> AlfaaMuted
+        else -> AlfaaCyan
+    }
+
     Surface(
         modifier = modifier.graphicsLayer(
             scaleX = scale.value,
@@ -804,75 +880,95 @@ private fun VersionItemLayout(
         ),
         onClick = onClick,
         shape = shape,
-        color = AlfaaPanel,
+        color = AlfaaSurface,
         contentColor = AlfaaText,
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             1.dp,
-            AlfaaBorder
+            if (isRelease) {
+                AlfaaGreen.copy(alpha = 0.28f)
+            } else {
+                AlfaaBorder
+            }
         )
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(
+                    start = 12.dp,
+                    top = 12.dp,
+                    end = 12.dp,
+                    bottom = 12.dp
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(
-                        AlfaaPanel2
-                    ),
-                contentAlignment = Alignment.Center
+                    .width(4.dp)
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(accent)
+            )
+
+            Spacer(
+                modifier = Modifier.width(10.dp)
+            )
+
+            Surface(
+                shape = RoundedCornerShape(13.dp),
+                color = accent.copy(alpha = 0.08f),
+                border = BorderStroke(
+                    1.dp,
+                    accent.copy(alpha = 0.22f)
+                )
             ) {
-
-                icon?.let { versionIcon ->
-
-                    Image(
-                        modifier = Modifier.size(32.dp),
-                        painter = versionIcon,
-                        contentDescription = null
-                    )
+                Box(
+                    modifier = Modifier.size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    icon?.let { versionIcon ->
+                        Image(
+                            modifier = Modifier.size(31.dp),
+                            painter = versionIcon,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
 
             Spacer(
-                modifier = Modifier.width(14.dp)
+                modifier = Modifier.width(13.dp)
             )
 
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
-
                     Text(
                         text = version.version.id,
                         color = AlfaaText,
                         fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 0.3.sp
                     )
 
                     VersionTypeBadge(
-                        text = versionType
+                        text = versionType,
+                        accent = accent
                     )
                 }
 
                 summary?.let { text ->
-
                     Text(
-                        modifier = Modifier.alpha(0.65f),
                         text = text,
-                        color = AlfaaText,
-                        fontSize = 11.sp,
-                        maxLines = 1
+                        color = AlfaaMuted,
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        modifier = Modifier.alpha(0.9f)
                     )
                 }
 
@@ -883,25 +979,25 @@ private fun VersionItemLayout(
                             R.string.date_format
                         )
                     ),
-                    color = AlfaaMuted,
-                    fontSize = 10.sp
+                    color = AlfaaMuted.copy(alpha = 0.72f),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.3.sp
                 )
             }
 
             if (wikiUrl != null) {
-
                 Surface(
                     onClick = {
                         onAccessWiki(wikiUrl)
                     },
                     shape = RoundedCornerShape(11.dp),
-                    color = AlfaaPanel2,
-                    border = androidx.compose.foundation.BorderStroke(
+                    color = AlfaaSurface2,
+                    border = BorderStroke(
                         1.dp,
                         AlfaaBorder
                     )
                 ) {
-
                     Icon(
                         painter = painterResource(
                             R.drawable.ic_link
@@ -910,7 +1006,7 @@ private fun VersionItemLayout(
                         tint = AlfaaCyan,
                         modifier = Modifier
                             .padding(9.dp)
-                            .size(18.dp)
+                            .size(17.dp)
                     )
                 }
             }
@@ -920,36 +1016,27 @@ private fun VersionItemLayout(
 
 @Composable
 private fun VersionTypeBadge(
-    text: String
+    text: String,
+    accent: Color
 ) {
-
-    val isRelease = text ==
-            stringResource(
-                R.string.download_game_type_release
-            )
-
     Surface(
-        shape = RoundedCornerShape(7.dp),
-        color = if (isRelease) {
-            AlfaaGreen.copy(alpha = 0.12f)
-        } else {
-            AlfaaCyan.copy(alpha = 0.10f)
-        }
+        shape = RoundedCornerShape(6.dp),
+        color = accent.copy(alpha = 0.10f),
+        border = BorderStroke(
+            1.dp,
+            accent.copy(alpha = 0.22f)
+        )
     ) {
-
         Text(
             modifier = Modifier.padding(
-                horizontal = 7.dp,
+                horizontal = 6.dp,
                 vertical = 3.dp
             ),
-            text = text,
-            color = if (isRelease) {
-                AlfaaGreen
-            } else {
-                AlfaaCyan
-            },
-            fontSize = 9.sp,
-            fontWeight = FontWeight.Bold
+            text = text.uppercase(),
+            color = accent,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 0.7.sp
         )
     }
 }
@@ -957,7 +1044,7 @@ private fun VersionTypeBadge(
 @Composable
 private fun getVersionComponents(
     version: MinecraftVersion
-): Quadruple<Painter?, String, String?, String?> {
+): Quadruple<androidx.compose.ui.graphics.painter.Painter?, String, String?, String?> {
 
     val vmVer = version.version
 
