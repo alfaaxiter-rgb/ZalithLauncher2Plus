@@ -6,10 +6,8 @@
 package com.movtery.zalithlauncher.ui.screens.content.elements
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -79,14 +77,17 @@ fun SideBar(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    val width by animateDpAsState(
-        targetValue = if (expanded) ExpandedWidth else CollapsedWidth,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "sidebarWidth"
-    )
+    val sidebarWidth by animateDpAsState(
+    targetValue = if (expanded) {
+        ExpandedWidth
+    } else {
+        CollapsedWidth
+    },
+    animationSpec = tween(
+        durationMillis = 150
+    ),
+    label = "sidebarWidth"
+)
 
     Card(
         modifier = modifier
@@ -160,36 +161,40 @@ private fun SideBarShortcut(
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
-        targetValue = if (pressed) .93f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessHigh
-        ),
-        label = "sidebarItemScale"
-    )
+    targetValue = if (isPressed) 0.97f else 1f,
+    animationSpec = tween(70),
+    label = "sidebarItemScale"
+)
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = if (expanded) 7.dp else 6.dp)
-            .scale(scale)
-            .shadow(
-                elevation = if (pressed) 1.dp else 3.dp,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .clip(RoundedCornerShape(12.dp))
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            ),
-        shape = RoundedCornerShape(12.dp),
-        color = if (pressed) {
-            MaterialTheme.colorScheme.primary.copy(alpha = .16f)
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .30f)
-        }
-    ) {
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(
+            horizontal = if (expanded) 7.dp else 6.dp
+        )
+        .scale(scale)
+        .clip(RoundedCornerShape(12.dp))
+        .clickable(
+            interactionSource = interactionSource,
+            indication = null,
+            onClick = onClick
+        ),
+
+    shape = RoundedCornerShape(12.dp),
+
+    border = androidx.compose.foundation.BorderStroke(
+        width = 1.dp,
+        color = MaterialTheme.colorScheme.primary.copy(
+            alpha = if (isPressed) 0.75f else 0.18f
+        )
+    ),
+
+    color = if (isPressed) {
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.30f)
+    }
+) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -233,13 +238,10 @@ private fun SideBarToggle(
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
-        targetValue = if (pressed) .86f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessHigh
-        ),
-        label = "sidebarToggleScale"
-    )
+    targetValue = if (isPressed) 0.97f else 1f,
+    animationSpec = tween(70),
+    label = "sidebarToggleScale"
+)
 
     Surface(
         modifier = Modifier
