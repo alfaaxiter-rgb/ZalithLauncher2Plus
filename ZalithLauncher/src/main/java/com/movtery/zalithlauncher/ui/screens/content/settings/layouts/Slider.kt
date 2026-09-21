@@ -6,14 +6,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content.settings.layouts
@@ -70,16 +62,22 @@ fun IntSliderSettingsCard(
         outerShape = outerShape,
         innerShape = innerShape
     ) {
-        var showValueEditDialog by remember { mutableStateOf(false) }
+        var showValueEditDialog by remember {
+            mutableStateOf(false)
+        }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+
+            // NEON TITLE
             Column(
-                modifier = Modifier.alpha(alpha = if (enabled) 1f else DisabledAlpha)
+                modifier = Modifier.alpha(
+                    if (enabled) 1f else DisabledAlpha
+                )
             ) {
                 TitleAndSummary(
                     title = title,
@@ -88,14 +86,22 @@ fun IntSliderSettingsCard(
                     summaryStyle = summaryStyle
                 )
             }
+
+            // NEON SLIDER
             SimpleTextSlider(
                 modifier = Modifier.fillMaxWidth(),
                 value = value.toFloat(),
                 shorter = shorter,
                 enabled = enabled,
-                onValueChange = { onValueChange(it.toInt()) },
-                onValueChangeFinished = { onValueChangeFinished() },
-                onTextClick = { showValueEditDialog = true },
+                onValueChange = {
+                    onValueChange(it.toInt())
+                },
+                onValueChangeFinished = {
+                    onValueChangeFinished()
+                },
+                onTextClick = {
+                    showValueEditDialog = true
+                },
                 toInt = true,
                 valueRange = valueRange,
                 steps = steps,
@@ -104,16 +110,21 @@ fun IntSliderSettingsCard(
                 fineTuningStep = 1f,
                 appendContent = appendContent
             )
+
             previewContent()
         }
 
         if (showValueEditDialog) {
             SliderValueEditDialog(
-                onDismissRequest = { showValueEditDialog = false },
+                onDismissRequest = {
+                    showValueEditDialog = false
+                },
                 title = title,
                 valueRange = valueRange,
                 value = value.toFloat(),
-                onValueChange = { onValueChange(it.toInt()) },
+                onValueChange = {
+                    onValueChange(it.toInt())
+                },
                 onValueChangeFinished = onValueChangeFinished,
                 intCheck = true
             )
@@ -157,7 +168,9 @@ fun IntSliderSettingsCard(
             unit.updateState(it)
             onValueChange(it)
         },
-        onValueChangeFinished = { unit.save(unit.state) },
+        onValueChangeFinished = {
+            unit.save(unit.state)
+        },
         enabled = enabled,
         shorter = shorter,
         fineTuningControl = fineTuningControl,
@@ -204,7 +217,9 @@ fun IntSliderSettingsCard(
             unit.updateState(it)
             onValueChange(it)
         },
-        onValueChangeFinished = { unit.save(unit.state) },
+        onValueChangeFinished = {
+            unit.save(unit.state)
+        },
         enabled = enabled,
         shorter = shorter,
         fineTuningControl = fineTuningControl,
