@@ -6,21 +6,15 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
 package com.movtery.zalithlauncher.ui.screens.content.settings.layouts
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
@@ -60,7 +54,8 @@ import com.movtery.zalithlauncher.ui.components.IDItem
 import com.movtery.zalithlauncher.ui.components.SimpleListItem
 import com.movtery.zalithlauncher.ui.components.TitleAndSummary
 import com.movtery.zalithlauncher.ui.screens.content.elements.DisabledAlpha
-import com.movtery.zalithlauncher.utils.animation.getAnimateTween
+
+private const val LIST_ANIMATION_DURATION = 180
 
 @Composable
 private fun <E> BaseListSettingsCard(
@@ -77,14 +72,22 @@ private fun <E> BaseListSettingsCard(
     middleLayout: (@Composable ColumnScope.() -> Unit)? = null,
     trailingIcon: (@Composable RowScope.() -> Unit)? = null,
     enabled: Boolean = true,
-    itemListPadding: PaddingValues = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp),
+    itemListPadding: PaddingValues = PaddingValues(
+        start = 8.dp,
+        end = 8.dp,
+        bottom = 8.dp
+    ),
     titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     summaryStyle: TextStyle = MaterialTheme.typography.labelSmall
 ) {
-    require(items.isNotEmpty()) { "Items list cannot be empty" }
+    require(items.isNotEmpty()) {
+        "Items list cannot be empty"
+    }
 
     LaunchedEffect(enabled) {
-        if (!enabled) onExpandChange(false)
+        if (!enabled) {
+            onExpandChange(false)
+        }
     }
 
     SettingsCard(
@@ -93,73 +96,120 @@ private fun <E> BaseListSettingsCard(
         outerShape = outerShape,
         innerShape = innerShape
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .alpha(alpha = if (enabled) 1f else DisabledAlpha)
+                .alpha(
+                    if (enabled) {
+                        1f
+                    } else {
+                        DisabledAlpha
+                    }
+                )
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
+
+            /*
+             * HEADER
+             */
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = enabled) {
+                        onExpandChange(!expanded)
+                    }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(enabled = enabled) { onExpandChange(!expanded) }
-                        .padding(all = 16.dp)
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) innerColumn@ {
-                        TitleAndSummary(
-                            title = title,
-                            summary = summary,
-                            titleStyle = titleStyle,
-                            summaryStyle = summaryStyle
-                        )
-                        middleLayout?.invoke(this@innerColumn)
-                    }
-                    trailingIcon?.let { trailing ->
-                        Row(
-                            modifier = Modifier.align(Alignment.CenterVertically),
-                            content = trailing
-                        )
-                    }
-                    val rotation by animateFloatAsState(
-                        targetValue = if (expanded) -180f else 0f,
-                        animationSpec = getAnimateTween()
+                    TitleAndSummary(
+                        title = title,
+                        summary = summary,
+                        titleStyle = titleStyle,
+                        summaryStyle = summaryStyle
                     )
-                    IconButton(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .size(34.dp)
-                            .rotate(rotation),
-                        enabled = enabled,
-                        onClick = { onExpandChange(!expanded) }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_drop_down_rounded),
-                            contentDescription = stringResource(if (expanded) R.string.generic_expand else R.string.generic_collapse)
-                        )
-                    }
+
+                    middleLayout?.invoke(this)
                 }
 
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    AnimatedVisibility(
-                        modifier = Modifier.fillMaxWidth(),
-                        visible = expanded,
-                        enter = expandVertically(animationSpec = getAnimateTween()),
-                        exit = shrinkVertically(animationSpec = getAnimateTween()) + fadeOut(),
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(itemListPadding)
-                        ) {
-                            items.forEach { item ->
-                                itemLayout(item)
+                trailingIcon?.let { trailing ->
+                    Row(
+                        modifier = Modifier.padding(start = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = trailing
+                    )
+                }
+
+                /*
+                 * NEON DROPDOWN ARROW
+                 */
+                val rotation by animateFloatAsState(
+                    targetValue = if (expanded) 180f else 0f,
+                    animationSpec = tween(
+                        durationMillis = LIST_ANIMATION_DURATION
+                    ),
+                    label = "listArrowRotation"
+                )
+
+                IconButton(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .rotate(rotation),
+                    enabled = enabled,
+                    onClick = {
+                        onExpandChange(!expanded)
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            R.drawable.ic_arrow_drop_down_rounded
+                        ),
+                        contentDescription = stringResource(
+                            if (expanded) {
+                                R.string.generic_expand
+                            } else {
+                                R.string.generic_collapse
                             }
-                        }
+                        )
+                    )
+                }
+            }
+
+            /*
+             * CONTENT
+             */
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = expanded,
+                enter = expandVertically(
+                    animationSpec = tween(
+                        durationMillis = LIST_ANIMATION_DURATION
+                    )
+                ) + fadeIn(
+                    animationSpec = tween(
+                        durationMillis = LIST_ANIMATION_DURATION
+                    )
+                ),
+                exit = shrinkVertically(
+                    animationSpec = tween(
+                        durationMillis = LIST_ANIMATION_DURATION
+                    )
+                ) + fadeOut(
+                    animationSpec = tween(
+                        durationMillis = LIST_ANIMATION_DURATION
+                    )
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(itemListPadding)
+                ) {
+                    items.forEach { item ->
+                        itemLayout(item)
                     }
                 }
             }
@@ -185,44 +235,70 @@ fun <E> ListSettingsCard(
     trailingIcon: (@Composable RowScope.() -> Unit)? = null,
     enabled: Boolean = true,
     autoCollapse: Boolean = true,
-    itemListPadding: PaddingValues = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp),
+    itemListPadding: PaddingValues = PaddingValues(
+        start = 8.dp,
+        end = 8.dp,
+        bottom = 8.dp
+    ),
     onValueChange: (E) -> Unit = {},
     titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     summaryStyle: TextStyle = MaterialTheme.typography.labelSmall
 ) {
-    require(items.isNotEmpty()) { "Items list cannot be empty" }
+    require(items.isNotEmpty()) {
+        "Items list cannot be empty"
+    }
 
     var selectedItem by remember(currentId) {
         mutableStateOf(
-            items.firstOrNull { getItemId(it) == currentId }
-                ?: items.firstOrNull { getItemId(it) == defaultId }
+            items.firstOrNull {
+                getItemId(it) == currentId
+            }
+                ?: items.firstOrNull {
+                    getItemId(it) == defaultId
+                }
                 ?: items.first()
         )
     }
-    var expanded by remember { mutableStateOf(false) }
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
 
     BaseListSettingsCard(
         items = items,
         expanded = expanded,
-        onExpandChange = { expanded = it },
+        onExpandChange = {
+            expanded = it
+        },
         title = title,
         position = position,
         itemLayout = { item ->
+
             SimpleListItem(
                 modifier = Modifier.fillMaxWidth(),
                 selected = getItemId(selectedItem) == getItemId(item),
                 itemName = getItemText(item),
                 summary = getItemSummary?.let {
-                    { it.invoke(item) }
+                    {
+                        it.invoke(item)
+                    }
                 },
                 trailing = getItemTrailing?.let {
-                    { it.invoke(item) }
+                    {
+                        it.invoke(item)
+                    }
                 },
                 onClick = {
-                    if (expanded && getItemId(selectedItem) != getItemId(item)) {
+                    if (
+                        expanded &&
+                        getItemId(selectedItem) != getItemId(item)
+                    ) {
                         selectedItem = item
                         onValueChange(item)
-                        if (autoCollapse) expanded = false
+
+                        if (autoCollapse) {
+                            expanded = false
+                        }
                     }
                 }
             )
@@ -234,7 +310,10 @@ fun <E> ListSettingsCard(
         middleLayout = {
             Text(
                 modifier = Modifier.alpha(0.7f),
-                text = stringResource(R.string.settings_element_selected, getItemText(selectedItem)),
+                text = stringResource(
+                    R.string.settings_element_selected,
+                    getItemText(selectedItem)
+                ),
                 style = MaterialTheme.typography.labelSmall
             )
         },
@@ -263,7 +342,11 @@ fun <E> ListSettingsCard(
     trailingIcon: (@Composable RowScope.() -> Unit)? = null,
     enabled: Boolean = true,
     autoCollapse: Boolean = true,
-    itemListPadding: PaddingValues = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp),
+    itemListPadding: PaddingValues = PaddingValues(
+        start = 8.dp,
+        end = 8.dp,
+        bottom = 8.dp
+    ),
     onValueChange: (E) -> Unit = {},
     titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     summaryStyle: TextStyle = MaterialTheme.typography.labelSmall
@@ -296,7 +379,7 @@ fun <E> ListSettingsCard(
 }
 
 @Composable
-fun <E: Enum<E>> ListSettingsCard(
+fun <E : Enum<E>> ListSettingsCard(
     unit: EnumSettingUnit<E>,
     items: List<E>,
     title: String,
@@ -309,7 +392,11 @@ fun <E: Enum<E>> ListSettingsCard(
     getItemSummary: (@Composable (E) -> Unit)? = null,
     enabled: Boolean = true,
     autoCollapse: Boolean = true,
-    itemListPadding: PaddingValues = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp),
+    itemListPadding: PaddingValues = PaddingValues(
+        start = 8.dp,
+        end = 8.dp,
+        bottom = 8.dp
+    ),
     onValueChange: (E) -> Unit = {},
     titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     summaryStyle: TextStyle = MaterialTheme.typography.labelSmall
@@ -356,21 +443,32 @@ fun <E> StringListSettingsCard(
     getItemCheck: (contains: Boolean) -> Boolean = { it },
     trailingIcon: (@Composable RowScope.() -> Unit)? = null,
     enabled: Boolean = true,
-    itemListPadding: PaddingValues = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp),
+    itemListPadding: PaddingValues = PaddingValues(
+        start = 8.dp,
+        end = 8.dp,
+        bottom = 8.dp
+    ),
     titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     summaryStyle: TextStyle = MaterialTheme.typography.labelSmall
 ) {
-    require(items.isNotEmpty()) { "Items list cannot be empty" }
+    require(items.isNotEmpty()) {
+        "Items list cannot be empty"
+    }
 
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember {
+        mutableStateOf(false)
+    }
 
     BaseListSettingsCard(
         items = items,
         expanded = expanded,
-        onExpandChange = { expanded = it },
+        onExpandChange = {
+            expanded = it
+        },
         title = title,
         position = position,
         itemLayout = { item ->
+
             val itemID = getItemID(item)
             val listState = unit.state
             val contains = itemID in listState
@@ -380,12 +478,17 @@ fun <E> StringListSettingsCard(
                 checked = getItemCheck(contains),
                 onCheckedChange = { value ->
                     unit.save(
-                        listState.onItemsChange(value, item)
+                        listState.onItemsChange(
+                            value,
+                            item
+                        )
                     )
                 },
                 itemName = getItemText(item),
                 summary = getItemSummary?.let {
-                    { it.invoke(item) }
+                    {
+                        it.invoke(item)
+                    }
                 }
             )
         },
@@ -411,7 +514,9 @@ fun SimpleIDListCard(
     modifier: Modifier = Modifier,
     summary: String? = null,
     enabled: Boolean = true,
-    itemListPadding: PaddingValues = PaddingValues(bottom = 4.dp),
+    itemListPadding: PaddingValues = PaddingValues(
+        bottom = 4.dp
+    ),
     onValueChange: (IDItem) -> Unit = {}
 ) {
     ListSettingsCard(
@@ -422,8 +527,12 @@ fun SimpleIDListCard(
         defaultId = defaultId,
         title = title,
         summary = summary,
-        getItemText = { it.title },
-        getItemId = { it.id },
+        getItemText = {
+            it.title
+        },
+        getItemId = {
+            it.id
+        },
         enabled = enabled,
         itemListPadding = itemListPadding,
         onValueChange = onValueChange
