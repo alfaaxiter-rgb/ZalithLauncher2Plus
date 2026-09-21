@@ -66,6 +66,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.round
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -256,11 +257,10 @@ fun SelectGameVersionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AlfaaBlack)
-                .offset {
-                    IntOffset(
-                        x = 0,
-                        y = yOffset.roundToPx()
-                    )
+                .offset(
+    x = 0.dp,
+    y = yOffset
+)
                 }
         ) {
             when (val state = viewModel.versionState) {
