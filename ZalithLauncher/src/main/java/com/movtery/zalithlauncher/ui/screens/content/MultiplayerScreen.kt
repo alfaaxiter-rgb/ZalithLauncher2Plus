@@ -28,15 +28,20 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.notification.NotificationManager
@@ -123,7 +129,7 @@ fun MultiplayerScreen(
     }
 }
 
-private sealed interface MultiplayerOperation {
+private val AlfaaBlack = Color(0xFF05080D)\nprivate val AlfaaPanel = Color(0xFF0B1118)\nprivate val AlfaaPanel2 = Color(0xFF101923)\nprivate val AlfaaCyan = Color(0xFF43C7FF)\nprivate val AlfaaGreen = Color(0xFF20E0B2)\nprivate val AlfaaText = Color(0xFFE8FFF8)\nprivate val AlfaaMuted = Color(0xFF829A98)\nprivate val AlfaaBorder = Color(0xFF16483F)\n\n@Composable\nprivate fun NeonInfoPanel(modifier: Modifier = Modifier, text: String) {\n    androidx.compose.foundation.layout.Box(\n        modifier = modifier\n            .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)), androidx.compose.foundation.shape.RoundedCornerShape(18.dp))\n            .border(1.dp, AlfaaCyan.copy(alpha = 0.4f), androidx.compose.foundation.shape.RoundedCornerShape(18.dp))\n            .padding(16.dp)\n    ) {\n        BasicText(text = text, style = TextStyle(color = AlfaaText, fontSize = 12.sp, lineHeight = 18.sp))\n    }\n}\n\nprivate sealed interface MultiplayerOperation {
     data object None : MultiplayerOperation
     data object Notice : MultiplayerOperation
     /** 没有通知权限，提醒用户 */
