@@ -115,15 +115,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-private val AlfaaBlack = Color(0xFF050608)
-private val AlfaaPanel = Color(0xFF0A0D11)
-private val AlfaaPanel2 = Color(0xFF10141A)
-private val AlfaaBorder = Color(0xFF1D252E)
-private val AlfaaCyan = Color(0xFF00E5FF)
-private val AlfaaGreen = Color(0xFF00FF9C)
-private val AlfaaPurple = Color(0xFF9B6CFF)
-private val AlfaaText = Color(0xFFF3F7FA)
-private val AlfaaMuted = Color(0xFF8B96A3)
+private val AlfaaVMBlack = Color(0xFF050608)
+private val AlfaaVMPanel = Color(0xFF0A0D11)
+private val AlfaaVMPanel2 = Color(0xFF10141A)
+private val AlfaaVMBorder = Color(0xFF1D252E)
+private val AlfaaVMCyan = Color(0xFF00E5FF)
+private val AlfaaVMGreen = Color(0xFF00FF9C)
+private val AlfaaVMPurple = Color(0xFF9B6CFF)
+private val AlfaaVMText = Color(0xFFF3F7FA)
+private val AlfaaVMMuted = Color(0xFF8B96A3)
 
 private class VersionsScreenViewModel : ViewModel() {
 
@@ -389,7 +389,7 @@ fun VersionsManageScreen(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AlfaaBlack)
+                .background(AlfaaVMBlack)
         ) {
 
             AlfaaVersionsSidebar(
@@ -561,10 +561,10 @@ private fun AlfaaVersionsSidebar(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(22.dp),
-            color = AlfaaPanel,
+            color = AlfaaVMPanel,
             border = androidx.compose.foundation.BorderStroke(
                 1.dp,
-                AlfaaBorder
+                AlfaaVMBorder
             )
         ) {
 
@@ -574,7 +574,7 @@ private fun AlfaaVersionsSidebar(
 
                 Text(
                     text = "ALFAA",
-                    color = AlfaaCyan,
+                    color = AlfaaVMCyan,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 11.sp,
@@ -587,14 +587,14 @@ private fun AlfaaVersionsSidebar(
 
                 Text(
                     text = "VERSIONS",
-                    color = AlfaaText,
+                    color = AlfaaVMText,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 20.sp
                 )
 
                 Text(
                     text = "MINECRAFT INSTALLATIONS",
-                    color = AlfaaMuted,
+                    color = AlfaaVMMuted,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 7.sp,
                     letterSpacing = 0.8.sp
@@ -611,10 +611,10 @@ private fun AlfaaVersionsSidebar(
                 .fillMaxWidth()
                 .weight(1f),
             shape = RoundedCornerShape(20.dp),
-            color = AlfaaPanel,
+            color = AlfaaVMPanel,
             border = androidx.compose.foundation.BorderStroke(
                 1.dp,
-                AlfaaBorder
+                AlfaaVMBorder
             )
         ) {
 
@@ -704,7 +704,7 @@ private fun AlfaaVersionsSidebar(
             text = stringResource(
                 R.string.versions_manage_game_path_add_new
             ),
-            accent = AlfaaCyan,
+            accent = AlfaaVMCyan,
             enabled = canHandlePermission,
             onClick = onAddPath
         )
@@ -714,7 +714,7 @@ private fun AlfaaVersionsSidebar(
             text = stringResource(
                 R.string.versions_manage_move_versions
             ),
-            accent = AlfaaPurple,
+            accent = AlfaaVMPurple,
             onClick = onMoveVersions
         )
 
@@ -723,7 +723,7 @@ private fun AlfaaVersionsSidebar(
             text = stringResource(
                 R.string.versions_manage_cleanup
             ),
-            accent = AlfaaGreen,
+            accent = AlfaaVMGreen,
             onClick = onCleanup
         )
     }
@@ -745,7 +745,7 @@ private fun AlfaaSideButton(
         enabled = enabled,
         onClick = onClick,
         shape = RoundedCornerShape(15.dp),
-        color = AlfaaPanel2,
+        color = AlfaaVMPanel2,
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
             accent.copy(alpha = 0.28f)
@@ -773,7 +773,7 @@ private fun AlfaaSideButton(
 
             Text(
                 text = text,
-                color = AlfaaText,
+                color = AlfaaVMText,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -825,10 +825,10 @@ private fun AlfaaVersionsContent(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
-        color = AlfaaPanel,
+        color = AlfaaVMPanel,
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
-            AlfaaBorder
+            AlfaaVMBorder
         )
     ) {
 
@@ -847,12 +847,12 @@ private fun AlfaaVersionsContent(
                 ) {
 
                     CircularProgressIndicator(
-                        color = AlfaaCyan
+                        color = AlfaaVMCyan
                     )
 
                     Text(
                         text = "REFRESHING VERSIONS",
-                        color = AlfaaMuted,
+                        color = AlfaaVMMuted,
                         fontFamily = FontFamily.Monospace,
                         fontSize = 9.sp
                     )
@@ -888,7 +888,7 @@ private fun AlfaaVersionsContent(
 
                         Text(
                             text = "INSTALLED MINECRAFT",
-                            color = AlfaaText,
+                            color = AlfaaVMText,
                             fontWeight =
                                 FontWeight.ExtraBold,
                             fontSize = 19.sp
@@ -897,7 +897,7 @@ private fun AlfaaVersionsContent(
                         Text(
                             text =
                                 "${versions.size} VERSION${if (versions.size == 1) "" else "S"} AVAILABLE",
-                            color = AlfaaMuted,
+                            color = AlfaaVMMuted,
                             fontFamily =
                                 FontFamily.Monospace,
                             fontSize = 8.sp,
@@ -909,11 +909,11 @@ private fun AlfaaVersionsContent(
                         onClick = onRefresh,
                         shape =
                             RoundedCornerShape(13.dp),
-                        color = AlfaaPanel2,
+                        color = AlfaaVMPanel2,
                         border =
                             androidx.compose.foundation.BorderStroke(
                                 1.dp,
-                                AlfaaBorder
+                                AlfaaVMBorder
                             )
                     ) {
 
@@ -933,7 +933,7 @@ private fun AlfaaVersionsContent(
                                     stringResource(
                                         R.string.generic_refresh
                                     ),
-                                tint = AlfaaCyan,
+                                tint = AlfaaVMCyan,
                                 modifier =
                                     Modifier.size(17.dp)
                             )
@@ -945,7 +945,7 @@ private fun AlfaaVersionsContent(
 
                             Text(
                                 text = "REFRESH",
-                                color = AlfaaText,
+                                color = AlfaaVMText,
                                 fontSize = 9.sp,
                                 fontWeight =
                                     FontWeight.Bold
@@ -961,7 +961,7 @@ private fun AlfaaVersionsContent(
                         onClick = onInstall,
                         shape =
                             RoundedCornerShape(13.dp),
-                        color = AlfaaCyan
+                        color = AlfaaVMCyan
                     ) {
 
                         Row(
@@ -1022,7 +1022,7 @@ private fun AlfaaVersionsContent(
                         selected =
                             versionCategory ==
                                     VersionCategory.ALL,
-                        accent = AlfaaCyan,
+                        accent = AlfaaVMCyan,
                         onClick = {
                             onCategoryChange(
                                 VersionCategory.ALL
@@ -1036,7 +1036,7 @@ private fun AlfaaVersionsContent(
                         selected =
                             versionCategory ==
                                     VersionCategory.VANILLA,
-                        accent = AlfaaGreen,
+                        accent = AlfaaVMGreen,
                         onClick = {
                             onCategoryChange(
                                 VersionCategory.VANILLA
@@ -1050,7 +1050,7 @@ private fun AlfaaVersionsContent(
                         selected =
                             versionCategory ==
                                     VersionCategory.MODLOADER,
-                        accent = AlfaaPurple,
+                        accent = AlfaaVMPurple,
                         onClick = {
                             onCategoryChange(
                                 VersionCategory.MODLOADER
@@ -1202,11 +1202,11 @@ private fun AlfaaVersionsContent(
                             Surface(
                                 shape =
                                     RoundedCornerShape(20.dp),
-                                color = AlfaaPanel2,
+                                color = AlfaaVMPanel2,
                                 border =
                                     androidx.compose.foundation.BorderStroke(
                                         1.dp,
-                                        AlfaaBorder
+                                        AlfaaVMBorder
                                     )
                             ) {
 
@@ -1225,7 +1225,7 @@ private fun AlfaaVersionsContent(
                                             Icons.Default.Folder,
                                         contentDescription =
                                             null,
-                                        tint = AlfaaMuted,
+                                        tint = AlfaaVMMuted,
                                         modifier =
                                             Modifier.size(35.dp)
                                     )
@@ -1237,7 +1237,7 @@ private fun AlfaaVersionsContent(
 
                                     Text(
                                         text = "NO VERSIONS",
-                                        color = AlfaaText,
+                                        color = AlfaaVMText,
                                         fontWeight =
                                             FontWeight.ExtraBold,
                                         fontSize = 13.sp
@@ -1251,7 +1251,7 @@ private fun AlfaaVersionsContent(
                                     Text(
                                         text =
                                             "Install a Minecraft version to get started.",
-                                        color = AlfaaMuted,
+                                        color = AlfaaVMMuted,
                                         fontSize = 9.sp
                                     )
                                 }
@@ -1285,14 +1285,14 @@ private fun AlfaaCategory(
         color = if (selected) {
             accent.copy(alpha = 0.14f)
         } else {
-            AlfaaPanel2
+            AlfaaVMPanel2
         },
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
             if (selected) {
                 accent.copy(alpha = 0.7f)
             } else {
-                AlfaaBorder
+                AlfaaVMBorder
             }
         )
     ) {
@@ -1311,7 +1311,7 @@ private fun AlfaaCategory(
                 color = if (selected) {
                     accent
                 } else {
-                    AlfaaMuted
+                    AlfaaVMMuted
                 },
                 fontFamily =
                     FontFamily.Monospace,
@@ -1327,9 +1327,9 @@ private fun AlfaaCategory(
             Text(
                 text = count.toString(),
                 color = if (selected) {
-                    AlfaaText
+                    AlfaaVMText
                 } else {
-                    AlfaaMuted
+                    AlfaaVMMuted
                 },
                 fontSize = 8.sp,
                 fontWeight =
@@ -1361,14 +1361,14 @@ private fun AlfaaVersionCard(
         color = if (selected) {
             Color(0xFF0D1718)
         } else {
-            AlfaaPanel2
+            AlfaaVMPanel2
         },
         border = androidx.compose.foundation.BorderStroke(
             width = if (selected) 1.5.dp else 1.dp,
             color = if (selected) {
-                AlfaaCyan.copy(alpha = 0.8f)
+                AlfaaVMCyan.copy(alpha = 0.8f)
             } else {
-                AlfaaBorder
+                AlfaaVMBorder
             }
         )
     ) {
@@ -1389,7 +1389,7 @@ private fun AlfaaVersionCard(
                     shape =
                         RoundedCornerShape(10.dp),
                     color =
-                        AlfaaCyan.copy(alpha = 0.08f)
+                        AlfaaVMCyan.copy(alpha = 0.08f)
                 ) {
 
                     Row(
@@ -1406,7 +1406,7 @@ private fun AlfaaVersionCard(
                             modifier = Modifier
                                 .size(7.dp)
                                 .background(
-                                    AlfaaGreen,
+                                    AlfaaVMGreen,
                                     RoundedCornerShape(50)
                                 )
                         )
@@ -1418,7 +1418,7 @@ private fun AlfaaVersionCard(
 
                         Text(
                             text = "ACTIVE VERSION",
-                            color = AlfaaCyan,
+                            color = AlfaaVMCyan,
                             fontFamily =
                                 FontFamily.Monospace,
                             fontWeight =
