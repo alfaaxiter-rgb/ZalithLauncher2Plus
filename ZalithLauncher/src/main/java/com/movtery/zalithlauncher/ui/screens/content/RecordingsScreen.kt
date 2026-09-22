@@ -291,7 +291,6 @@ private fun RecordingCard(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(onLongClick = { menuExpanded = true }, onClick = onPlay),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -343,8 +342,8 @@ private fun RecordingCard(
                     add(SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                         .format(Date(entry.dateAddedSec * 1000L)))
                 }
-                Text(
-                    text = parts.joinToString(" \u00b7 "),
+                BasicText(
+                    text = parts.joinToString(" \\u00b7 "),
                     style = TextStyle(color = AlfaaMuted, fontSize = 10.sp)
                 )
             }
