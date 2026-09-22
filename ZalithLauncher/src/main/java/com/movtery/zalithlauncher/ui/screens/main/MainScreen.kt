@@ -578,11 +578,11 @@ private fun NavigationUI(
                 visible = currentKey != null &&
                         currentKey != NormalNavKey.LauncherMain,
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(
-                        top = 14.dp,
-                        end = 16.dp
-                    ),
+    .align(Alignment.BottomEnd)
+    .padding(
+        end = 18.dp,
+        bottom = 18.dp
+),
                 enter = fadeIn(
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioNoBouncy,
