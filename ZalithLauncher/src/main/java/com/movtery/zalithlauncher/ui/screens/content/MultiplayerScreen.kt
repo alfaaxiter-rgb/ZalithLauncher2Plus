@@ -65,19 +65,16 @@ import com.movtery.zalithlauncher.terracotta.Terracotta
 import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.AnimatedRow
-import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.NotificationCheck
 import com.movtery.zalithlauncher.ui.components.OwnOutlinedTextField
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
-import com.movtery.zalithlauncher.ui.components.influencedByBackgroundColor
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCard
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
-import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.utils.file.shareFile
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
@@ -267,11 +264,12 @@ private fun MainMenu(
                                 AllSettings.terracottaNodes.save(value)
                             },
                             label = {
-                                Text(text = stringResource(R.string.terracotta_custom_note_list_hint))
+                                BasicText(
+                                    text = stringResource(R.string.terracotta_custom_note_list_hint),
+                                    style = TextStyle(color = AlfaaMuted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                                )
                             },
-                            textStyle = MaterialTheme.typography.labelMedium,
                             singleLine = true,
-                            shape = MaterialTheme.shapes.large,
                         )
                     }
                 }
@@ -318,11 +316,12 @@ private data class TabItem(
 private fun TutorialMenu(
     modifier: Modifier = Modifier
 ) {
-    BackgroundCard(
+    androidx.compose.foundation.layout.Box(
         modifier = modifier
             .fillMaxHeight()
-            .padding(vertical = 12.dp),
-        shape = MaterialTheme.shapes.extraLarge
+            .padding(vertical = 12.dp)
+            .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)), androidx.compose.foundation.shape.RoundedCornerShape(22.dp))
+            .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(22.dp))
     ) {
         val tabs = remember {
             listOf(
@@ -340,23 +339,26 @@ private fun TutorialMenu(
         }
 
         //顶贴标签栏
-        SecondaryTabRow(
-            containerColor = influencedByBackgroundColor(
-                color = cardTitleColor(),
-                influencedAlpha = 0.5f * (AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f)
-            ),
-            selectedTabIndex = selectedTabIndex
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(AlfaaPanel)
+                .padding(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             tabs.forEachIndexed { index, item ->
-                Tab(
-                    selected = index == selectedTabIndex,
-                    onClick = {
-                        selectedTabIndex = index
-                    },
-                    text = {
-                        MarqueeText(text = stringResource(item.text))
-                    }
-                )
+                val selected = index == selectedTabIndex
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(if (selected) AlfaaCyan.copy(alpha = 0.14f) else Color.Transparent, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .border(1.dp, if (selected) AlfaaCyan.copy(alpha = 0.55f) else AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .clickable { selectedTabIndex = index }
+                        .padding(horizontal = 8.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MarqueeText(text = stringResource(item.text))
+                }
             }
         }
 
@@ -476,10 +478,7 @@ private fun TitleTextLayout(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium
-        )
+        BasicText(text = title, style = TextStyle(color = AlfaaText, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold))
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -493,9 +492,5 @@ private fun BodyText(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        modifier = modifier,
-        text = text,
-        style = MaterialTheme.typography.bodySmall
-    )
+    BasicText(modifier = modifier, text = text, style = TextStyle(color = AlfaaMuted, fontSize = 12.sp, lineHeight = 19.sp))
 }
