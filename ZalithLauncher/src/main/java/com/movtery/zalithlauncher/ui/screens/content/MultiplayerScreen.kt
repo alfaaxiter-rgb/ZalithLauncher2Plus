@@ -28,20 +28,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.notification.NotificationManager
@@ -65,16 +59,19 @@ import com.movtery.zalithlauncher.terracotta.Terracotta
 import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.AnimatedRow
+import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.NotificationCheck
 import com.movtery.zalithlauncher.ui.components.OwnOutlinedTextField
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
+import com.movtery.zalithlauncher.ui.components.influencedByBackgroundColor
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCard
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
+import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.utils.file.shareFile
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
@@ -126,7 +123,7 @@ fun MultiplayerScreen(
     }
 }
 
-private val AlfaaBlack = Color(0xFF05080D)\nprivate val AlfaaPanel = Color(0xFF0B1118)\nprivate val AlfaaPanel2 = Color(0xFF101923)\nprivate val AlfaaCyan = Color(0xFF43C7FF)\nprivate val AlfaaGreen = Color(0xFF20E0B2)\nprivate val AlfaaText = Color(0xFFE8FFF8)\nprivate val AlfaaMuted = Color(0xFF829A98)\nprivate val AlfaaBorder = Color(0xFF16483F)\n\n@Composable\nprivate fun NeonInfoPanel(modifier: Modifier = Modifier, text: String) {\n    androidx.compose.foundation.layout.Box(\n        modifier = modifier\n            .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)), androidx.compose.foundation.shape.RoundedCornerShape(18.dp))\n            .border(1.dp, AlfaaCyan.copy(alpha = 0.4f), androidx.compose.foundation.shape.RoundedCornerShape(18.dp))\n            .padding(16.dp)\n    ) {\n        BasicText(text = text, style = TextStyle(color = AlfaaText, fontSize = 12.sp, lineHeight = 18.sp))\n    }\n}\n\nprivate sealed interface MultiplayerOperation {
+private sealed interface MultiplayerOperation {
     data object None : MultiplayerOperation
     data object Notice : MultiplayerOperation
     /** 没有通知权限，提醒用户 */
@@ -264,12 +261,11 @@ private fun MainMenu(
                                 AllSettings.terracottaNodes.save(value)
                             },
                             label = {
-                                BasicText(
-                                    text = stringResource(R.string.terracotta_custom_note_list_hint),
-                                    style = TextStyle(color = AlfaaMuted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                                )
+                                Text(text = stringResource(R.string.terracotta_custom_note_list_hint))
                             },
+                            textStyle = MaterialTheme.typography.labelMedium,
                             singleLine = true,
+                            shape = MaterialTheme.shapes.large,
                         )
                     }
                 }
@@ -316,12 +312,11 @@ private data class TabItem(
 private fun TutorialMenu(
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.foundation.layout.Box(
+    BackgroundCard(
         modifier = modifier
             .fillMaxHeight()
-            .padding(vertical = 12.dp)
-            .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)), androidx.compose.foundation.shape.RoundedCornerShape(22.dp))
-            .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(22.dp))
+            .padding(vertical = 12.dp),
+        shape = MaterialTheme.shapes.extraLarge
     ) {
         val tabs = remember {
             listOf(
@@ -339,26 +334,23 @@ private fun TutorialMenu(
         }
 
         //顶贴标签栏
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(AlfaaPanel)
-                .padding(6.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        SecondaryTabRow(
+            containerColor = influencedByBackgroundColor(
+                color = cardTitleColor(),
+                influencedAlpha = 0.5f * (AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f)
+            ),
+            selectedTabIndex = selectedTabIndex
         ) {
             tabs.forEachIndexed { index, item ->
-                val selected = index == selectedTabIndex
-                androidx.compose.foundation.layout.Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(if (selected) AlfaaCyan.copy(alpha = 0.14f) else Color.Transparent, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                        .border(1.dp, if (selected) AlfaaCyan.copy(alpha = 0.55f) else AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                        .clickable { selectedTabIndex = index }
-                        .padding(horizontal = 8.dp, vertical = 10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    MarqueeText(text = stringResource(item.text))
-                }
+                Tab(
+                    selected = index == selectedTabIndex,
+                    onClick = {
+                        selectedTabIndex = index
+                    },
+                    text = {
+                        MarqueeText(text = stringResource(item.text))
+                    }
+                )
             }
         }
 
@@ -478,7 +470,10 @@ private fun TitleTextLayout(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        BasicText(text = title, style = TextStyle(color = AlfaaText, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium
+        )
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -492,5 +487,9 @@ private fun BodyText(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    BasicText(modifier = modifier, text = text, style = TextStyle(color = AlfaaMuted, fontSize = 12.sp, lineHeight = 19.sp))
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.bodySmall
+    )
 }
