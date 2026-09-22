@@ -48,6 +48,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Brush
@@ -147,7 +148,7 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                             tint = AlfaaCyan.copy(alpha = 0.4f)
                         )
                         Spacer(Modifier.height(12.dp))
-                        Text(
+                        BasicText(
                             text = stringResource(R.string.recordings_empty),
                             style = TextStyle(color = AlfaaText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         )
@@ -194,66 +195,73 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
         }
 
         renameTarget?.let { entry ->
-            var name by remember(entry.id) {
-                mutableStateOf(entry.displayName.removeSuffix(".mp4"))
-            }
-            AlertDialog(
-                onDismissRequest = { renameTarget = null },
-                title = { Text(stringResource(R.string.recordings_rename)) },
-                text = {
-                    OutlinedTextField(
+            var name by remember(entry.id) { mutableStateOf(entry.displayName.removeSuffix(".mp4")) }
+            Dialog(onDismissRequest = { renameTarget = null }) {
+                Column(
+                    modifier = Modifier.width(340.dp)
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                        .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)))
+                        .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                        .padding(20.dp)
+                ) {
+                    BasicText(stringResource(R.string.recordings_rename), style = TextStyle(color = AlfaaCyan, fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                    Spacer(Modifier.height(14.dp))
+                    BasicTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text(stringResource(R.string.recordings_rename_hint)) },
-                        singleLine = true
-                    )
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val newName = "${name.trim()}.mp4"
-                        scope.launch(Dispatchers.IO) {
-                            val values = ContentValues().apply {
-                                put(MediaStore.Video.Media.DISPLAY_NAME, newName)
+                        singleLine = true,
+                        textStyle = TextStyle(color = AlfaaText, fontSize = 14.sp),
+                        modifier = Modifier.fillMaxWidth()
+                            .background(AlfaaBlack, androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                            .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                            .padding(12.dp),
+                        decorationBox = { inner ->
+                            Box {
+                                if (name.isEmpty()) BasicText(stringResource(R.string.recordings_rename_hint), style = TextStyle(color = AlfaaMuted, fontSize = 14.sp))
+                                inner()
                             }
-                            context.contentResolver.update(entry.uri, values, null, null)
-                            withContext(Dispatchers.Main) { renameTarget = null; reload() }
                         }
-                    }) { Text(stringResource(R.string.generic_save)) }
-                },
-                dismissButton = {
-                    TextButton(onClick = { renameTarget = null }) {
-                        Text(stringResource(R.string.generic_cancel))
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        BasicText(stringResource(R.string.generic_cancel), style = TextStyle(color = AlfaaMuted, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.clickable { renameTarget = null }.padding(12.dp))
+                        BasicText(stringResource(R.string.generic_save), style = TextStyle(color = AlfaaGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.clickable {
+                            val newName = name.trim() + ".mp4"
+                            scope.launch(Dispatchers.IO) {
+                                val values = ContentValues().apply { put(MediaStore.Video.Media.DISPLAY_NAME, newName) }
+                                context.contentResolver.update(entry.uri, values, null, null)
+                                withContext(Dispatchers.Main) { renameTarget = null; reload() }
+                            }
+                        }.padding(12.dp))
                     }
                 }
-            )
+            }
         }
 
         deleteTarget?.let { entry ->
-            AlertDialog(
-                onDismissRequest = { deleteTarget = null },
-                title = { Text(stringResource(R.string.recordings_delete_title)) },
-                text = {
-                    Text(stringResource(R.string.recordings_delete_message, entry.displayName))
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        scope.launch(Dispatchers.IO) {
-                            runCatching { context.contentResolver.delete(entry.uri, null, null) }
-                            withContext(Dispatchers.Main) { deleteTarget = null; reload() }
-                        }
-                    }) {
-                        Text(
-                            stringResource(R.string.generic_delete),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { deleteTarget = null }) {
-                        Text(stringResource(R.string.generic_cancel))
+            Dialog(onDismissRequest = { deleteTarget = null }) {
+                Column(
+                    modifier = Modifier.width(340.dp)
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                        .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)))
+                        .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                        .padding(20.dp)
+                ) {
+                    BasicText(stringResource(R.string.recordings_delete_title), style = TextStyle(color = Color(0xFFFF5577), fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                    Spacer(Modifier.height(10.dp))
+                    BasicText(stringResource(R.string.recordings_delete_message, entry.displayName), style = TextStyle(color = AlfaaText, fontSize = 13.sp))
+                    Spacer(Modifier.height(16.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        BasicText(stringResource(R.string.generic_cancel), style = TextStyle(color = AlfaaMuted, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.clickable { deleteTarget = null }.padding(12.dp))
+                        BasicText(stringResource(R.string.generic_delete), style = TextStyle(color = Color(0xFFFF5577), fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.clickable {
+                            scope.launch(Dispatchers.IO) {
+                                runCatching { context.contentResolver.delete(entry.uri, null, null) }
+                                withContext(Dispatchers.Main) { deleteTarget = null; reload() }
+                            }
+                        }.padding(12.dp))
                     }
                 }
-            )
+            }
         }
 
         playingEntry?.let { entry ->
@@ -310,7 +318,7 @@ private fun RecordingCard(
                         painter = painterResource(R.drawable.ic_videocam_outlined),
                         contentDescription = null,
                         modifier = Modifier.size(32.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        tint = AlfaaMuted.copy(alpha = 0.4f)
                     )
                 }
             }
@@ -318,7 +326,7 @@ private fun RecordingCard(
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                BasicText(
                     text = entry.displayName.removeSuffix(".mp4"),
                     style = TextStyle(color = AlfaaText, fontSize = 13.sp, fontWeight = FontWeight.Bold),
                     maxLines = 2,
@@ -345,17 +353,21 @@ private fun RecordingCard(
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(painterResource(R.drawable.ic_more_vert), contentDescription = null)
                 }
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false }
-                ) {
-                    BasicText(stringResource(R.string.recordings_play), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onPlay()}.padding(14.dp))
-                    BasicText(stringResource(R.string.recordings_share), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onShare()}.padding(14.dp))
-                    BasicText(stringResource(R.string.recordings_rename), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onRename()}.padding(14.dp))
-                    BasicText(stringResource(R.string.recordings_reveal), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onReveal()}.padding(14.dp))
-                    BasicText(stringResource(R.string.generic_delete), style=TextStyle(color=Color(0xFFFF5577),fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onDelete()}.padding(14.dp))
+                Dialog(onDismissRequest = { menuExpanded = false }) {
+                    Column(
+                        modifier = Modifier.width(220.dp)
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                            .background(Brush.verticalGradient(listOf(AlfaaPanel2, AlfaaPanel)))
+                            .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                            .padding(vertical = 6.dp)
+                    ) {
+                        BasicText(stringResource(R.string.recordings_play), style = TextStyle(color = AlfaaText, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.fillMaxWidth().clickable { menuExpanded=false; onPlay() }.padding(14.dp))
+                        BasicText(stringResource(R.string.recordings_share), style = TextStyle(color = AlfaaText, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.fillMaxWidth().clickable { menuExpanded=false; onShare() }.padding(14.dp))
+                        BasicText(stringResource(R.string.recordings_rename), style = TextStyle(color = AlfaaText, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.fillMaxWidth().clickable { menuExpanded=false; onRename() }.padding(14.dp))
+                        BasicText(stringResource(R.string.recordings_reveal), style = TextStyle(color = AlfaaText, fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.fillMaxWidth().clickable { menuExpanded=false; onReveal() }.padding(14.dp))
+                        BasicText(stringResource(R.string.generic_delete), style = TextStyle(color = Color(0xFFFF5577), fontSize = 13.sp, fontWeight = FontWeight.Bold), modifier = Modifier.fillMaxWidth().clickable { menuExpanded=false; onDelete() }.padding(14.dp))
                     }
-            }
+                }            }
         }
     }
 }
