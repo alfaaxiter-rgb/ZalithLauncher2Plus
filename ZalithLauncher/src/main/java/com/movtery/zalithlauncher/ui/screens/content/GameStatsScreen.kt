@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -163,7 +163,7 @@ fun GameStatsScreen(
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(
+                        BasicText(
                             text = stringResource(
                                 R.string.stats_game_stats
                             ),
@@ -177,7 +177,7 @@ fun GameStatsScreen(
                             modifier = Modifier.height(2.dp)
                         )
 
-                        Text(
+                        BasicText(
                             text = "PLAYTIME / INSTANCE",
                             color = AlfaaCyan,
                             fontSize = 9.sp,
@@ -204,7 +204,7 @@ fun GameStatsScreen(
                                 vertical = 6.dp
                             )
                     ) {
-                        Text(
+                        BasicText(
                             text = "${stats.size} INSTANCES",
                             color = AlfaaGreen,
                             fontSize = 9.sp,
@@ -250,7 +250,7 @@ fun GameStatsScreen(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
+                                BasicText(
                                     text = "0",
                                     color = AlfaaCyan,
                                     fontSize = 22.sp,
@@ -262,7 +262,7 @@ fun GameStatsScreen(
                                 modifier = Modifier.height(12.dp)
                             )
 
-                            Text(
+                            BasicText(
                                 text = stringResource(
                                     R.string.stats_no_data
                                 ),
@@ -275,7 +275,7 @@ fun GameStatsScreen(
                                 modifier = Modifier.height(4.dp)
                             )
 
-                            Text(
+                            BasicText(
                                 text = "PLAY A VERSION TO CREATE STATISTICS",
                                 color = AlfaaMuted,
                                 fontSize = 9.sp,
@@ -390,7 +390,7 @@ fun GameStatsScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
+                                        BasicText(
                                             text = stat.name,
                                             color = AlfaaText,
                                             fontSize = 13.sp,
@@ -403,7 +403,7 @@ fun GameStatsScreen(
                                             modifier = Modifier.width(8.dp)
                                         )
 
-                                        Text(
+                                        BasicText(
                                             text = PlayTimeUtils.formatPlayTime(
                                                 context,
                                                 stat.totalMs
@@ -474,7 +474,7 @@ fun GameStatsScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text(
+                                        BasicText(
                                             text = "PLAYTIME",
                                             color = AlfaaMuted,
                                             fontSize = 8.sp,
@@ -482,7 +482,7 @@ fun GameStatsScreen(
                                             letterSpacing = 1.sp
                                         )
 
-                                        Text(
+                                        BasicText(
                                             text = "${(progress * 100).toInt()}%",
                                             color = AlfaaMuted,
                                             fontSize = 8.sp,
