@@ -53,9 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.setting.AllSettings
-import com.movtery.zalithlauncher.setting.enums.DarkMode
-import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
 
 /* ========================================================= */
 /* ALFAA NEON PALETTE */
@@ -305,10 +302,6 @@ fun SideBar(
                 /* ================================================= */
                 /* THEME */
                 /* ================================================= */
-
-                ThemeToggle(
-                    expanded = expanded
-                )
 
                 Spacer(
                     modifier = Modifier.height(5.dp)
@@ -685,154 +678,4 @@ private fun SideBarToggle(
     }
 }
 
-/* ========================================================= */
-/* THEME TOGGLE */
-/* ========================================================= */
 
-@Composable
-private fun ThemeToggle(
-    expanded: Boolean
-) {
-    val dark = isLauncherInDarkTheme()
-
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-
-    val pressed by interactionSource.collectIsPressedAsState()
-
-    val accent = if (dark) {
-        AlfaaCyan
-    } else {
-        AlfaaOrange
-    }
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = if (expanded) {
-                    8.dp
-                } else {
-                    5.dp
-                }
-            )
-            .clip(
-                RoundedCornerShape(13.dp)
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-
-                AllSettings.launcherDarkMode.save(
-                    if (dark) {
-                        DarkMode.Disable
-                    } else {
-                        DarkMode.Enable
-                    }
-                )
-            },
-        shape = RoundedCornerShape(13.dp),
-        color = if (pressed) {
-            accent.copy(alpha = 0.15f)
-        } else {
-            AlfaaPanel2
-        },
-        border = BorderStroke(
-            1.dp,
-            accent.copy(
-                alpha = if (pressed) {
-                    0.70f
-                } else {
-                    0.22f
-                }
-            )
-        )
-    ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = if (expanded) {
-                        10.dp
-                    } else {
-                        8.dp
-                    },
-                    vertical = 8.dp
-                ),
-            horizontalArrangement = if (expanded) {
-                Arrangement.Start
-            } else {
-                Arrangement.Center
-            },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .clip(
-                        RoundedCornerShape(9.dp)
-                    )
-                    .background(
-                        accent.copy(alpha = 0.10f)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Text(
-                    text = if (dark) {
-                        "☾"
-                    } else {
-                        "☀"
-                    },
-                    color = accent,
-                    fontSize = 15.sp
-                )
-            }
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn(
-                    animationSpec = tween(150)
-                ),
-                exit = fadeOut(
-                    animationSpec = tween(100)
-                )
-            ) {
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Spacer(
-                        modifier = Modifier.width(9.dp)
-                    )
-
-                    Column {
-
-                        Text(
-                            text = if (dark) {
-                                "DARK MODE"
-                            } else {
-                                "LIGHT MODE"
-                            },
-                            color = AlfaaText,
-                            fontSize = 9.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                        )
-
-                        Text(
-                            text = "THEME",
-                            color = accent.copy(alpha = 0.75f),
-                            fontSize = 6.sp,
-                            letterSpacing = 0.8.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
