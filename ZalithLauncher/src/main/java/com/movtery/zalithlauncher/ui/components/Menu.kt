@@ -614,7 +614,6 @@ fun MenuSliderLayout(
                 onValueChangeFinished = { onValueChangeFinished(value) },
                 interactionSource = interactionSource,
                 valueRange = valueRange,
-                colors = colors,
                 enabled = enabled
             )
         }
