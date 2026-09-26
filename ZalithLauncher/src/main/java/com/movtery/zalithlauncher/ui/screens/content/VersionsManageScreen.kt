@@ -50,7 +50,6 @@ import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoveDown
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,6 +69,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -765,11 +765,11 @@ private fun AlfaaSideButton(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Icon(
-                modifier = Modifier.size(19.dp),
-                imageVector = icon,
+            Image(
+                painter = rememberVectorPainter(icon),
                 contentDescription = null,
-                tint = accent
+                colorFilter = ColorFilter.tint(accent),
+                modifier = Modifier.size(19.dp)
             )
 
             Spacer(
@@ -929,16 +929,11 @@ private fun AlfaaVersionsContent(
                                 Alignment.CenterVertically
                         ) {
 
-                            Icon(
-                                imageVector =
-                                    Icons.Default.Refresh,
-                                contentDescription =
-                                    stringResource(
-                                        R.string.generic_refresh
-                                    ),
-                                tint = AlfaaVMCyan,
-                                modifier =
-                                    Modifier.size(17.dp)
+                            Image(
+                                painter = rememberVectorPainter(Icons.Default.Refresh),
+                                contentDescription = stringResource(R.string.generic_refresh),
+                                colorFilter = ColorFilter.tint(AlfaaVMCyan),
+                                modifier = Modifier.size(17.dp)
                             )
 
                             Spacer(
@@ -976,13 +971,11 @@ private fun AlfaaVersionsContent(
                                 Alignment.CenterVertically
                         ) {
 
-                            Icon(
-                                imageVector =
-                                    Icons.Default.Add,
+                            Image(
+                                painter = rememberVectorPainter(Icons.Default.Add),
                                 contentDescription = null,
-                                tint = Color.Black,
-                                modifier =
-                                    Modifier.size(17.dp)
+                                colorFilter = ColorFilter.tint(Color.Black),
+                                modifier = Modifier.size(17.dp)
                             )
 
                             Spacer(
@@ -1223,14 +1216,11 @@ private fun AlfaaVersionsContent(
                                         Alignment.CenterHorizontally
                                 ) {
 
-                                    Icon(
-                                        imageVector =
-                                            Icons.Default.Folder,
-                                        contentDescription =
-                                            null,
-                                        tint = AlfaaVMMuted,
-                                        modifier =
-                                            Modifier.size(35.dp)
+                                    Image(
+                                        painter = rememberVectorPainter(Icons.Default.Folder),
+                                        contentDescription = null,
+                                        colorFilter = ColorFilter.tint(AlfaaVMMuted),
+                                        modifier = Modifier.size(35.dp)
                                     )
 
                                     Spacer(
