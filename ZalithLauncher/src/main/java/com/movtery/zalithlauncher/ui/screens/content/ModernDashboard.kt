@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -548,13 +547,14 @@ private fun HeroCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Icon(
+                Image(
                     painter = painterResource(
                         R.drawable.ic_play_arrow_filled
                     ),
                     contentDescription = null,
-                    tint = Color(0xFF03100D),
-                    modifier = Modifier.size(25.dp)
+                    colorFilter = ColorFilter.tint(Color(0xFF03100D)),
+                    modifier = Modifier.size(25.dp
+                )
                 )
 
                 Spacer(Modifier.width(8.dp))
@@ -1026,11 +1026,12 @@ private fun ActionCard(
                     .border(1.dp, accent.copy(alpha = .32f), RoundedCornerShape(14.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
+                Image(
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier.size(22.dp)
+                    colorFilter = ColorFilter.tint(accent),
+                    modifier = Modifier.size(22.dp
+                )
                 )
             }
 
@@ -1086,11 +1087,12 @@ private fun ResourceModsCard(
                     .border(1.dp, AlfaaOrange.copy(alpha = .25f), RoundedCornerShape(11.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
+                Image(
                     painter = painterResource(R.drawable.ic_extension_outlined),
                     contentDescription = null,
-                    tint = AlfaaOrange,
-                    modifier = Modifier.size(18.dp)
+                    colorFilter = ColorFilter.tint(AlfaaOrange),
+                    modifier = Modifier.size(18.dp
+                )
                 )
             }
             Spacer(Modifier.width(9.dp))
