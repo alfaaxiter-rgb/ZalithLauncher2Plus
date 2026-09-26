@@ -26,6 +26,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -51,7 +52,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -325,10 +325,7 @@ private fun <E> SuggestionsText(
                 IconButton(
                     onClick = onSearch
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_search),
-                        contentDescription = stringResource(R.string.generic_search)
-                    )
+                    Image(painter = painterResource(R.drawable.ic_search), contentDescription = stringResource(R.string.generic_search))
                 }
             },
             singleLine = true,
@@ -661,13 +658,7 @@ private fun GameVersionFilterLayout(
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                     if (isInstalled) {
-                                        Icon(
-                                            modifier = Modifier
-                                                .padding(end = 8.dp)
-                                                .size(14.dp),
-                                            painter = painterResource(R.drawable.ic_star_filled),
-                                            contentDescription = stringResource(R.string.download_assets_filter_game_version_installed)
-                                        )
+                                        Image(modifier = Modifier.padding(end = 8.dp).size(14.dp), painter = painterResource(R.drawable.ic_star_filled), contentDescription = stringResource(R.string.download_assets_filter_game_version_installed))
                                     }
                                 }
                             }
@@ -755,11 +746,7 @@ fun PlatformListLayout(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    modifier = Modifier.size(14.dp),
-                    painter = painterResource(platform.getDrawable()),
-                    contentDescription = platform.displayName
-                )
+                Image(modifier = Modifier.size(14.dp), painter = painterResource(platform.getDrawable()), contentDescription = platform.displayName)
                 Text(
                     text = platform.displayName,
                     style = MaterialTheme.typography.labelMedium
@@ -810,13 +797,7 @@ private fun FilterHeader(
                 targetValue = if (expanded) -180f else 0f,
                 animationSpec = getAnimateTween()
             )
-            Icon(
-                modifier = Modifier
-                    .size(28.dp)
-                    .rotate(rotation),
-                painter = painterResource(R.drawable.ic_arrow_drop_down_rounded),
-                contentDescription = null
-            )
+            Image(modifier = Modifier.size(28.dp).rotate(rotation), painter = painterResource(R.drawable.ic_arrow_drop_down_rounded), contentDescription = null)
             AnimatedVisibility(
                 visible = selected && cancelable
             ) {
@@ -825,11 +806,7 @@ private fun FilterHeader(
                         if (selected && cancelable) onClear()
                     }
                 ) {
-                    Icon(
-                        modifier = Modifier.size(20.dp),
-                        painter = painterResource(R.drawable.ic_deselect),
-                        contentDescription = stringResource(R.string.generic_clear)
-                    )
+                    Image(modifier = Modifier.size(20.dp), painter = painterResource(R.drawable.ic_deselect), contentDescription = stringResource(R.string.generic_clear))
                 }
             }
         }
