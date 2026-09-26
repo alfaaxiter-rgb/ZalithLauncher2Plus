@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.Environment
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -49,10 +50,7 @@ import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoveDown
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,12 +59,19 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -846,9 +851,7 @@ private fun AlfaaVersionsContent(
                         Arrangement.spacedBy(12.dp)
                 ) {
 
-                    CircularProgressIndicator(
-                        color = AlfaaVMCyan
-                    )
+                    AlfaaProgressIndicator()
 
                     Text(
                         text = "REFRESHING VERSIONS",
@@ -1261,6 +1264,30 @@ private fun AlfaaVersionsContent(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AlfaaProgressIndicator() {
+    val transition = rememberInfiniteTransition(label = "alfaa_progress")
+    val sweep by transition.animateFloat(
+        initialValue = 40f,
+        targetValue = 320f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "alfaa_progress_sweep"
+    )
+
+    Canvas(modifier = Modifier.size(28.dp)) {
+        drawArc(
+            color = AlfaaVMCyan,
+            startAngle = -90f,
+            sweepAngle = sweep,
+            useCenter = false,
+            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
+        )
     }
 }
 
