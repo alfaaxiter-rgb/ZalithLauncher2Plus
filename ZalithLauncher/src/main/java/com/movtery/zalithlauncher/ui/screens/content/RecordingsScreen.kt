@@ -66,6 +66,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -74,6 +75,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.RecordingPlayerOverlay
@@ -85,6 +87,16 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private val AlfaaRecBg = Color(0xFF05080D)
+private val AlfaaRecPanel = Color(0xFF0B1118)
+private val AlfaaRecPanel2 = Color(0xFF101923)
+private val AlfaaRecBorder = Color(0xFF16483F)
+private val AlfaaRecCyan = Color(0xFF43C7FF)
+private val AlfaaRecGreen = Color(0xFF20E0B2)
+private val AlfaaRecText = Color(0xFFE8FFF8)
+private val AlfaaRecMuted = Color(0xFF829A98)
+private val AlfaaRecError = Color(0xFFFF5577)
 
 data class RecordingEntry(
     val uri: Uri,
@@ -145,7 +157,7 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                         Text(
                             text = stringResource(R.string.recordings_empty),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = AlfaaRecMuted
                         )
                     }
                 }
@@ -371,7 +383,7 @@ private fun RecordingCard(
                         text = {
                             Text(
                                 stringResource(R.string.generic_delete),
-                                color = MaterialTheme.colorScheme.error
+                                color = AlfaaRecError
                             )
                         },
                         leadingIcon = {
