@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.movtery.zalithlauncher.R
@@ -163,7 +164,7 @@ fun GameStatsScreen(
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(
+                        AlfaaLabel(
                             text = stringResource(
                                 R.string.stats_game_stats
                             ),
@@ -177,7 +178,7 @@ fun GameStatsScreen(
                             modifier = Modifier.height(2.dp)
                         )
 
-                        Text(
+                        AlfaaLabel(
                             text = "PLAYTIME / INSTANCE",
                             color = AlfaaCyan,
                             fontSize = 9.sp,
@@ -204,7 +205,7 @@ fun GameStatsScreen(
                                 vertical = 6.dp
                             )
                     ) {
-                        Text(
+                        AlfaaLabel(
                             text = "${stats.size} INSTANCES",
                             color = AlfaaGreen,
                             fontSize = 9.sp,
@@ -250,7 +251,7 @@ fun GameStatsScreen(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
+                                AlfaaLabel(
                                     text = "0",
                                     color = AlfaaCyan,
                                     fontSize = 22.sp,
@@ -262,7 +263,7 @@ fun GameStatsScreen(
                                 modifier = Modifier.height(12.dp)
                             )
 
-                            Text(
+                            AlfaaLabel(
                                 text = stringResource(
                                     R.string.stats_no_data
                                 ),
@@ -275,7 +276,7 @@ fun GameStatsScreen(
                                 modifier = Modifier.height(4.dp)
                             )
 
-                            Text(
+                            AlfaaLabel(
                                 text = "PLAY A VERSION TO CREATE STATISTICS",
                                 color = AlfaaMuted,
                                 fontSize = 9.sp,
@@ -390,7 +391,7 @@ fun GameStatsScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
+                                        AlfaaLabel(
                                             text = stat.name,
                                             color = AlfaaText,
                                             fontSize = 13.sp,
@@ -403,7 +404,7 @@ fun GameStatsScreen(
                                             modifier = Modifier.width(8.dp)
                                         )
 
-                                        Text(
+                                        AlfaaLabel(
                                             text = PlayTimeUtils.formatPlayTime(
                                                 context,
                                                 stat.totalMs
@@ -474,7 +475,7 @@ fun GameStatsScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text(
+                                        AlfaaLabel(
                                             text = "PLAYTIME",
                                             color = AlfaaMuted,
                                             fontSize = 8.sp,
@@ -482,7 +483,7 @@ fun GameStatsScreen(
                                             letterSpacing = 1.sp
                                         )
 
-                                        Text(
+                                        AlfaaLabel(
                                             text = "${(progress * 100).toInt()}%",
                                             color = AlfaaMuted,
                                             fontSize = 8.sp,
@@ -497,4 +498,27 @@ fun GameStatsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun AlfaaLabel(
+    text: String,
+    color: Color,
+    fontSize: androidx.compose.ui.unit.TextUnit = 14.sp,
+    fontWeight: FontWeight? = null,
+    letterSpacing: androidx.compose.ui.unit.TextUnit = androidx.compose.ui.unit.TextUnit.Unspecified,
+    maxLines: Int = Int.MAX_VALUE,
+    modifier: Modifier = Modifier
+) {
+    BasicText(
+        text = text,
+        modifier = modifier,
+        maxLines = maxLines,
+        style = TextStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            letterSpacing = letterSpacing
+        )
+    )
 }
