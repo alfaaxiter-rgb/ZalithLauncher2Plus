@@ -890,7 +890,6 @@ private fun AddInstanceChip(
                 letterSpacing = .3.sp
             )
         }
-        }
     }
 }
 
