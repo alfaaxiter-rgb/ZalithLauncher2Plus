@@ -45,16 +45,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -85,15 +85,6 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-private val AlfaaBlack = Color(0xFF05080D)
-private val AlfaaPanel = Color(0xFF0B1118)
-private val AlfaaPanel2 = Color(0xFF101923)
-private val AlfaaCyan = Color(0xFF43C7FF)
-private val AlfaaGreen = Color(0xFF20E0B2)
-private val AlfaaText = Color(0xFFE8FFF8)
-private val AlfaaMuted = Color(0xFF829A98)
-private val AlfaaBorder = Color(0xFF16483F)
 
 data class RecordingEntry(
     val uri: Uri,
@@ -135,7 +126,11 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
         Column(modifier = Modifier.fillMaxSize()) {
             if (loading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    BasicText(text = stringResource(R.string.generic_loading), style = TextStyle(color = AlfaaCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                    Text(
+                        text = stringResource(R.string.generic_loading),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             } else if (recordings.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -144,12 +139,13 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                             painter = painterResource(R.drawable.ic_videocam_outlined),
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = AlfaaCyan.copy(alpha = 0.4f)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
                             text = stringResource(R.string.recordings_empty),
-                            style = TextStyle(color = AlfaaText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -279,11 +275,12 @@ private fun RecordingCard(
     val context = LocalContext.current
     var menuExpanded by remember { mutableStateOf(false) }
 
-    Box(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(onLongClick = { menuExpanded = true }, onClick = onPlay),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
+        shape = MaterialTheme.shapes.medium,
+        tonalElevation = 2.dp
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -293,9 +290,8 @@ private fun RecordingCard(
                 modifier = Modifier
                     .width(120.dp)
                     .aspectRatio(16f / 9f)
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                    .background(AlfaaBlack)
-                    .border(1.dp, AlfaaBorder, androidx.compose.foundation.shape.RoundedCornerShape(12.dp)),
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 if (thumbnail != null) {
@@ -320,7 +316,7 @@ private fun RecordingCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = entry.displayName.removeSuffix(".mp4"),
-                    style = TextStyle(color = AlfaaText, fontSize = 13.sp, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -337,7 +333,8 @@ private fun RecordingCard(
                 }
                 Text(
                     text = parts.joinToString(" \u00b7 "),
-                    style = TextStyle(color = AlfaaMuted, fontSize = 10.sp)
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -349,12 +346,43 @@ private fun RecordingCard(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false }
                 ) {
-                    BasicText(stringResource(R.string.recordings_play), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onPlay()}.padding(14.dp))
-                    BasicText(stringResource(R.string.recordings_share), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onShare()}.padding(14.dp))
-                    BasicText(stringResource(R.string.recordings_rename), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onRename()}.padding(14.dp))
-                    BasicText(stringResource(R.string.recordings_reveal), style=TextStyle(color=AlfaaText,fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onReveal()}.padding(14.dp))
-                    BasicText(stringResource(R.string.generic_delete), style=TextStyle(color=Color(0xFFFF5577),fontSize=13.sp,fontWeight=FontWeight.Bold), modifier=Modifier.fillMaxWidth().clickable{menuExpanded=false;onDelete()}.padding(14.dp))
-                    }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.recordings_play)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_play_arrow_filled), null) },
+                        onClick = { menuExpanded = false; onPlay() }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.recordings_share)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_share_filled), null) },
+                        onClick = { menuExpanded = false; onShare() }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.recordings_rename)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_edit_outlined), null) },
+                        onClick = { menuExpanded = false; onRename() }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.recordings_reveal)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_folder_outlined), null) },
+                        onClick = { menuExpanded = false; onReveal() }
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                stringResource(R.string.generic_delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painterResource(R.drawable.ic_delete_outlined),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        onClick = { menuExpanded = false; onDelete() }
+                    )
+                }
             }
         }
     }
