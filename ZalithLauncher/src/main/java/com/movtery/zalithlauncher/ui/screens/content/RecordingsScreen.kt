@@ -123,13 +123,13 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
 
         LaunchedEffect(Unit) { reload() }
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().background(AlfaaRecBg)) {
             if (loading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = stringResource(R.string.generic_loading),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AlfaaRecMuted
                     )
                 }
             } else if (recordings.isEmpty()) {
@@ -139,7 +139,7 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                             painter = painterResource(R.drawable.ic_videocam_outlined),
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                            tint = AlfaaRecMuted.copy(alpha = 0.4f)
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
@@ -240,7 +240,7 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                     }) {
                         Text(
                             stringResource(R.string.generic_delete),
-                            color = MaterialTheme.colorScheme.error
+                            color = AlfaaRecError
                         )
                     }
                 },
@@ -279,8 +279,9 @@ private fun RecordingCard(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(onLongClick = { menuExpanded = true }, onClick = onPlay),
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 2.dp
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
+        color = AlfaaRecPanel,
+        border = androidx.compose.foundation.BorderStroke(1.dp, AlfaaRecBorder)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -290,8 +291,8 @@ private fun RecordingCard(
                 modifier = Modifier
                     .width(120.dp)
                     .aspectRatio(16f / 9f)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                    .background(AlfaaRecPanel2),
                 contentAlignment = Alignment.Center
             ) {
                 if (thumbnail != null) {
@@ -316,7 +317,7 @@ private fun RecordingCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = entry.displayName.removeSuffix(".mp4"),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                    style = androidx.compose.ui.text.TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AlfaaRecText),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -333,7 +334,7 @@ private fun RecordingCard(
                 }
                 Text(
                     text = parts.joinToString(" \u00b7 "),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = androidx.compose.ui.text.TextStyle(fontSize = 10.sp, color = AlfaaRecMuted),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
