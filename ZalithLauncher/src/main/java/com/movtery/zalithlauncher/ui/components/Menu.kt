@@ -50,12 +50,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.SliderColors
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -309,7 +305,12 @@ private fun MenuTitleLayout(
             content = titleLayout
         )
     }
-    HorizontalDivider(modifier = Modifier.fillMaxWidth())
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(Color(0xFF16483F).copy(alpha = 0.7f))
+    )
 }
 
 @Composable
@@ -536,14 +537,50 @@ private fun MenuListItem(
 ) {
     Row(
         modifier = modifier
-            .clip(shape = MaterialTheme.shapes.medium)
-            .clickable(onClick = onClick),
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                if (selected) Color(0xFF20E0B2).copy(alpha = 0.10f)
+                else Color(0xFF101923).copy(alpha = 0.72f)
+            )
+            .border(
+                width = 1.dp,
+                color = if (selected) Color(0xFF20E0B2).copy(alpha = 0.48f)
+                else Color(0xFF16483F).copy(alpha = 0.42f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClick
+            )
+            .padding(horizontal = 10.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick
-        )
+        Box(
+            modifier = Modifier
+                .size(18.dp)
+                .clip(RoundedCornerShape(50))
+                .background(
+                    if (selected) Color(0xFF20E0B2).copy(alpha = 0.18f)
+                    else Color(0xFF0B1118)
+                )
+                .border(
+                    width = 2.dp,
+                    color = if (selected) Color(0xFF20E0B2) else Color(0xFF829A98).copy(alpha = 0.55f),
+                    shape = RoundedCornerShape(50)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (selected) {
+                Box(
+                    modifier = Modifier
+                        .size(7.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFF20E0B2))
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(10.dp))
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -566,8 +603,7 @@ fun MenuSliderLayout(
     onValueChangeFinished: (Int) -> Unit = {},
     suffix: String? = null,
     influencedByBackground: Boolean = false,
-    colors: SliderColors = SliderDefaults.colors(),
-    shape: Shape = MaterialTheme.shapes.large,
+        shape: Shape = MaterialTheme.shapes.large,
     color: Color = itemColor(influencedByBackground),
     contentColor: Color = onItemColor(),
 ) {
