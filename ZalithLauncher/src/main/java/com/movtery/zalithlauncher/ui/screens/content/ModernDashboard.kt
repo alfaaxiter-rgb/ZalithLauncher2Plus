@@ -8,18 +8,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,121 +86,89 @@ fun ModernDashboard(
     val version by VersionsManager.currentVersion.collectAsStateWithLifecycle()
     val versions by VersionsManager.versions.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF03070B),
-                        AlfaaBlack,
-                        Color(0xFF061019)
-                    )
-                )
-            )
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize()
     ) {
+        val compact = maxWidth < 700.dp
 
-        /* subtle neon background lines */
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color.Transparent,
-                            AlfaaCyan.copy(alpha = .45f),
-                            AlfaaGreen.copy(alpha = .65f),
-                            Color.Transparent
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                Color.Transparent,
+                                AlfaaCyan.copy(alpha = .45f),
+                                AlfaaGreen.copy(alpha = .65f),
+                                Color.Transparent
+                            )
                         )
                     )
-                )
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    start = 8.dp,
-                    end = 8.dp,
-                    top = 8.dp,
-                    bottom = 8.dp
-                ),
-            verticalArrangement = Arrangement.spacedBy(9.dp)
-        ) {
-
-            DashboardTitleBar(
-                version = version,
-                hasAccount = account != null
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(9.dp),
-                verticalAlignment = Alignment.Top
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(9.dp)
             ) {
+                DashboardTitleBar(version = version, hasAccount = account != null)
 
-                /* ================= LEFT ================= */
-
-                Column(
-                    modifier = Modifier.weight(1.65f),
-                    verticalArrangement = Arrangement.spacedBy(9.dp)
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-
-                    HeroCard(
-                        accountName = account?.username,
-                        version = version,
-                        onLaunchGame = onLaunchGame
-                    )
-
-                    QuickActions(
-                        panel = AlfaaPanel2,
-                        border = AlfaaBorder,
-                        onVersionsClick = onVersionsClick,
-                        onAccountClick = onAccountClick,
-                        onVersionSettingsClick = onVersionSettingsClick,
-                        onSettingsClick = onSettingsClick
-                    )
-                }
-
-                /* ================= RIGHT ================= */
-
-                Column(
-                    modifier = Modifier.weight(.82f),
-                    verticalArrangement = Arrangement.spacedBy(9.dp)
-                ) {
-
-                    AccountCard(
-                        accountName = account?.username,
-                        hasAccount = account != null,
-                        onAccountClick = onAccountClick
+                    Column(
+                        modifier = Modifier.weight(if (compact) 1.45f else 1.7f),
+                        verticalArrangement = Arrangement.spacedBy(9.dp)
                     ) {
-                        AccountAvatar(
-                            account = account,
-                            avatarSize = 48.dp,
-                            onClick = onAccountClick
+                        HeroCard(
+                            modifier = Modifier.weight(1f),
+                            accountName = account?.username,
+                            version = version,
+                            onLaunchGame = onLaunchGame
+                        )
+                        QuickActions(
+                            panel = AlfaaPanel2,
+                            border = AlfaaBorder,
+                            onVersionsClick = onVersionsClick,
+                            onAccountClick = onAccountClick,
+                            onVersionSettingsClick = onVersionSettingsClick,
+                            onSettingsClick = onSettingsClick
                         )
                     }
 
-                    InstancesCard(
-                        versions = versions,
-                        selected = version,
-                        muted = AlfaaMuted,
-                        onVersionsClick = onVersionsClick
-                    )
-
-                    SessionCard(
-                        version = version,
-                        onClick = onVersionSettingsClick
-                    )
+                    Column(
+                        modifier = Modifier.weight(if (compact) .95f else .9f),
+                        verticalArrangement = Arrangement.spacedBy(9.dp)
+                    ) {
+                        AccountCard(
+                            accountName = account?.username,
+                            hasAccount = account != null,
+                            onAccountClick = onAccountClick
+                        ) {
+                            AccountAvatar(account = account, avatarSize = 48.dp, onClick = onAccountClick)
+                        }
+                        InstancesCard(
+                            versions = versions,
+                            selected = version,
+                            muted = AlfaaMuted,
+                            onVersionsClick = onVersionsClick
+                        )
+                        ResourceModsCard(
+                            version = version,
+                            onClick = onVersionSettingsClick
+                        )
+                    }
                 }
-            }
 
-            FooterBar()
+                FooterBar()
+            }
         }
     }
-}
 
 /* ========================================================= */
 /* GENERIC NEON PANEL */
@@ -372,6 +340,7 @@ private fun NeonStatus(
 
 @Composable
 private fun HeroCard(
+    modifier: Modifier = Modifier,
     accountName: String?,
     version: Version?,
     onLaunchGame: (Version?) -> Unit
@@ -379,9 +348,9 @@ private fun HeroCard(
     val shape = RoundedCornerShape(23.dp)
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(285.dp)
+            .heightIn(min = 190.dp)
             .shadow(
                 elevation = 15.dp,
                 shape = shape,
@@ -605,13 +574,14 @@ private fun HeroCard(
 
 @Composable
 private fun AccountCard(
+    modifier: Modifier = Modifier,
     accountName: String?,
     hasAccount: Boolean,
     onAccountClick: () -> Unit,
     avatar: @Composable () -> Unit
 ) {
     NeonPanel(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onAccountClick),
         accent = AlfaaGreen
@@ -691,13 +661,14 @@ private fun AccountCard(
 
 @Composable
 private fun InstancesCard(
+    modifier: Modifier = Modifier,
     versions: List<Version>,
     selected: Version?,
     muted: Color,
     onVersionsClick: () -> Unit
 ) {
     NeonPanel(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         accent = AlfaaCyan
     ) {
 
@@ -1078,82 +1049,61 @@ private fun ActionCard(
 /* ========================================================= */
 
 @Composable
-private fun SessionCard(
+private fun ResourceModsCard(
+    modifier: Modifier = Modifier,
     version: Version?,
     onClick: () -> Unit
 ) {
     NeonPanel(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         accent = AlfaaOrange
     ) {
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(RoundedCornerShape(11.dp))
-                    .background(
-                        AlfaaOrange.copy(alpha = .08f)
-                    )
-                    .border(
-                        1.dp,
-                        AlfaaOrange.copy(alpha = .25f),
-                        RoundedCornerShape(11.dp)
-                    ),
+                    .background(AlfaaOrange.copy(alpha = .08f))
+                    .border(1.dp, AlfaaOrange.copy(alpha = .25f), RoundedCornerShape(11.dp)),
                 contentAlignment = Alignment.Center
             ) {
-
                 Icon(
-                    painter = painterResource(
-                        R.drawable.ic_assignment_filled
-                    ),
+                    painter = painterResource(R.drawable.ic_extension_outlined),
                     contentDescription = null,
                     tint = AlfaaOrange,
                     modifier = Modifier.size(18.dp)
                 )
             }
-
             Spacer(Modifier.width(9.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "SESSION",
+                    text = "RESOURCES / MODS",
                     color = AlfaaText,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     fontSize = 9.sp,
-                    letterSpacing = .8.sp
+                    letterSpacing = .5.sp,
+                    maxLines = 1
                 )
-
                 Text(
-                    text = version?.getVersionName()
-                        ?: "NO ACTIVE INSTANCE",
+                    text = version?.getVersionName() ?: "NO ACTIVE VERSION",
                     color = AlfaaMuted,
-                    fontSize = 8.sp
+                    fontSize = 8.sp,
+                    maxLines = 1
+                )
+                Text(
+                    text = "CHECK INSTALLED CONTENT  ›",
+                    color = AlfaaOrange,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 6.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
-
-            Text(
-                text = "›",
-                color = AlfaaOrange,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 }
-
-/* ========================================================= */
-/* SECTION TITLE */
-/* ========================================================= */
 
 @Composable
 private fun SectionTitle(
