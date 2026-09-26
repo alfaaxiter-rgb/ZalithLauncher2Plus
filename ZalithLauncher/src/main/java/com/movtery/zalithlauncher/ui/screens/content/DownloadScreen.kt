@@ -36,10 +36,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -277,11 +273,9 @@ private fun DownloadSidebar(
                             Box(
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Download,
-                                    contentDescription = null,
-                                    tint = NeonColors.CyanBright,
-                                    modifier = Modifier.size(22.dp)
+                                CategoryIcon(
+                                    R.drawable.ic_package_2_outlined,
+                                    R.string.download_category_game
                                 )
                             }
                         }
@@ -355,11 +349,9 @@ private fun DownloadSidebar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = Color(0xFF697381),
-                        modifier = Modifier.size(17.dp)
+                    CategoryIcon(
+                        R.drawable.ic_card,
+                        R.string.download_category_by_id
                     )
 
                     Spacer(
