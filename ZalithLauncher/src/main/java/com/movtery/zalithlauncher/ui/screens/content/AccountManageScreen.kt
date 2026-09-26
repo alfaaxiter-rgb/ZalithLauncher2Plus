@@ -24,6 +24,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +48,6 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialExpressiveTheme
@@ -78,6 +78,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -1381,15 +1382,10 @@ private fun AccountCard(
         IconButton(
             onClick = openChangeSkinDialog
         ) {
-            Icon(
-                painter = painterResource(
-                    R.drawable.ic_checkroom
-                ),
-                contentDescription =
-                    stringResource(
-                        R.string.account_change_skin
-                    ),
-                tint = NeonColors.Cyan
+            Image(
+                painter = painterResource(R.drawable.ic_checkroom),
+                contentDescription = stringResource(R.string.account_change_skin),
+                colorFilter = ColorFilter.tint(NeonColors.Cyan)
             )
         }
     }
@@ -1403,15 +1399,10 @@ private fun AccountCard(
         IconButton(
             onClick = onRefreshClick
         ) {
-            Icon(
-                painter = painterResource(
-                    R.drawable.ic_refresh
-                ),
-                contentDescription =
-                    stringResource(
-                        R.string.generic_refresh
-                    ),
-                tint = NeonColors.Cyan
+            Image(
+                painter = painterResource(R.drawable.ic_refresh),
+                contentDescription = stringResource(R.string.generic_refresh),
+                colorFilter = ColorFilter.tint(NeonColors.Cyan)
             )
         }
     }
@@ -1423,15 +1414,10 @@ private fun AccountCard(
     IconButton(
         onClick = onCopyUUID
     ) {
-        Icon(
-            painter = painterResource(
-                R.drawable.ic_copy_all_outlined
-            ),
-            contentDescription =
-                stringResource(
-                    R.string.account_local_uuid_copy
-                ),
-            tint = NeonColors.Cyan
+        Image(
+            painter = painterResource(R.drawable.ic_copy_all_outlined),
+            contentDescription = stringResource(R.string.account_local_uuid_copy),
+            colorFilter = ColorFilter.tint(NeonColors.Cyan)
         )
     }
 
@@ -1442,15 +1428,10 @@ private fun AccountCard(
                                 IconButton(
                     onClick = onDeleteClick
                 ) {
-                    Icon(
-                        painter = painterResource(
-                            R.drawable.ic_delete_outlined
-                        ),
-                        contentDescription =
-                            stringResource(
-                                R.string.generic_delete
-                            ),
-                        tint = NeonColors.Orange
+                    Image(
+                        painter = painterResource(R.drawable.ic_delete_outlined),
+                        contentDescription = stringResource(R.string.generic_delete),
+                        colorFilter = ColorFilter.tint(NeonColors.Orange)
                     )
                 }
             }
