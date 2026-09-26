@@ -56,7 +56,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -295,19 +294,14 @@ private fun MenuTitleLayout(
     titleLayout: @Composable BoxScope.() -> Unit,
     height: Dp = 48.dp
 ) {
-    Surface(
+    Box(
         modifier = Modifier
             .height(height)
-            .fillMaxWidth(),
-        color = cardTitleColor(),
-        contentColor = onCardColor()
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-            content = titleLayout
-        )
-    }
+            .fillMaxWidth()
+            .background(cardTitleColor()),
+        contentAlignment = Alignment.Center,
+        content = titleLayout
+    )
     Box(
         modifier = Modifier
             .fillMaxWidth()
