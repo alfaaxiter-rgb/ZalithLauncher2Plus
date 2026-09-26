@@ -31,6 +31,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -49,7 +50,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -352,8 +352,20 @@ private fun RecordingCard(
             }
 
             Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(painterResource(R.drawable.ic_more_vert), contentDescription = null)
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { menuExpanded = true }
+                        .background(AlfaaRecPanel)
+                        .border(1.dp, AlfaaRecBorder, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_more_vert),
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
