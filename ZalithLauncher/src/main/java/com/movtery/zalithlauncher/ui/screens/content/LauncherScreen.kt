@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
@@ -46,7 +47,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -637,11 +637,10 @@ private fun LastLogCard(
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
+                    Image(
                         painter = painterResource(R.drawable.ic_play_arrow_filled),
                         contentDescription = stringResource(R.string.generic_open_link),
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -719,9 +718,10 @@ private fun RightMenuContent(
                         modifier = Modifier.padding(end = 8.dp),
                         onClick = toVersionSettingsScreen
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(R.drawable.ic_settings_filled),
-                            contentDescription = stringResource(R.string.versions_manage_settings)
+                            contentDescription = stringResource(R.string.versions_manage_settings),
+                        modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -761,10 +761,10 @@ private fun RightMenuContent(
                                         showList = false
                                     }
                                 ) {
-                                    Icon(
+                                    Image(
                                         painter = painterResource(R.drawable.ic_play_arrow_filled),
                                         contentDescription = stringResource(R.string.main_launch_game),
-                                        tint = MaterialTheme.colorScheme.primary
+                                    modifier = Modifier.size(20.dp)
                                     )
                                 }
                             }
