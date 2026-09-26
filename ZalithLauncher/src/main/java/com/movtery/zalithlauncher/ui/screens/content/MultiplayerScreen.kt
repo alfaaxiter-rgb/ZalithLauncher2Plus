@@ -33,10 +33,16 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,19 +65,16 @@ import com.movtery.zalithlauncher.terracotta.Terracotta
 import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.AnimatedRow
-import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.NotificationCheck
 import com.movtery.zalithlauncher.ui.components.OwnOutlinedTextField
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
-import com.movtery.zalithlauncher.ui.components.influencedByBackgroundColor
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCard
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
-import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.utils.file.shareFile
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
@@ -121,6 +124,23 @@ fun MultiplayerScreen(
             }
         }
     }
+}
+
+private val AlfaaMPPanel = Color(0xFF0B1118)
+private val AlfaaMPPanel2 = Color(0xFF101923)
+private val AlfaaMPCyan = Color(0xFF43C7FF)
+private val AlfaaMPText = Color(0xFFE8FFF8)
+private val AlfaaMPMuted = Color(0xFF829A98)
+private val AlfaaMPBorder = Color(0xFF16483F)
+
+@Composable
+private fun NeonPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = modifier.background(Brush.verticalGradient(listOf(AlfaaMPPanel2, AlfaaMPPanel)), RoundedCornerShape(22.dp)).border(1.dp, AlfaaMPBorder, RoundedCornerShape(22.dp)).padding(8.dp), content = content)
+}
+
+@Composable
+private fun NeonText(text: String, modifier: Modifier = Modifier, size: androidx.compose.ui.unit.TextUnit = 12.sp, color: Color = AlfaaMPMuted, weight: FontWeight = FontWeight.Normal) {
+    BasicText(text = text, modifier = modifier, style = TextStyle(color = color, fontSize = size, fontWeight = weight))
 }
 
 private sealed interface MultiplayerOperation {
@@ -261,11 +281,11 @@ private fun MainMenu(
                                 AllSettings.terracottaNodes.save(value)
                             },
                             label = {
-                                Text(text = stringResource(R.string.terracotta_custom_note_list_hint))
+                                NeonText(text = stringResource(R.string.terracotta_custom_note_list_hint), size = 11.sp)
                             },
-                            textStyle = MaterialTheme.typography.labelMedium,
+                            textStyle = TextStyle(color = AlfaaMPText, fontSize = 13.sp),
                             singleLine = true,
-                            shape = MaterialTheme.shapes.large,
+                            shape = RoundedCornerShape(14.dp),
                         )
                     }
                 }
@@ -312,11 +332,10 @@ private data class TabItem(
 private fun TutorialMenu(
     modifier: Modifier = Modifier
 ) {
-    BackgroundCard(
+    NeonPanel(
         modifier = modifier
             .fillMaxHeight()
-            .padding(vertical = 12.dp),
-        shape = MaterialTheme.shapes.extraLarge
+            .padding(vertical = 12.dp)
     ) {
         val tabs = remember {
             listOf(
@@ -334,23 +353,22 @@ private fun TutorialMenu(
         }
 
         //顶贴标签栏
-        SecondaryTabRow(
-            containerColor = influencedByBackgroundColor(
-                color = cardTitleColor(),
-                influencedAlpha = 0.5f * (AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f)
-            ),
-            selectedTabIndex = selectedTabIndex
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth().padding(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             tabs.forEachIndexed { index, item ->
-                Tab(
-                    selected = index == selectedTabIndex,
-                    onClick = {
-                        selectedTabIndex = index
-                    },
-                    text = {
-                        MarqueeText(text = stringResource(item.text))
-                    }
-                )
+                val selected = index == selectedTabIndex
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier.weight(1f)
+                        .background(if (selected) AlfaaMPCyan.copy(alpha = 0.14f) else Color.Transparent, RoundedCornerShape(12.dp))
+                        .border(1.dp, if (selected) AlfaaMPCyan.copy(alpha = 0.65f) else AlfaaMPBorder, RoundedCornerShape(12.dp))
+                        .clickable { selectedTabIndex = index }
+                        .padding(horizontal = 8.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MarqueeText(text = stringResource(item.text))
+                }
             }
         }
 
@@ -470,10 +488,7 @@ private fun TitleTextLayout(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium
-        )
+        NeonText(text = title, size = 16.sp, color = AlfaaMPText, weight = FontWeight.ExtraBold)
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -487,9 +502,5 @@ private fun BodyText(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        modifier = modifier,
-        text = text,
-        style = MaterialTheme.typography.bodySmall
-    )
+    NeonText(modifier = modifier, text = text, size = 12.sp, color = AlfaaMPMuted)
 }
