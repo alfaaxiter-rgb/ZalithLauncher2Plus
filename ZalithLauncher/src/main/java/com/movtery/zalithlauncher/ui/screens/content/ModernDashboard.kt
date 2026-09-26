@@ -149,10 +149,15 @@ fun ModernDashboard(
                         AccountCard(
                             accountName = account?.username,
                             hasAccount = account != null,
-                            onAccountClick = onAccountClick
-                        ) {
-                            AccountAvatar(account = account, avatarSize = 48.dp, onClick = onAccountClick)
-                        }
+                            onAccountClick = onAccountClick,
+                            avatar = {
+                                AccountAvatar(
+                                    account = account,
+                                    avatarSize = 48.dp,
+                                    onClick = onAccountClick
+                                )
+                            }
+                        )
                         InstancesCard(
                             versions = versions,
                             selected = version,
@@ -577,14 +582,13 @@ private fun HeroCard(
 
 @Composable
 private fun AccountCard(
-    modifier: Modifier = Modifier,
     accountName: String?,
     hasAccount: Boolean,
     onAccountClick: () -> Unit,
     avatar: @Composable () -> Unit
 ) {
     NeonPanel(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onAccountClick),
         accent = AlfaaGreen
