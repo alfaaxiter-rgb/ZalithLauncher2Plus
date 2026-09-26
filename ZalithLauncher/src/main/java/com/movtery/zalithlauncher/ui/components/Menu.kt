@@ -28,6 +28,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +56,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,6 +70,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContentColor
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -731,18 +733,25 @@ fun MenuButtonLayout(
         scale.animateTo(targetValue = 1f, animationSpec = getAnimateTween())
     }
 
-    Surface(
-        modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        enabled = enabled,
-        onClick = onClick
-    ) {
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
         Row(
-            modifier = Modifier
+            modifier = modifier
+                .graphicsLayer(scaleY = scale.value, scaleX = scale.value)
                 .fillMaxWidth()
-                .backgroundGlass(blur, color, influencedByBackground),
+                .clip(shape)
+                .background(color)
+                .border(
+                    width = 1.dp,
+                    color = if (enabled) Color(0xFF20E0B2).copy(alpha = 0.42f) else Color(0xFF16483F).copy(alpha = 0.28f),
+                    shape = shape
+                )
+                .backgroundGlass(blur, color, influencedByBackground)
+                .clickable(
+                    enabled = enabled,
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = onClick
+                ),
             horizontalArrangement = horizontalArrangement,
             verticalAlignment = verticalAlignment,
             content = content
