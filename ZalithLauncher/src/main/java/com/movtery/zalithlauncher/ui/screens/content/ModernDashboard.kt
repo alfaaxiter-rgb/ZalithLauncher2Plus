@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -166,16 +165,11 @@ fun ModernDashboard(
                             }
                         )
                         InstancesCard(
-                            modifier = Modifier.weight(1.45f),
+                            modifier = Modifier.weight(1f),
                             versions = versions,
                             selected = version,
                             muted = AlfaaMuted,
                             onVersionsClick = onVersionsClick
-                        )
-                        ResourceModsCard(
-                            modifier = Modifier.weight(0.72f),
-                            version = version,
-                            onClick = onVersionSettingsClick
                         )
                     }
                 }
@@ -936,17 +930,12 @@ private fun QuickActions(
         Spacer(Modifier.height(9.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .horizontalScroll(
-                    rememberScrollState()
-                ),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
             ActionCard(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "VERSIONS",
                 subtitle = "MANAGE INSTANCES",
                 icon = R.drawable.ic_assignment_filled,
@@ -955,7 +944,7 @@ private fun QuickActions(
             )
 
             ActionCard(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "ACCOUNT",
                 subtitle = "MANAGE PROFILE",
                 icon = R.drawable.ic_person_outlined,
@@ -964,16 +953,16 @@ private fun QuickActions(
             )
 
             ActionCard(
-                modifier = Modifier.fillMaxHeight(),
-                title = "INSTANCE",
-                subtitle = "EDIT SELECTED",
-                icon = R.drawable.ic_settings_filled,
-                accent = AlfaaPurple,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                title = "RESOURCES",
+                subtitle = "MODS / PACKS",
+                icon = R.drawable.ic_extension_outlined,
+                accent = AlfaaOrange,
                 onClick = onVersionSettingsClick
             )
 
             ActionCard(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "SETTINGS",
                 subtitle = "LAUNCHER OPTIONS",
                 icon = R.drawable.ic_settings_filled,
@@ -998,7 +987,6 @@ private fun ActionCard(
 
     Box(
         modifier = modifier
-            .width(148.dp)
             .heightIn(min = 88.dp)
             .shadow(
                 elevation = 8.dp,
