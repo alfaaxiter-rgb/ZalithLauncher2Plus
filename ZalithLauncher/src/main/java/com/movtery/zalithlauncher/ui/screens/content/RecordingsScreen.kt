@@ -29,6 +29,7 @@ import android.provider.MediaStore
 import android.text.format.Formatter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,18 +44,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,13 +63,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.RecordingPlayerOverlay
@@ -128,8 +127,8 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = stringResource(R.string.generic_loading),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Medium),
+                        color = AlfaaMuted
                     )
                 }
             } else if (recordings.isEmpty()) {
@@ -139,13 +138,13 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                             painter = painterResource(R.drawable.ic_videocam_outlined),
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                            tint = AlfaaMuted.copy(alpha = 0.4f)
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
                             text = stringResource(R.string.recordings_empty),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
+                            color = AlfaaMuted
                         )
                     }
                 }
@@ -240,7 +239,7 @@ fun RecordingsScreen(backStackViewModel: ScreenBackStackViewModel) {
                     }) {
                         Text(
                             stringResource(R.string.generic_delete),
-                            color = MaterialTheme.colorScheme.error
+                            color = AlfaaError
                         )
                     }
                 },
@@ -279,7 +278,7 @@ private fun RecordingCard(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(onLongClick = { menuExpanded = true }, onClick = onPlay),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(16.dp),
         tonalElevation = 2.dp
     ) {
         Row(
@@ -290,7 +289,7 @@ private fun RecordingCard(
                 modifier = Modifier
                     .width(120.dp)
                     .aspectRatio(16f / 9f)
-                    .clip(MaterialTheme.shapes.small)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
@@ -306,7 +305,7 @@ private fun RecordingCard(
                         painter = painterResource(R.drawable.ic_videocam_outlined),
                         contentDescription = null,
                         modifier = Modifier.size(32.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        tint = AlfaaMuted.copy(alpha = 0.4f)
                     )
                 }
             }
@@ -316,7 +315,7 @@ private fun RecordingCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = entry.displayName.removeSuffix(".mp4"),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Medium).copy(fontWeight = FontWeight.Medium),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -333,14 +332,14 @@ private fun RecordingCard(
                 }
                 Text(
                     text = parts.joinToString(" \u00b7 "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = TextStyle(fontSize = 11.sp),
+                    color = AlfaaMuted
                 )
             }
 
             Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(painterResource(R.drawable.ic_more_vert), contentDescription = null)
+                Box(Modifier.size(42.dp).clip(RoundedCornerShape(12.dp)).background(AlfaaPanel2).border(1.dp, AlfaaBorder, RoundedCornerShape(12.dp)).clickable { menuExpanded = true }, contentAlignment = Alignment.Center) {
+                    Icon(painterResource(R.drawable.ic_more_vert), null, Modifier.size(20.dp), tint = AlfaaPrimary)
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
@@ -370,14 +369,14 @@ private fun RecordingCard(
                         text = {
                             Text(
                                 stringResource(R.string.generic_delete),
-                                color = MaterialTheme.colorScheme.error
+                                color = AlfaaError
                             )
                         },
                         leadingIcon = {
                             Icon(
                                 painterResource(R.drawable.ic_delete_outlined),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error
+                                tint = AlfaaError
                             )
                         },
                         onClick = { menuExpanded = false; onDelete() }
@@ -467,4 +466,18 @@ private fun shareRecording(context: Context, uri: Uri) {
     runCatching { context.startActivity(Intent.createChooser(intent, null).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }) }
+}
+
+
+private val AlfaaPanel = Color(0xFF0B1118)
+private val AlfaaPanel2 = Color(0xFF101923)
+private val AlfaaBorder = Color(0xFF16483F)
+private val AlfaaMuted = Color(0xFF829A98)
+private val AlfaaError = Color(0xFFFF5577)
+private val AlfaaPrimary = Color(0xFF20E0B2)
+
+@Composable private fun NeonRecordingAction(icon: androidx.compose.ui.graphics.painter.Painter, label: String, color: Color = Color(0xFFE8FFF8), onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable(onClick=onClick).padding(10.dp), verticalAlignment=Alignment.CenterVertically) {
+        Icon(icon, null, Modifier.size(18.dp), tint=color); Spacer(Modifier.width(10.dp)); BasicText(label, style=TextStyle(color=color,fontSize=12.sp,fontWeight=FontWeight.Bold))
+    }
 }
