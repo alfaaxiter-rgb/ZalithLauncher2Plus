@@ -937,7 +937,7 @@ private fun QuickActions(
             ActionCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "VERSIONS",
-                subtitle = "MANAGE INSTANCES",
+                subtitle = "INSTANCES",
                 icon = R.drawable.ic_assignment_filled,
                 accent = AlfaaGreen,
                 onClick = onVersionsClick
@@ -946,7 +946,7 @@ private fun QuickActions(
             ActionCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "ACCOUNT",
-                subtitle = "MANAGE PROFILE",
+                subtitle = "PROFILE",
                 icon = R.drawable.ic_person_outlined,
                 accent = AlfaaCyan,
                 onClick = onAccountClick
@@ -955,7 +955,7 @@ private fun QuickActions(
             ActionCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "MODS / PACKS",
-                subtitle = "RESOURCEPACKS + MODS",
+                subtitle = "RESOURCES",
                 icon = R.drawable.ic_extension_outlined,
                 accent = AlfaaOrange,
                 onClick = onVersionSettingsClick
@@ -964,7 +964,7 @@ private fun QuickActions(
             ActionCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 title = "SETTINGS",
-                subtitle = "LAUNCHER OPTIONS",
+                subtitle = "LAUNCHER",
                 icon = R.drawable.ic_settings_filled,
                 accent = AlfaaOrange,
                 onClick = onSettingsClick
@@ -1013,56 +1013,49 @@ private fun ActionCard(
     ) {
 
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Box(
                 modifier = Modifier
-                    .size(39.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        accent.copy(alpha = .09f)
-                    )
-                    .border(
-                        1.dp,
-                        accent.copy(alpha = .25f),
-                        RoundedCornerShape(12.dp)
-                    ),
+                    .size(46.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(accent.copy(alpha = .10f))
+                    .border(1.dp, accent.copy(alpha = .32f), RoundedCornerShape(14.dp)),
                 contentAlignment = Alignment.Center
             ) {
-
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
                     tint = accent,
-                    modifier = Modifier.size(19.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
 
-            Spacer(Modifier.width(9.dp))
+            Spacer(Modifier.height(9.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Text(
+                text = title,
+                color = AlfaaText,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Black,
+                fontSize = 10.sp,
+                letterSpacing = .7.sp,
+                maxLines = 1
+            )
 
-                Text(
-                    text = title,
-                    color = AlfaaText,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 9.sp,
-                    maxLines = 1
-                )
+            Spacer(Modifier.height(3.dp))
 
-                Spacer(Modifier.height(2.dp))
-
-                Text(
-                    text = subtitle,
-                    color = AlfaaMuted,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 6.sp,
-                    maxLines = 2
-                )
-            }
+            Text(
+                text = subtitle,
+                color = accent.copy(alpha = .78f),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                fontSize = 6.sp,
+                letterSpacing = .45.sp,
+                maxLines = 1
+            )
         }
     }
 }
