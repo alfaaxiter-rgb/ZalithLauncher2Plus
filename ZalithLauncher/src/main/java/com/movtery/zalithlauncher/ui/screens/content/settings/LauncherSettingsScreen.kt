@@ -24,6 +24,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -66,6 +68,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -1047,35 +1051,99 @@ private fun CustomBackground(
     }
 
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
                 .clickable { filePicker.launch(Unit) }
-                .padding(all = 16.dp),
+                .padding(horizontal = 4.dp, vertical = 8.dp),
         ) {
             TitleAndSummary(
                 title = stringResource(R.string.settings_launcher_background_title),
                 summary = stringResource(R.string.settings_launcher_background_summary),
             )
+
+            if (backgroundViewModel.isValid) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = if (backgroundViewModel.isVideo) {
+                        "VIDEO // ACTIVE"
+                    } else {
+                        "IMAGE // ACTIVE"
+                    },
+                    color = Color(0xFF20E0B2),
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+                    letterSpacing = 0.8.sp
+                )
+            } else {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "PHOTO / VIDEO // TAP TO SELECT",
+                    color = Color(0xFF43C7FF),
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+                    letterSpacing = 0.7.sp
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF20E0B2).copy(alpha = 0.08f))
+                .border(
+                    width = 1.dp,
+                    color = Color(0xFF20E0B2).copy(alpha = 0.35f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .clickable { filePicker.launch(Unit) }
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+        ) {
+            Text(
+                text = if (backgroundViewModel.isValid) "CHANGE" else "SELECT",
+                color = Color(0xFF20E0B2),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                fontSize = 8.sp,
+                letterSpacing = 0.8.sp
+            )
         }
 
         AnimatedVisibility(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(start = 2.dp),
             visible = backgroundViewModel.isValid
         ) {
-            IconTextButton(
-                painter = painterResource(R.drawable.ic_restart_alt),
-                text = stringResource(R.string.generic_reset),
-                onClick = {
-                    if (operation == BackgroundOperation.None) {
-                        operation = BackgroundOperation.PreReset
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFFF5577).copy(alpha = 0.08f))
+                    .border(
+                        width = 1.dp,
+                        color = Color(0xFFFF5577).copy(alpha = 0.30f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clickable {
+                        if (operation == BackgroundOperation.None) {
+                            operation = BackgroundOperation.PreReset
+                        }
                     }
-                }
-            )
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
+            ) {
+                Text(
+                    text = "RESET",
+                    color = Color(0xFFFF5577),
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+                    letterSpacing = 0.7.sp
+                )
+            }
         }
     }
 }
