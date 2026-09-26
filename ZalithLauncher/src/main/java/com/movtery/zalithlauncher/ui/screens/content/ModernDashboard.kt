@@ -919,7 +919,7 @@ private fun QuickActions(
             Spacer(Modifier.weight(1f))
 
             Text(
-                text = "SWIPE →",
+                text = "4 MODULES",
                 color = AlfaaPurple,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 7.sp,
@@ -954,8 +954,8 @@ private fun QuickActions(
 
             ActionCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                title = "RESOURCES",
-                subtitle = "MODS / PACKS",
+                title = "MODS / PACKS",
+                subtitle = "RESOURCEPACKS + MODS",
                 icon = R.drawable.ic_extension_outlined,
                 accent = AlfaaOrange,
                 onClick = onVersionSettingsClick
