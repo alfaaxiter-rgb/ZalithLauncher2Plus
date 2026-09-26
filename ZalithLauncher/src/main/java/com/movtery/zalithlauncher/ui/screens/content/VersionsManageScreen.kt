@@ -115,15 +115,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-private val AlfaaVMBlack = Color(0xFF050608)
-private val AlfaaVMPanel = Color(0xFF0A0D11)
-private val AlfaaVMPanel2 = Color(0xFF10141A)
-private val AlfaaVMBorder = Color(0xFF1D252E)
-private val AlfaaVMCyan = Color(0xFF00E5FF)
-private val AlfaaVMGreen = Color(0xFF00FF9C)
-private val AlfaaVMPurple = Color(0xFF9B6CFF)
-private val AlfaaVMText = Color(0xFFF3F7FA)
-private val AlfaaVMMuted = Color(0xFF8B96A3)
+private val AlfaaVMBlack = Color(0xFF05080D)
+private val AlfaaVMPanel = Color(0xFF0B1118)
+private val AlfaaVMPanel2 = Color(0xFF101923)
+private val AlfaaVMBorder = Color(0xFF16483F)
+private val AlfaaVMCyan = Color(0xFF43C7FF)
+private val AlfaaVMGreen = Color(0xFF20E0B2)
+private val AlfaaVMPurple = Color(0xFFA78BFA)
+private val AlfaaVMText = Color(0xFFE8FFF8)
+private val AlfaaVMMuted = Color(0xFF829A98)
 
 private class VersionsScreenViewModel : ViewModel() {
 
