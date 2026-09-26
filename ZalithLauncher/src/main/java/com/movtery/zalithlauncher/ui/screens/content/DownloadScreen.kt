@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -291,14 +292,17 @@ private fun DownloadSidebar(
                             Text(
                                 text = "DOWNLOAD",
                                 color = Color.White,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 17.sp,
+                                letterSpacing = 1.4.sp,
+                                fontWeight = FontWeight.Black
                             )
 
                             Text(
                                 text = "Explore Minecraft content",
                                 color = Color(0xFF7E8794),
-                                style = MaterialTheme.typography.labelSmall
+                                fontSize = 10.sp,
+                                letterSpacing = 0.8.sp,
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
@@ -312,8 +316,9 @@ private fun DownloadSidebar(
             Text(
                 text = "CONTENT",
                 color = NeonColors.CyanBright,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
+                fontSize = 10.sp,
+                letterSpacing = 1.8.sp,
+                fontWeight = FontWeight.Black,
                 modifier = Modifier.padding(
                     horizontal = 10.dp,
                     vertical = 4.dp
@@ -439,7 +444,8 @@ private fun DownloadSidebarItem(
                 } else {
                     Color(0xFF9AA2AE)
                 },
-                style = MaterialTheme.typography.labelMedium,
+                fontSize = 13.sp,
+                letterSpacing = 0.25.sp,
                 fontWeight = if (selected) {
                     FontWeight.Bold
                 } else {
