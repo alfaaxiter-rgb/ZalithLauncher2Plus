@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -127,12 +128,13 @@ fun ModernDashboard(
                         verticalArrangement = Arrangement.spacedBy(9.dp)
                     ) {
                         HeroCard(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1.55f),
                             accountName = account?.username,
                             version = version,
                             onLaunchGame = onLaunchGame
                         )
                         QuickActions(
+                            modifier = Modifier.weight(0.85f),
                             panel = AlfaaPanel2,
                             border = AlfaaBorder,
                             onVersionsClick = onVersionsClick,
@@ -159,12 +161,14 @@ fun ModernDashboard(
                             }
                         )
                         InstancesCard(
+                            modifier = Modifier.weight(1.45f),
                             versions = versions,
                             selected = version,
                             muted = AlfaaMuted,
                             onVersionsClick = onVersionsClick
                         )
                         ResourceModsCard(
+                            modifier = Modifier.weight(0.72f),
                             version = version,
                             onClick = onVersionSettingsClick
                         )
@@ -718,19 +722,18 @@ private fun InstancesCard(
 
         Spacer(Modifier.height(9.dp))
 
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(
-                    rememberScrollState()
-                ),
-            horizontalArrangement = Arrangement.spacedBy(7.dp)
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
             versions
                 .take(8)
                 .forEach { item ->
                     InstanceChip(
+                        modifier = Modifier.fillMaxWidth(),
                         version = item,
                         selected = item == selected,
                         muted = muted,
@@ -739,6 +742,7 @@ private fun InstancesCard(
                 }
 
             AddInstanceChip(
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onVersionsClick
             )
         }
@@ -747,6 +751,7 @@ private fun InstancesCard(
 
 @Composable
 private fun InstanceChip(
+    modifier: Modifier = Modifier,
     version: Version,
     selected: Boolean,
     muted: Color,
@@ -756,8 +761,8 @@ private fun InstanceChip(
     val shape = RoundedCornerShape(15.dp)
 
     Box(
-        modifier = Modifier
-            .width(165.dp)
+        modifier = modifier
+            .fillMaxWidth()
             .height(70.dp)
             .clip(shape)
             .background(
@@ -832,11 +837,12 @@ private fun InstanceChip(
 
 @Composable
 private fun AddInstanceChip(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .width(105.dp)
+        modifier = modifier
+            .fillMaxWidth()
             .height(70.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(
@@ -879,6 +885,7 @@ private fun AddInstanceChip(
 
 @Composable
 private fun QuickActions(
+    modifier: Modifier = Modifier,
     panel: Color,
     border: Color,
     onVersionsClick: () -> Unit,
@@ -887,7 +894,7 @@ private fun QuickActions(
     onSettingsClick: () -> Unit
 ) {
     NeonPanel(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         accent = AlfaaPurple
     ) {
 
@@ -916,6 +923,7 @@ private fun QuickActions(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
                 .horizontalScroll(
                     rememberScrollState()
                 ),
@@ -923,6 +931,7 @@ private fun QuickActions(
         ) {
 
             ActionCard(
+                modifier = Modifier.fillMaxHeight(),
                 title = "VERSIONS",
                 subtitle = "MANAGE INSTANCES",
                 icon = R.drawable.ic_assignment_filled,
@@ -931,6 +940,7 @@ private fun QuickActions(
             )
 
             ActionCard(
+                modifier = Modifier.fillMaxHeight(),
                 title = "ACCOUNT",
                 subtitle = "MANAGE PROFILE",
                 icon = R.drawable.ic_person_outlined,
@@ -939,6 +949,7 @@ private fun QuickActions(
             )
 
             ActionCard(
+                modifier = Modifier.fillMaxHeight(),
                 title = "INSTANCE",
                 subtitle = "EDIT SELECTED",
                 icon = R.drawable.ic_settings_filled,
@@ -947,6 +958,7 @@ private fun QuickActions(
             )
 
             ActionCard(
+                modifier = Modifier.fillMaxHeight(),
                 title = "SETTINGS",
                 subtitle = "LAUNCHER OPTIONS",
                 icon = R.drawable.ic_settings_filled,
@@ -959,6 +971,7 @@ private fun QuickActions(
 
 @Composable
 private fun ActionCard(
+    modifier: Modifier = Modifier,
     title: String,
     subtitle: String,
     icon: Int,
@@ -968,9 +981,9 @@ private fun ActionCard(
     val shape = RoundedCornerShape(16.dp)
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(148.dp)
-            .height(88.dp)
+            .heightIn(min = 88.dp)
             .shadow(
                 elevation = 8.dp,
                 shape = shape,
