@@ -693,10 +693,11 @@ private fun InstancesCard(
         modifier = modifier.fillMaxWidth(),
         accent = AlfaaCyan
     ) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
             SectionTitle(
                 text = "INSTANCES",
@@ -889,6 +890,7 @@ private fun AddInstanceChip(
                 letterSpacing = .3.sp
             )
         }
+        }
     }
 }
 
@@ -910,10 +912,11 @@ private fun QuickActions(
         modifier = modifier.fillMaxWidth(),
         accent = AlfaaPurple
     ) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
             SectionTitle(
                 text = "QUICK ACTIONS",
@@ -978,6 +981,7 @@ private fun QuickActions(
                 accent = AlfaaOrange,
                 onClick = onSettingsClick
             )
+        }
         }
     }
 }
